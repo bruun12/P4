@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production  
+    volumes:
+      - .:/src  
+    command: python src/main.py
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test  # if you have a test stage
+    volumes:
+      - .:/src
+    command: pytest tests/ -v
