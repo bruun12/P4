@@ -1,4 +1,3 @@
-
 from enum import Enum
 source = "integer x = 5 ;"
 tokens = []
@@ -7,7 +6,7 @@ tokens = []
 
 
 KEYWORDS = {
-    "ingeger": "INTEGER",
+    "integer": "INTEGER",
 }
 
 class Token:
@@ -59,7 +58,27 @@ class Lexer:
 
     #Function to read number; can be integer or float
     def read_number(self):
-                return
+        start = self.position
+        
+        # Check if we haven't reached the end of the source
+        """
+        while self.position < len(self.source):
+            char = self.peek_next_char()
+            if char.isdigit() or char == '.':
+                self.advance()
+            else:
+                break
+        
+        number_str = self.source[start:self.position]
+        """
+        number_str = self.source[start:3]
+
+        if not number_str:  # Handle empty string case
+            return None  # or raise an error
+        
+        if '.' in number_str:
+            return float(number_str)
+        return int(number_str)
 
     #Function to read identifier and check if identifier is a keyword
     def read_identifier(self):
@@ -68,6 +87,7 @@ class Lexer:
     #Function to read strings, denoted by quotes
     def read_string(self):
         return
+    
     def lexer(self):
         while(self.position < self.length):
             char = source[self.position]
