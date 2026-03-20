@@ -64,10 +64,10 @@ class Lexer:
     #Function to skip block comments
     def skip_comment(self):
         # '/' or '*' \n */  /* */
-        while (self.current_char != '*' or self.peek_next_char != '/'):
+        while (self.current_char() != '*' or self.peek_next_char() != '/'):
                 if self.position >= self.length:
                     raise MyCustomError("Comment is never ended, please put */", 420)
-                self.advance
+                self.advance()
 
     #Function to read number; can be integer or float
     def read_number(self):
