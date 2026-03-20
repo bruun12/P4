@@ -32,7 +32,7 @@ class Lexer:
     def __init__(self, source: str):
         self.source = source
         self.length = len(source)
-        self.self.position = 0
+        self.position = 0
         self.line = 1
         self.column = 1
 
@@ -71,7 +71,7 @@ class Lexer:
 
     #Function to read number; can be integer or float
     def read_number(self):
-        return
+                return
 
     #Function to read identifier and check if identifier is a keyword
     def read_identifier(self):
@@ -80,7 +80,6 @@ class Lexer:
     #Function to read strings, denoted by quotes
     def read_string(self):
         return
-
     def lexer(self):
         while(self.position < self.length):
             char = source[self.position]
