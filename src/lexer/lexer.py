@@ -1,7 +1,10 @@
-import sys
+
 from enum import Enum
 source = "integer x = 5 ;"
 tokens = []
+
+
+
 
 KEYWORDS = {
     "ingeger": "INTEGER",
@@ -27,23 +30,44 @@ class Lexer:
 
     #Function for finding current char in source
     def current_char(self):
-        return
+        if self.position >= self.length:
+            return None
+        return self.source[self.position]
 
     #Function for viewing the next char in source
     def peek_next_char(self):
-        return
+        if self.position+1 >= self.length:
+            return None
+        return self.source[self.position+1]
 
     #Function for advancing for whitespace and next line
     def advance(self):
-        return
+        if self.current_char().isspace():
+            while(self.current_char().isspace() and self.self.position <= self.length):
+                self.position+=1
+                self.line+=1
+        if self.current_char() == "\n":
+            while(self.current_char() == "\n" and self.self.position <= self.length):
+                self.position+=1
+                self.column+=1
+        print(self.position)
+
 
     #Function to skip block comments
     def skip_block_comment(Self):
         return
 
+    #Function to read number; can be integer or float
     def read_number(self):
+                return
+
+    #Function to read identifier and check if identifier is a keyword
+    def read_identifier(self):
         return
-        
+
+    #Function to read strings, denoted by quotes
+    def read_string(self):
+        return
     def lexer(self):
         while(self.position < self.length):
             char = source[self.position]
