@@ -42,15 +42,17 @@ class Lexer:
 
     #Function for advancing for whitespace and next line
     def advance(self):
-        if self.current_char().isspace():
-            while(self.current_char().isspace() and self.self.position <= self.length):
-                self.position+=1
-                self.line+=1
-        if self.current_char() == "\n":
-            while(self.current_char() == "\n" and self.self.position <= self.length):
-                self.position+=1
-                self.column+=1
-        print(self.position)
+        ch = self.current_char()
+        if ch is None:
+            return None
+
+        self.position += 1
+        if ch == "\n":
+            self.line += 1
+            self.column = 1
+        else:
+            self.column += 1
+        return ch
 
 
     #Function to skip block comments
@@ -59,7 +61,7 @@ class Lexer:
 
     #Function to read number; can be integer or float
     def read_number(self):
-                return
+        return
 
     #Function to read identifier and check if identifier is a keyword
     def read_identifier(self):
