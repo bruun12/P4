@@ -1,0 +1,34 @@
+Prog            -> FuncList                                 OK                             
+FuncList        -> FuncDef | FuncDef FuncList               FÆLLES PRÆFIX(FP)
+FuncDef         -> Type Idf (ParamList){Stm}                OK            
+ParamList       -> Param |                                  OK
+Param           -> Type Idf | Param, Param                  VENSTRE REKURSION(VR)
+Idf             -> ???                                      ??
+Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
+                    | Idf = Exp | Idf = Arr                 FP    
+                    | Stm_1Stm_2| return Exp;               VR
+                    | break; | if(Exp){Stm_1}else{Stm_2}    OK
+                    | while(Exp){Stm} |                     OK
+Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
+                    | Exp_1 + Exp_2 |Exp_1 * Exp_2          VR & FP
+                    | Exp_1 - Exp_2 |Exp_1/Exp_2            VR & FP
+                    | Exp_1 MOD Exp_2 | (Exp)               VR & FP
+                    | Exp_1 == Exp_2 | Exp_1 != Exp_2       VR & FP
+                    | Exp_1 <= Exp_2 | Exp_1 >= Exp_2       VR & FP
+                    | Exp_1 < Exp_2 | Exp_1 > Exp_2         VR & FP
+                    | Exp_1 AND Exp_2 | Exp_1 OR Exp_2      VR & FP
+                    |!Exp                                   OK
+Type            -> integer | doubleFloatingPoint            OK
+                    | character | string                    OK
+                    | boolean | void                        OK
+Nat             -> 0 | ... | 9 | Nat0 | ... | Nat9          VR & FP
+Int             -> Nat | -Int                               OK
+DoubleFloat     -> Int.Nat                                  OK
+Bool            -> TRUE | FALSE                             OK
+ASCII           -> Everything in ascii table                ??
+Char            -> 'ASCII'                                  OK
+FormatString    -> "String" |""                             FP?
+String          -> ASCII | String_1 + String_2              VR
+Arr             -> [ArrElems] | []                          FP?
+ArrElems        -> ArrElem | ArrElem, ArrElems              VR
+ArrElem         -> Exp | String | Arr                       OK
