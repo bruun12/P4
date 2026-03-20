@@ -73,14 +73,19 @@ class Lexer:
             if char.isdigit() or char == '.':
                 self.advance()
             else:
-                self.advance()
                 break
         
+        self.advance()
+
         number_str = self.source[start:self.position]
 
-        if not number_str:  # Handle empty string case
-            return None  # or raise an error
-        
+        ##
+        #TODO: insert error handling
+        ##
+        if number_str.count(".") > 1:
+            print("Invalid Number")
+            return None
+
         if '.' in number_str:
             return float(number_str)
         return int(number_str)
