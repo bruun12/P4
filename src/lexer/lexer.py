@@ -21,7 +21,7 @@ class Lexer:
     def __init__(self, source: str):
         self.source = source
         self.length = len(source)
-        self.self.position = 0
+        self.position = 0
         self.line = 1
         self.column = 1
 
@@ -42,6 +42,7 @@ class Lexer:
         return
 
     def read_number(self):
+        return
         
     def lexer(self):
         while(self.position < self.length):
