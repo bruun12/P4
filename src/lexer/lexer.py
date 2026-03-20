@@ -58,22 +58,25 @@ class Lexer:
     def skip_block_comment(Self):
         return
 
+    ##
     #Function to read number; can be integer or float
+    ##
     def read_number(self):
         start = self.position
         
         # Check if we haven't reached the end of the source
-        """
         while self.position < len(self.source):
             char = self.peek_next_char()
+            # check is needed because we are peaking at a char that doesn't exist
+            if char is None:
+                break
             if char.isdigit() or char == '.':
                 self.advance()
             else:
+                self.advance()
                 break
         
         number_str = self.source[start:self.position]
-        """
-        number_str = self.source[start:3]
 
         if not number_str:  # Handle empty string case
             return None  # or raise an error
