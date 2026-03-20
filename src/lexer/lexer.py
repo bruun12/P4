@@ -65,7 +65,7 @@ class Lexer:
     def skip_comment(self):
         # '/' or '*' \n */  /* */
         while (self.current_char != '*' or self.peek_next_char != '/'):
-                if self.position <= self.length:
+                if self.position >= self.length:
                     raise MyCustomError("Comment is never ended, please put */", 420)
                 self.advance
 
