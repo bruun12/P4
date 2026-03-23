@@ -1,4 +1,4 @@
-from src.lexer.lexer import Lexer
+from lexer.lexer import Lexer
 
 def test_skip_comment_with_inline_comment():
     #string = "int x = 20 // initilizing x"

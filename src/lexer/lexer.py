@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.error_handling import LexerError
+from error_handling import LexerError
 source = "integer x = 5 ;"
 tokens = []
 

@@ -1,7 +1,7 @@
 import pytest
 
-from src.lexer.lexer import Lexer
-from src.error_handling import LexerError
+from lexer.lexer import Lexer
+from error_handling import LexerError
 
 def test_read_number_with_int_input():
     lex = Lexer("123")
