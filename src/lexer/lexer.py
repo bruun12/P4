@@ -1,9 +1,8 @@
 from enum import Enum
+
+from src.error_handling import LexerError
 source = "integer x = 5 ;"
 tokens = []
-
-
-
 
 KEYWORDS = {
     "integer": "INTEGER",
@@ -79,12 +78,8 @@ class Lexer:
 
         number_str = self.source[start:self.position]
 
-        ##
-        #TODO: insert error handling
-        ##
         if number_str.count(".") > 1:
-            print("Invalid Number")
-            return None
+            raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
 
         if '.' in number_str:
             return float(number_str)
@@ -99,6 +94,8 @@ class Lexer:
     def read_string(self):
         return
     
+
+    #
     def lexer(self):
         while(self.position < self.length):
             char = source[self.position]
@@ -106,10 +103,7 @@ class Lexer:
             if char.isspace():
                 self.position+=1
             elif char.isdigit():
-                start = self.position
-                while self.position < self.length and source[self.position].isdigit():
-                    self.position+=1
-                value = source[start:self.position]
+                value = self.read_number()
                 tokens.append(("NUMBER", value))
             elif char.isalpha():
                 start = 0
