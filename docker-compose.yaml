@@ -7,9 +7,9 @@ services:
     volumes:
       - .:/app
     environment:
-      - PYTHONPATH=/app
-    working_dir: /app
-    command: python src/main.py
+      - PYTHONPATH=/app/src
+    working_dir: /app/src
+    command: python main.py
 
   test:
     build:
@@ -19,6 +19,6 @@ services:
     volumes:
       - .:/app
     environment:
-      - PYTHONPATH=/app
-    working_dir: /app
-    command: pytest tests/ -v
+      - PYTHONPATH=/app/src
+    working_dir: /app/tests
+    command: pytest -v
