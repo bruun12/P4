@@ -78,6 +78,15 @@ class Token:
         self.column = column
 
 
+class MyCustomError(Exception):
+    def __init__(self, message, error_code):
+         super().__init__(message)
+         self.message = message
+         self.error_code = error_code
+    
+    def __str__(self):
+        return f"{self.message} (Error code: {self.error_code})"
+
 class Lexer:
 
     def __init__(self, source: str):
@@ -115,10 +124,17 @@ class Lexer:
 
 
     #Function to skip block comments
-    def skip_block_comment(self):
-        return
+    def skip_comment(self):
 
-    ##
+        while (self.current_char() != '*' or self.peek_next_char() != '/'):
+            if self.position >= self.length:
+                raise LexerError("Comment is never ended, please put */", 420)
+            self.advance()  
+        self.advance()
+        self.advance()
+        return self.current_char()
+ 
+        
     #Function to read number; can be integer or float
     ##
     def read_number(self):
