@@ -74,13 +74,6 @@ class Token:
         self.value = value
         self.row = row
         self.column = column
-
-
-class MyCustomError(Exception):
-    def __init__(self, message, error_code):
-         super().__init__(message)
-         self.message = message
-         self.error_code = error_code
     
     def __str__(self):
         return f"{self.message} (Error code: {self.error_code})"
@@ -93,6 +86,7 @@ class Lexer:
         self.position = 0
         self.line = 1
         self.column = 1
+        self.tokens = []
 
     #Function for finding current char in source
     def current_char(self):
@@ -157,8 +151,10 @@ class Lexer:
             raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
 
         if '.' in number_str:
-            return float(number_str)
-        return int(number_str)
+            self.add_token(Token(TokenType.FLOAT, float(number_str), self.line, self.column))
+        else:
+            self.add_token(Token(TokenType.INTEGER, int(number_str), self.line, self.column))
+        return
 
 
     #Function to read identifier and check if identifier is a keyword
@@ -179,6 +175,8 @@ class Lexer:
     def read_string(self):
         return
     
+    def add_token(self, token):
+        self.tokens.append(token)
 
     #
     def lexer(self):
