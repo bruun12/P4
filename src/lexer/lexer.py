@@ -2,8 +2,8 @@ from enum import Enum, auto
 
 from error_handling import LexerError
 
-source = "integer x = 5 ;"
-tokens = []
+#source = "integer x = 5 ;"
+#tokens = []
 
 
 class TokenType(Enum):
