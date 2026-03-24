@@ -1,8 +1,7 @@
-from enum import Enum
+from enum import Enum, auto
 
 from error_handling import LexerError
 
-from enum import Enum, auto
 source = "integer x = 5 ;"
 tokens = []
 
@@ -55,7 +54,6 @@ class TokenType(Enum):
     SEMICOLON = auto()
 
 KEYWORDS = {
-    "integer": "INTEGER",
     "integer": TokenType.INTEGER,
     "double floating point": TokenType.FLOAT,
     "if": TokenType.IF,
