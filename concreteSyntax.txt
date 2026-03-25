@@ -1,8 +1,12 @@
+                                                            FÆLLES PRÆFIX(FP)
+                                                            VENSTRE REKURSIV(VR)
+
 Prog            -> FuncList                                 OK                             
-FuncList        -> FuncDef | FuncDef FuncList               FÆLLES PRÆFIX(FP)
+FuncList        -> FuncDef | FuncDef FuncList               FP
 FuncDef         -> Type Idf (ParamList){Stm}                OK            
 ParamList       -> Param |                                  OK
-Param           -> Type Idf | Param, Param                  VENSTRE REKURSION(VR)
+Param           -> ParamA| ParamA, Param                    FP
+ParamA          -> Type Idf
 Idf             -> ???                                      ??
 Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
                     | Idf = Exp | Idf = Arr                 FP    
