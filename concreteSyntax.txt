@@ -2,8 +2,9 @@
                                                             VENSTRE REKURSIV(VR)
 
 Prog            -> FuncList                                 OK                             
-FuncList        -> FuncDef | FuncDef FuncList               FP
-FuncDef         -> Type Idf (ParamList){Stm}                OK            
+FuncList        -> FuncDef FuncListA                        OK
+FuncListA       -> FuncDef FuncList                         OK
+FuncDef         -> Type Idf (ParamList){Stm}                OK    
 ParamList       -> Param |                                  OK
 Param           -> ParamA| ParamA, Param                    FP
 ParamA          -> Type Idf
