@@ -175,11 +175,11 @@ class Lexer:
         return token()
         
 
-    #Function to read strings, denoted by quotes
+    #Function to read strings, denoted by quotes "hello"
     def read_string(self):
+        self.advance()
         start_line = self.line
         start_col = self.column
-        self.advance()
         start = self.position
         while (self.current_char() != '"'):
             if (self.position >= self.length):
