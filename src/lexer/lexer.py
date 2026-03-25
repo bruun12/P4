@@ -1,71 +1,9 @@
-from enum import Enum, auto
+from lexer.token import Token,TokenType
 
 from error_handling import LexerError
 
 source = "integer x = 5 ;"
 tokens = []
-
-
-class TokenType(Enum):
-    # Special
-    EOF = auto()
-
-    # Literals
-    IDENTIFIER = auto()
-    INTEGER = auto()
-    FLOAT = auto()
-    STRING = auto()
-
-    # Keywords
-    LET = auto()
-    IF = auto()
-    ELSE = auto()
-    WHILE = auto()
-    RETURN = auto()
-    TRUE = auto()
-    FALSE = auto()
-    NULL = auto()
-
-    # Operators
-    PLUS = auto()
-    MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
-    PERCENT = auto()
-
-    ASSIGN = auto()       # =
-    EQ = auto()           # ==
-    NE = auto()           # !=
-    LT = auto()           # <
-    LE = auto()           # <=
-    GT = auto()           # >
-    GE = auto()           # >=
-
-    AND = auto()          # &&
-    OR = auto()           # ||
-    NOT = auto()          # !
-
-    # Delimiters
-    LPAREN = auto()
-    RPAREN = auto()
-    LBRACE = auto()
-    RBRACE = auto()
-    COMMA = auto()
-    SEMICOLON = auto()
-
-KEYWORDS = {
-    "integer": TokenType.INTEGER,
-    "double": TokenType.FLOAT,
-    "if": TokenType.IF,
-    "else": TokenType.ELSE,
-    "and": TokenType.AND,
-    "or": TokenType.OR,
-    "while": TokenType.WHILE,
-    "return": TokenType.RETURN,
-    "true": TokenType.TRUE,
-    "false": TokenType.FALSE,
-    "null": TokenType.NULL
-}
 
 class Token:
 
@@ -74,16 +12,6 @@ class Token:
         self.value = value
         self.row = row
         self.column = column
-
-
-class MyCustomError(Exception):
-    def __init__(self, message, error_code):
-         super().__init__(message)
-         self.message = message
-         self.error_code = error_code
-    
-    def __str__(self):
-        return f"{self.message} (Error code: {self.error_code})"
 
 class Lexer:
 
@@ -135,7 +63,7 @@ class Lexer:
         
     #Function to read number; can be integer or float
     ##
-    def read_number(self):
+    def read_number(self) -> Token:
         start = self.position
         
         # Check if we haven't reached the end of the source
@@ -157,9 +85,11 @@ class Lexer:
             raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
 
         if '.' in number_str:
-            return float(number_str)
-        return int(number_str)
 
+            return Token(TokenType.FLOAT, float(number_str), self.line, self.column)
+        else:
+            return Token(TokenType.INTEGER, int(number_str), self.line, self.column)
+        
 
     #Function to read identifier or other keyword and return Token
     def read_identifier(self):
@@ -176,19 +106,44 @@ class Lexer:
             return Token(KEYWORDS[value], value, start_line, start_col)
         return Token(TokenType.IDENTIFIER, value, start_line, start_col)
 
-    #Function to read strings, denoted by quotes
+    #Function to read strings, denoted by quotes "hello"
     def read_string(self):
-        return
+
+        self.advance()
+        start_line = self.line
+        start_col = self.column
+        start = self.position
+        while (self.current_char() != '"'):
+            if (self.position >= self.length):
+                raise LexerError("Missing """, 6969)
+            self.advance()
+        self.advance
+        string = self.source[start:self.position]
+
+        return Token[TokenType.STRING,string, start_line, start_col]
+    def add_token(self, token):
+        self.tokens.append(token)
+
 
     #
     def lexer(self):
         while(self.position < self.length):
-            char = self.current_char
-            if char.isalpha() or char == "_":
-                tokens.append(self.read_identifier())
-            elif char == " ":
-                self.advance()
-                tokens.append(self.read_string)
 
+            char = self.source[self.position]
+            peek = self.peek_next_char()
+            if char.isdigit():
+                token = self.read_number()
+            elif char.isalpha():
+                token = self.read_identifier()
+            elif char == '"':
+                token = self.read_string()
+            elif char == '=' and peek != '=':
+                token = Token(TokenType.ASSIGN, '=', self.line, self.column)
+            elif char == '/' and peek == '*':
+                #If a comment is read continue to the next valid input
+                self.skip_comment()
+                continue
 
+            self.add_token(token)
 
+            self.advance()
