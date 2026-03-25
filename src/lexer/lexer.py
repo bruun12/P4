@@ -100,9 +100,20 @@ class Lexer:
         return token()
         
 
-    #Function to read strings, denoted by quotes
+    #Function to read strings, denoted by quotes "hello"
     def read_string(self):
-        return
+        self.advance()
+        start_line = self.line
+        start_col = self.column
+        start = self.position
+        while (self.current_char() != '"'):
+            if (self.position >= self.length):
+                raise LexerError("Missing """, 6969)
+            self.advance()
+        self.advance
+        string = self.source[start:self.position]
+
+        return Token[TokenType.STRING,string, start_line, start_col]
     
     def add_token(self, token):
         self.tokens.append(token)
