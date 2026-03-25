@@ -2,8 +2,8 @@ from enum import Enum, auto
 
 from error_handling import LexerError
 
-#source = "integer x = 5 ;"
-#tokens = []
+source = "integer x = 5 ;"
+tokens = []
 
 
 class TokenType(Enum):
@@ -55,7 +55,7 @@ class TokenType(Enum):
 
 KEYWORDS = {
     "integer": TokenType.INTEGER,
-    "double floating point": TokenType.FLOAT,
+    "double": TokenType.FLOAT,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
     "and": TokenType.AND,
@@ -74,6 +74,13 @@ class Token:
         self.value = value
         self.row = row
         self.column = column
+
+
+class MyCustomError(Exception):
+    def __init__(self, message, error_code):
+         super().__init__(message)
+         self.message = message
+         self.error_code = error_code
     
     def __str__(self):
         return f"{self.message} (Error code: {self.error_code})"
@@ -86,7 +93,6 @@ class Lexer:
         self.position = 0
         self.line = 1
         self.column = 1
-        self.tokens = []
 
     #Function for finding current char in source
     def current_char(self):
@@ -151,13 +157,11 @@ class Lexer:
             raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
 
         if '.' in number_str:
-            self.add_token(Token(TokenType.FLOAT, float(number_str), self.line, self.column))
-        else:
-            self.add_token(Token(TokenType.INTEGER, int(number_str), self.line, self.column))
-        return
+            return float(number_str)
+        return int(number_str)
 
 
-    #Function to read identifier and check if identifier is a keyword
+    #Function to read identifier or other keyword and return Token
     def read_identifier(self):
         start_line = self.line
         start_col = self.column
@@ -167,33 +171,24 @@ class Lexer:
             self.advance()
 
         value = self.source[start_pos:self.position]
-        
-        return token()
-        
+
+        if value in KEYWORDS:
+            return Token(KEYWORDS[value], value, start_line, start_col)
+        return Token(TokenType.IDENTIFIER, value, start_line, start_col)
 
     #Function to read strings, denoted by quotes
     def read_string(self):
         return
-    
-    def add_token(self, token):
-        self.tokens.append(token)
 
     #
     def lexer(self):
         while(self.position < self.length):
-            char = source[self.position]
-            print(char)
-            if char.isspace():
-                self.position+=1
-            elif char.isdigit():
-                value = self.read_number()
-                tokens.append(("NUMBER", value))
-            elif char.isalpha():
-                start = 0
-                while self.position < self.length and (source[self.position].isalum() or source[self.position] == "_"):
-                    self.position+=1
-                value = source[start:self.position]
-                if value == "integer":
-                    tokens.append(("IDENTIFIER", value))
+            char = self.current_char
+            if char.isalpha() or char == "_":
+                tokens.append(self.read_identifier())
+            elif char == " ":
+                self.advance()
+                tokens.append(self.read_string)
+
 
 
