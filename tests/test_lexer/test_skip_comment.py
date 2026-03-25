@@ -17,8 +17,9 @@ def test_skip_comment_empty():
 def test_skip_comment_no_end():
     lexer = Lexer("hello world")
 
-    with pytest.raises(LexerError, match="Comment is never ended"): # Used pytest, for allowing the test to fail
+    with pytest.raises(LexerError) as err: # Used pytest, for allowing the test to fail
         lexer.skip_comment()
+        assert err.value.error_code == 420
 
 def test_skip_comment_slash_before_end():
     lexer = Lexer(" comment * / still comment */x")
