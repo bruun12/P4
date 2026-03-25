@@ -118,7 +118,7 @@ class Lexer:
                 token = self.read_identifier()
             elif char == '"':
                 token = self.read_string()
-            elif char == '=':
+            elif char == '=' and peek != '=':
                 token = Token(TokenType.ASSIGN, '=', self.line, self.column)
             elif char == '/' and peek == '*':
                 #If a comment is read continue to the next valid input
