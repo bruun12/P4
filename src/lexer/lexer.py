@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from lexer.token import Token,TokenType
 
 from error_handling import LexerError
 
@@ -6,77 +6,7 @@ from error_handling import LexerError
 #tokens = []
 
 
-class TokenType(Enum):
-    # Special
-    EOF = auto()
 
-    # Literals
-    IDENTIFIER = auto()
-    INTEGER = auto()
-    FLOAT = auto()
-    STRING = auto()
-
-    # Keywords
-    LET = auto()
-    IF = auto()
-    ELSE = auto()
-    WHILE = auto()
-    RETURN = auto()
-    TRUE = auto()
-    FALSE = auto()
-    NULL = auto()
-
-    # Operators
-    PLUS = auto()
-    MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
-    PERCENT = auto()
-
-    ASSIGN = auto()       # =
-    EQ = auto()           # ==
-    NE = auto()           # !=
-    LT = auto()           # <
-    LE = auto()           # <=
-    GT = auto()           # >
-    GE = auto()           # >=
-
-    AND = auto()          # &&
-    OR = auto()           # ||
-    NOT = auto()          # !
-
-    # Delimiters
-    LPAREN = auto()
-    RPAREN = auto()
-    LBRACE = auto()
-    RBRACE = auto()
-    COMMA = auto()
-    SEMICOLON = auto()
-
-KEYWORDS = {
-    "integer": TokenType.INTEGER,
-    "double floating point": TokenType.FLOAT,
-    "if": TokenType.IF,
-    "else": TokenType.ELSE,
-    "and": TokenType.AND,
-    "or": TokenType.OR,
-    "while": TokenType.WHILE,
-    "return": TokenType.RETURN,
-    "true": TokenType.TRUE,
-    "false": TokenType.FALSE,
-    "null": TokenType.NULL
-}
-
-class Token:
-
-    def __init__(self, type, value, row, column):
-        self.type = type
-        self.value = value
-        self.row = row
-        self.column = column
-    
-    def __str__(self):
-        return f"{self.message} (Error code: {self.error_code})"
 
 class Lexer:
 
@@ -129,7 +59,7 @@ class Lexer:
         
     #Function to read number; can be integer or float
     ##
-    def read_number(self):
+    def read_number(self) -> Token:
         start = self.position
         
         # Check if we haven't reached the end of the source
@@ -151,11 +81,10 @@ class Lexer:
             raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
 
         if '.' in number_str:
-            self.add_token(Token(TokenType.FLOAT, float(number_str), self.line, self.column))
+            return Token(TokenType.FLOAT, float(number_str), self.line, self.column)
         else:
-            self.add_token(Token(TokenType.INTEGER, int(number_str), self.line, self.column))
-        return
-
+            return Token(TokenType.INTEGER, int(number_str), self.line, self.column)
+        
 
     #Function to read identifier and check if identifier is a keyword
     def read_identifier(self):
@@ -181,19 +110,21 @@ class Lexer:
     #
     def lexer(self):
         while(self.position < self.length):
-            char = source[self.position]
-            print(char)
-            if char.isspace():
-                self.position+=1
-            elif char.isdigit():
-                value = self.read_number()
-                tokens.append(("NUMBER", value))
+            char = self.source[self.position]
+            peek = self.peek_next_char()
+            if char.isdigit():
+                token = self.read_number()
             elif char.isalpha():
-                start = 0
-                while self.position < self.length and (source[self.position].isalum() or source[self.position] == "_"):
-                    self.position+=1
-                value = source[start:self.position]
-                if value == "integer":
-                    tokens.append(("IDENTIFIER", value))
+                token = self.read_identifier()
+            elif char == '"':
+                token = self.read_string()
+            elif char == '=':
+                token = Token(TokenType.ASSIGN, '=', self.line, self.column)
+            elif char == '/' and peek == '*':
+                #If a comment is read continue to the next valid input
+                self.skip_comment()
+                continue
 
+            self.add_token(token)
 
+            self.advance()

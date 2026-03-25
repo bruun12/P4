@@ -9,8 +9,6 @@ def test_read_number_with_int_input():
     assert lex.tokens[0].type == TokenType.INTEGER
     assert lex.tokens[0].value == 123
 
-
-
 def test_read_number_with_float_input():
     lex = Lexer("0.987")
     lex.read_number()
