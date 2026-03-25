@@ -54,7 +54,7 @@ class Lexer:
 
         while (self.current_char() != '*' or self.peek_next_char() != '/'):
             if self.position >= self.length:
-                raise LexerError("Comment is never ended, please put */", 420)
+                raise LexerError("Comment is never ended, please put */", 420, self.column, self.line)
             self.advance()  
         self.advance()
         self.advance()
@@ -106,21 +106,20 @@ class Lexer:
             return Token(KEYWORDS[value], value, start_line, start_col)
         return Token(TokenType.IDENTIFIER, value, start_line, start_col)
 
-    #Function to read strings, denoted by quotes "hello"
+    #Function to read strings, denoted by quotes
     def read_string(self):
-
         self.advance()
         start_line = self.line
         start_col = self.column
         start = self.position
         while (self.current_char() != '"'):
             if (self.position >= self.length):
-                raise LexerError("Missing """, 6969)
+                raise LexerError("Missing closing quote", 6969, self.line, self.column)
             self.advance()
-        self.advance
         string = self.source[start:self.position]
+        self.advance()
 
-        return Token[TokenType.STRING,string, start_line, start_col]
+        return Token(TokenType.STRING, string, start_line, start_col)
     def add_token(self, token):
         self.tokens.append(token)
 
