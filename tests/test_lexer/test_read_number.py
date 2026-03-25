@@ -1,19 +1,19 @@
 import pytest
 
-from lexer.lexer import Lexer, TokenType, Token
+from lexer.lexer import Lexer, TokenType
 from error_handling import LexerError
 
 def test_read_number_with_int_input():
     lex = Lexer("123")
-    lex.read_number()
-    assert lex.tokens[0].type == TokenType.INTEGER
-    assert lex.tokens[0].value == 123
+    token = lex.read_number()
+    assert token.type == TokenType.INTEGER
+    assert token.value == 123
 
 def test_read_number_with_float_input():
     lex = Lexer("0.987")
-    lex.read_number()
-    assert lex.tokens[0].type == TokenType.FLOAT
-    assert lex.tokens[0].value == 0.987
+    token = lex.read_number()
+    assert token.type == TokenType.FLOAT
+    assert token.value == 0.987
 
 def test_read_number_with_two_dots():
     lex = Lexer("0.42.0")
@@ -24,6 +24,6 @@ def test_read_number_with_two_dots():
 
 def test_read_number_with_stress_input():
     lex = Lexer("1B2___?3")
-    lex.read_number()
-    assert lex.tokens[0].type == TokenType.INTEGER
-    assert lex.tokens[0].value == 1 
+    token = lex.read_number()
+    assert token.type == TokenType.INTEGER
+    assert token.value == 1

@@ -1,4 +1,4 @@
-from lexer.token import Token,TokenType
+from lexer.token import Token,TokenType,KEYWORDS
 
 from error_handling import LexerError
 
