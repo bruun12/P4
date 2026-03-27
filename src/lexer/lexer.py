@@ -116,7 +116,10 @@ class Lexer:
             self.advance()
         string = self.source[start:self.position]
 
+        self.advance()
+
         return Token(TokenType.STRING, string, start_line, start_col)
+    
     def add_token(self, token):
         self.tokens.append(token)
 
@@ -124,9 +127,20 @@ class Lexer:
     #
     def lexer(self):
         while(self.position < self.length):
-
-            char = self.source[self.position]
+            token = None
+            
+            char = self.current_char()
             peek = self.peek_next_char()
+            
+            # Skip to next token
+            if char.isspace():
+                self.advance()
+                continue
+            
+            if char == '/' and peek == '*':
+                self.skip_comment()
+                continue
+            
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
@@ -139,12 +153,12 @@ class Lexer:
             elif char == ';':
                 token = Token(TokenType.SEMICOLON, ';', self.line, self.column)
                 self.advance()
-            elif char == '/' and peek == '*':
-                #If a comment is read continue to the next valid input
-                self.skip_comment()
-                continue
-
-            self.add_token(token)
-
-            self.advance()
+            else:
+                raise LexerError("Invalid token", 1, self.line, self.column)
+            
+            if token is not None:
+                self.add_token(token)
+            
+            
+        
         self.add_token(Token(TokenType.EOF, "EOF", self.line, self.column))

@@ -12,6 +12,7 @@ class Token:
 class TokenType(Enum):
     # Special
     EOF = auto()
+    INVALID = auto()
 
     # Literals
     TYPE = auto()
