@@ -1,13 +1,19 @@
                                                             FÆLLES PRÆFIX(FP)
                                                             VENSTRE REKURSIV(VR)
 
-Prog            -> FuncList                                 OK                             
-FuncList        -> FuncDef | FuncDef FuncList               FP
-FuncDef         -> Type Idf (ParamList){Stm}                OK            
-ParamList       -> Param |                                  OK
-Param           -> ParamA| ParamA, Param                    FP
-ParamA          -> Type Idf
+Prog            -> FuncLenght                               OK
+FuncLenght      -> FuncList | FuncDef                       OK                             
+FuncList        -> FuncDef FuncList | FuncListA             OK  **Skal der et symbol til at adskille dem? Det er der ikke i vores abstrakte syntax
+FuncListA       -> FuncDef                                  OK
+FuncDef         -> Type Idf (ParamLenght){Stm}              OK
+ParamLenght     -> ParamList | \epsilon                     OK
+ParamList       -> Param, ParamList | ParamA                OK
+Param           -> ParamA                                   OK
+ParamA          -> Type Idf                                 OK
+
 Idf             -> ???                                      ??
+
+
 Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
                     | Idf = Exp | Idf = Arr                 FP    
                     | Stm_1Stm_2| return Exp;               VR
