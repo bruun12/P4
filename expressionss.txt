@@ -1,3 +1,16 @@
+Non terminaler skrives i CamelCase
+En samling terminaler skrives i ALL CAPS
+En enkelt terminal skrives med '..' ex. 'a'
+0-1 skrives med [] ex. 
+0-mange skrives med {} ex.
+En gruppe skrives med () ex. 
+Valg skrives med |
+
+
+
+
+
+
                                                             FÆLLES PRÆFIX(FP)
                                                             VENSTRE REKURSIV(VR)
 Prog            -> FuncList                                 OK                             
