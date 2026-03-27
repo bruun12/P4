@@ -1,5 +1,5 @@
 class LexerError(Exception):
-    def __init__(self, message, error_code, start_col, start_line):
+    def __init__(self, message, error_code, start_line, start_col):
          super().__init__(message)
          self.error_code = error_code
          self.start_col = start_col

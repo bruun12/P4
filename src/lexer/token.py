@@ -2,10 +2,10 @@ from enum import Enum, auto
 
 class Token:
 
-    def __init__(self, type, value, row, column):
+    def __init__(self, type, value, line, column):
         self.type = type
         self.value = value
-        self.row = row
+        self.row = line
         self.column = column
     
 
@@ -14,6 +14,7 @@ class TokenType(Enum):
     EOF = auto()
 
     # Literals
+    TYPE = auto()
     IDENTIFIER = auto()
     INTEGER = auto()
     FLOAT = auto()
@@ -59,6 +60,7 @@ class TokenType(Enum):
 KEYWORDS = {
     "integer": TokenType.INTEGER,
     "double floating point": TokenType.FLOAT,
+    "string": TokenType.STRING,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
     "and": TokenType.AND,
