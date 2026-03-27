@@ -44,20 +44,74 @@ def test_lexer_integer_assignment():
 
 
 
-"""
-def test_lexer_if_statement():
-    lex = Lexer("" "
-                boolean b = True;
 
+def test_lexer_if_statement():
+    lex = Lexer("""
+                boolean b = True;
                 if (b) {
                     b = False;
                 } else {
                     b = True;
                 }
-                "" ")
-
+                """)
     lex.lexer()
+     
+    # boolean b = True;
+    assert lex.tokens[0].type == TokenType.TYPE
+    assert lex.tokens[0].value == "boolean"
+    assert lex.tokens[1].type == TokenType.IDENTIFIER
+    assert lex.tokens[1].value == "b"
+    assert lex.tokens[2].type == TokenType.ASSIGN
+    assert lex.tokens[3].type == TokenType.TRUE
+    assert lex.tokens[3].value == "true"
+    assert lex.tokens[4].type == TokenType.SEMICOLON
 
+    # if (b) {
+    assert lex.tokens[5].type == TokenType.IF
+    assert lex.tokens[6].type == TokenType.LPAREN
+    assert lex.tokens[7].type == TokenType.IDENTIFIER
+    assert lex.tokens[7].value == "b"
+    assert lex.tokens[8].type == TokenType.RPAREN
+    assert lex.tokens[9].type == TokenType.LBRACE
+
+    # b = False;
+    assert lex.tokens[10].type == TokenType.IDENTIFIER
+    assert lex.tokens[10].value == "b"
+    assert lex.tokens[11].type == TokenType.ASSIGN
+    assert lex.tokens[12].type == TokenType.FALSE
+    assert lex.tokens[12].value == "false"
+    assert lex.tokens[13].type == TokenType.SEMICOLON
+
+    # } else {
+    assert lex.tokens[14].type == TokenType.RBRACE
+    assert lex.tokens[15].type == TokenType.ELSE
+    assert lex.tokens[16].type == TokenType.LBRACE
+    
+    # b = True;
+    assert lex.tokens[17].type == TokenType.IDENTIFIER
+    assert lex.tokens[17].value == "b"
+    assert lex.tokens[18].type == TokenType.ASSIGN
+    assert lex.tokens[19].type == TokenType.TRUE
+    assert lex.tokens[19].value == "true"
+    assert lex.tokens[20].type == TokenType.SEMICOLON
+
+    # }
+    assert lex.tokens[21].type == TokenType.RBRACE
+    assert lex.tokens[22].type == TokenType.EOF
+
+
+"""
+    This is inspiration on how to test the lexer
+
+    assert lex.tokens[0].type == TokenType.TYPE
+    assert lex.tokens[1].type == TokenType.IDENTIFIER
+    assert lex.tokens[1].value == "x"
+    assert lex.tokens[2].type == TokenType.ASSIGN
+    assert lex.tokens[3].type == TokenType.STRING
+    assert lex.tokens[3].value == "Hejsa"
+    assert lex.tokens[4].type == TokenType.SEMICOLON
+    assert lex.tokens[5].type == TokenType.EOF
+    #and some more assertions 
 """
 
 """
@@ -74,18 +128,4 @@ def test_lexer_while_statement():
 
     lex.lexer()
 
-"""
-
-"""
-    This is inspiration on how to test the lexer
-
-    assert lex.tokens[0].type == TokenType.TYPE
-    assert lex.tokens[1].type == TokenType.IDENTIFIER
-    assert lex.tokens[1].value == "x"
-    assert lex.tokens[2].type == TokenType.ASSIGN
-    assert lex.tokens[3].type == TokenType.STRING
-    assert lex.tokens[3].value == "Hejsa"
-    assert lex.tokens[4].type == TokenType.SEMICOLON
-    assert lex.tokens[5].type == TokenType.EOF
-    #and some more assertions 
 """

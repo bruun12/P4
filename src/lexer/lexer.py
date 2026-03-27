@@ -153,6 +153,18 @@ class Lexer:
             elif char == ';':
                 token = Token(TokenType.SEMICOLON, ';', self.line, self.column)
                 self.advance()
+            elif char == '(':
+                token = Token(TokenType.LPAREN, '(', self.line, self.column)
+                self.advance()
+            elif char == ')':
+                token = Token(TokenType.RPAREN, ')', self.line, self.column)
+                self.advance()
+            elif char == '{':
+                token = Token(TokenType.LBRACE, '{', self.line, self.column)
+                self.advance()
+            elif char == '}':
+                token = Token(TokenType.RBRACE, '}', self.line, self.column)
+                self.advance()
             else:
                 raise LexerError("Invalid token", 1, self.line, self.column)
             

@@ -22,6 +22,7 @@ class TokenType(Enum):
     STRING = auto()
 
     # Keywords
+    BOOLEAN = auto()
     LET = auto()
     IF = auto()
     ELSE = auto()
@@ -59,6 +60,7 @@ class TokenType(Enum):
     SEMICOLON = auto()
 
 KEYWORDS = {
+    "boolean": TokenType.BOOLEAN,
     "integer": TokenType.INTEGER,
     "double floating point": TokenType.FLOAT,
     "string": TokenType.STRING,
