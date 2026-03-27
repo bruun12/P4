@@ -23,22 +23,23 @@ FuncDef         -> Type Idf (ParamList){Stm}                    OK
 ParamList       -> Param | \epsilon                             OK
 Param           -> ParamA| ParamB, Param                        OK
 ParamB          -> ParamA |\epsilon                             OK
-ParamA          -> Type Idf                                     OK                              
+ParamA          -> Type Idf                                     OK 
+
 Stm             -> StmBStm |StmA                                OK
 StmB            -> StmA |\epsilon                               OK
 StmA            -> Type Idf = Def; | Idf = Def                  OK
                     | return Exp; | break;                      OK
                     | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK    
 Def             -> Arr | Exp                                    OK
-Exp             -> Int | Idf | DoubleFloat |Char | Bool         OK
-                    | Exp + Exp |Exp * Exp                  VR & FP
-                    | Exp - Exp |Exp/Exp                    VR & FP
-                    | Exp MOD Exp | (Exp)                   VR & FP
-                    | Exp == Exp | Exp != Exp               VR & FP
-                    | Exp <= Exp | Exp >= Exp               VR & FP
-                    | Exp < Exp | Exp > Exp                 VR & FP
-                    | Exp AND Exp | Exp OR Exp              VR & FP
-                    |!Exp                                   OK
+
+Exp             -> Int | Idf | DoubleFloat |Char | Bool | Exp + Exp |Exp * Exp | Exp - Exp |Exp/Exp | Exp MOD Exp | (Exp)                   
+                    
+                    
+                    | Exp == Exp | Exp != Exp               
+                    | Exp <= Exp | Exp >= Exp               
+                    | Exp < Exp | Exp > Exp                 
+                    | Exp AND Exp | Exp OR Exp              
+                    |!Exp                                   
 
 FormatString    -> "String"                                     OK
 String          -> StringA + String | Symbol                    OK
@@ -73,23 +74,60 @@ TYPE            -> integer | doubleFloatingPoint            OK
 
 
 
+Exp             ->     OK
+                    | Exp + Exp |Exp * Exp          
+                    | Exp - Exp |Exp/Exp            
+                    | Exp MOD Exp | (Exp)           
+                    | Exp == Exp | Exp != Exp       
+                    | Exp <= Exp | Exp >= Exp       
+                    | Exp < Exp | Exp > Exp         
+                    | Exp AND Exp | Exp OR Exp      
+                    |!Exp | Int | Idf | Double |Char | Bool 
 
 
 
+ExpAdd -> ExpAddA + ExpAdd |ExpMult
+ExpAddA -> ExpMult | \epsilon
 
+ExpMult -> ExpMultA * ExpMult | ExpSub 
+ExpMult -> ExpSub | \epsilon
 
+ExpSub -> ExpSubA - ExpSub | ExpDiv
+ExpSubA -> ExpDiv | \epsilon
 
+ExpDiv -> ExpDivA/ExpDiv | ExpMod
+ExpDivA -> ExpMod | \epsilon
 
+ExpMod -> ExpModA MOD ExpMod | ExpEqual
+ExpModA -> ExpEqual | \epsilon
 
+ExpEqual -> ExpEqualA == ExpEqual | ExpNotEq 
+ExpEqualA -> ExpNotEq | \epsilon
 
+ExpNotEq -> ExpNotEqA != ExpNotEq | ExpLessEq 
+ExpNotEqA -> ExpLessEq | \epsilon
 
+ExpLessEq -> ExpLessEqA <= ExpLessEq | ExpGreatEq
+ExpLessEqA -> ExpGreatEq | \epsilon
 
+ExpGreatEq -> ExpGreatEqA >= ExpGreatEq | ExpLess
+ExpGreatEqA -> ExpLess | \epsilon
 
+ExpLess -> ExpLessA < ExpLess | ExpGreat
+ExpLessA -> ExpGreat | \epsilon
 
+ExpGreat -> ExpGreatA > ExpGreat | ExpAnd
+ExpGreatA -> ExpAnd | \epsilon
 
+ExpAnd -> ExpAndA AND ExpAnd | ExpOr
+ExpAndA -> ExpOr | \epsilon
 
+ExpOr -> ExpOrA OR ExpOr | ExpNot
+ExpOrA -> ExpNot | \epsilon 
 
+ExpNot -> !Term
 
+Term ->  Int | Idf | Double |Char | Bool |(ExpAdd)
 
 
 
@@ -102,58 +140,6 @@ TYPE            -> integer | doubleFloatingPoint            OK
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Exp             -> Int | Idf | Double |Char | Bool     OK
-                    | Exp + Exp |Exp * Exp          VR & FP
-                    | Exp - Exp |Exp/Exp            VR & FP
-                    | Exp MOD Exp | (Exp)               VR & FP
-                    | Exp == Exp | Exp != Exp       VR & FP
-                    | Exp <= Exp | Exp >= Exp       VR & FP
-                    | Exp < Exp | Exp > Exp         VR & FP
-                    | Exp AND Exp | Exp OR Exp      VR & FP
-                    |!Exp  
-
-
-
-
-Exp -> Exp + Exp | Int | Idf | Double |Char | Bool
-
-ExpAdd -> ExpAddB + ExpAdd |ExpAddA
-ExpAddB -> ExpAddA | \epsilon
-ExpAddA -> Int | Idf | Double |Char | Bool
 
 Exp -> Exp * Exp
 
