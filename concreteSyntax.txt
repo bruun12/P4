@@ -33,13 +33,12 @@ ASCII           -> Everything in ascii table                ??
 Char            -> 'ASCII'                                  OK
 
 FormatString    -> "String"                                 OK
-PreString       -> String | StringA                         OK
-String          -> StringA + PreString                      OK
-StringA         -> \epsilon | Symbol                        OK
+String          -> StringA + String | Symbol                OK
+StringA         -> Symbol | \epsilon                        OK
 Symbol          -> ASCII | \epsilon                         OK
 
 Arr             -> [ArrLenght]                              OK
-ArrLenght       -> empty | ArrList                          OK
-ArrList         -> ArrElems, ArrList                        OK
+ArrLenght       -> ArrList | \epsilon                       OK
+ArrList         -> ArrElems, ArrList | ArrElem              OK
 ArrElems        -> ArrElem                                  OK
 ArrElem         -> Exp | String | Arr                       OK
