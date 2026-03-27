@@ -5,8 +5,9 @@ En enkelt terminal skrives med '..' ex. 'a'
 0-mange skrives med {} ex.
 En gruppe skrives med () ex. 
 Valg skrives med |
-
-
+? indicates an optional element
+* indicates zero or more repititions of an element
++ indicates one or more repititions of an element
 
 
 
@@ -14,16 +15,14 @@ Valg skrives med |
                                                             FÆLLES PRÆFIX(FP)
                                                             VENSTRE REKURSIV(VR)
 Prog            -> FuncList                                 OK                             
-FuncList        -> FuncDef | FuncDef FuncList               FP
+FuncList        -> FuncDef | FuncListA FuncList             OK
+FuncListA       -> FuncDef |\epsilon                        OK
 FuncDef         -> Type Idf (ParamList){Stm}                OK            
-ParamList       -> Param |                                  OK
-Param           -> Type Idf| Param, Param                   VR & FP                                
-Idf             -> ???                                      ??
-Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
-                    | Idf = Exp | Idf = Arr                 FP    
-                    | StmStm| return Exp;                   VR
-                    | break; | if(Exp){Stm}else{Stm}        OK
-                    | while(Exp){Stm} |                     OK
+ParamList       -> Param | \epsilon                         OK
+Param           -> ParamA| ParamB, Param                    OK
+ParamB          -> ParamA |\epsilon                         OK
+ParamA          -> Type Idf                                 OK                              
+Stm             -> Type Idf = Exp; | Type Idf = Arr;| Idf = Exp | Idf = Arr | StmStm| return Exp; | break; | if(Exp){Stm}else{Stm}| while(Exp){Stm} |                     
 Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
                     | Exp + Exp |Exp * Exp                  VR & FP
                     | Exp - Exp |Exp/Exp                    VR & FP
@@ -33,20 +32,28 @@ Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
                     | Exp < Exp | Exp > Exp                 VR & FP
                     | Exp AND Exp | Exp OR Exp              VR & FP
                     |!Exp                                   OK
-Type            -> integer | doubleFloatingPoint            OK
-                    | character | string                    OK
-                    | boolean | void                        OK
+
+FormatString    -> "String"                                 OK
+String          -> StringA + String | Symbol                OK
+StringA         -> Symbol | \epsilon                        OK
+Symbol          -> ASCII | \epsilon                         OK
+
+Arr             -> [ArrLenght]                              OK
+ArrLenght       -> ArrList | \epsilon                       OK
+ArrList         -> ArrElems, ArrList | ArrElem              OK
+ArrElems        -> ArrElem                                  OK
+ArrElem         -> Exp | String | Arr                       OK
+
 NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
 INT             -> NAT | -INT                               OK
 DOUBLE          -> INT.NAT                                  OK
 BOOL            -> TRUE | FALSE                             OK
 ASCII           -> Everything in ascii table                ??
 CHAR            -> 'ASCII'                                  OK
-FormatString    -> "String" |""                             FP?
-String          -> ASCII | String + String                  VR
-Arr             -> [ArrElems] | []                          FP?
-ArrElems        -> ArrElem | ArrElem, ArrElems              VR
-ArrElem         -> Exp | String | Arr                       OK
+IDF             -> ???                                      ??
+TYPE            -> integer | doubleFloatingPoint            OK
+                    | character | string                    OK
+                    | boolean | void                        OK
 
 
 
