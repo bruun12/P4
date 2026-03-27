@@ -1,0 +1,153 @@
+                                                            FÆLLES PRÆFIX(FP)
+                                                            VENSTRE REKURSIV(VR)
+Prog            -> FuncList                                 OK                             
+FuncList        -> FuncDef | FuncDef FuncList               FP
+FuncDef         -> Type Idf (ParamList){Stm}                OK            
+ParamList       -> Param |                                  OK
+Param           -> Type Idf| Param, Param                   VR & FP                                
+Idf             -> ???                                      ??
+Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
+                    | Idf = Exp | Idf = Arr                 FP    
+                    | StmStm| return Exp;                   VR
+                    | break; | if(Exp){Stm}else{Stm}        OK
+                    | while(Exp){Stm} |                     OK
+Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
+                    | Exp + Exp |Exp * Exp                  VR & FP
+                    | Exp - Exp |Exp/Exp                    VR & FP
+                    | Exp MOD Exp | (Exp)                   VR & FP
+                    | Exp == Exp | Exp != Exp               VR & FP
+                    | Exp <= Exp | Exp >= Exp               VR & FP
+                    | Exp < Exp | Exp > Exp                 VR & FP
+                    | Exp AND Exp | Exp OR Exp              VR & FP
+                    |!Exp                                   OK
+Type            -> integer | doubleFloatingPoint            OK
+                    | character | string                    OK
+                    | boolean | void                        OK
+NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
+INT             -> NAT | -INT                               OK
+DOUBLE          -> INT.NAT                                  OK
+BOOL            -> TRUE | FALSE                             OK
+ASCII           -> Everything in ascii table                ??
+CHAR            -> 'ASCII'                                  OK
+FormatString    -> "String" |""                             FP?
+String          -> ASCII | String + String                  VR
+Arr             -> [ArrElems] | []                          FP?
+ArrElems        -> ArrElem | ArrElem, ArrElems              VR
+ArrElem         -> Exp | String | Arr                       OK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Exp             -> Int | Idf | Double |Char | Bool     OK
+                    | Exp + Exp |Exp * Exp          VR & FP
+                    | Exp - Exp |Exp/Exp            VR & FP
+                    | Exp MOD Exp | (Exp)               VR & FP
+                    | Exp == Exp | Exp != Exp       VR & FP
+                    | Exp <= Exp | Exp >= Exp       VR & FP
+                    | Exp < Exp | Exp > Exp         VR & FP
+                    | Exp AND Exp | Exp OR Exp      VR & FP
+                    |!Exp  
+
+
+
+
+Exp -> Exp + Exp | Int | Idf | Double |Char | Bool
+
+ExpAdd -> ExpAddB + ExpAdd |ExpAddA
+ExpAddB -> ExpAddA | \epsilon
+ExpAddA -> Int | Idf | Double |Char | Bool
+
+Exp -> Exp * Exp
+
+ExpMult -> ExpMultB * ExpMult
+ExpMultB -> ExpMultA | \epsilon
+ExpMultA -> Int | Idf | Double |Char | Bool
+
+Exp -> Exp - Exp
+
+ExpSub -> ExpSubB - ExpSub
+ExpSubB -> ExpSubA | \epsilon
+ExpSubA -> Int | Idf | Double |Char | Bool
+
+Exp -> Exp/Exp
+
+ExpDiv -> ExpDivB/ExpDiv
+ExpDivB -> ExpDivA | \epsilon
+ExpDivA -> Int | Idf | Double |Char | Bool
+
+Exp -> Exp MOD Exp
+
+ExpMod -> ExpModB MOD ExpMod
+ExpModB -> ExpModA | \epsilon
+ExpModA -> Int | Idf | Double |Char | Bool

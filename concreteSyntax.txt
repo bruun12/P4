@@ -6,7 +6,7 @@ FuncList        -> FuncDef | FuncDef FuncList               FP
 FuncDef         -> Type Idf (ParamList){Stm}                OK            
 ParamList       -> Param |                                  OK
 Param           -> ParamA| ParamA, Param                    FP
-ParamA          -> Type Idf
+ParamA          -> Type Idf                                 OK
 Idf             -> ???                                      ??
 Stm             -> Type Idf = Exp; | Type Idf = Arr;        FP
                     | Idf = Exp | Idf = Arr                 FP    
