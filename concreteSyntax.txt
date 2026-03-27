@@ -3,8 +3,8 @@
 
 Prog            -> FuncLenght                               OK
 FuncLenght      -> FuncList | FuncDef                       OK                             
-FuncList        -> FuncDef FuncList | FuncListA             OK  **Skal der et symbol til at adskille dem? Det er der ikke i vores abstrakte syntax
-FuncListA       -> FuncDef                                  OK
+FuncList        -> FuncListA FuncList | FuncDef             OK  **Skal der et symbol til at adskille dem? Det er der ikke i vores abstrakte syntax
+FuncListA       -> FuncDef | \epsilon                       OK  ** Nej ikke ummilbart, tænker der er semikolon i sluningen af en funktion
 FuncDef         -> Type Idf (ParamLenght){Stm}              OK
 ParamLenght     -> ParamList | \epsilon                     OK
 ParamList       -> Param, ParamList | ParamA                OK

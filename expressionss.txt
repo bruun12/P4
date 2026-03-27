@@ -9,21 +9,28 @@ Valg skrives med |
 * indicates zero or more repititions of an element
 + indicates one or more repititions of an element
 
+Introduction to compiler design p. 45
 
 
 
-                                                            FÆLLES PRÆFIX(FP)
-                                                            VENSTRE REKURSIV(VR)
-Prog            -> FuncList                                 OK                             
-FuncList        -> FuncDef | FuncListA FuncList             OK
-FuncListA       -> FuncDef |\epsilon                        OK
-FuncDef         -> Type Idf (ParamList){Stm}                OK            
-ParamList       -> Param | \epsilon                         OK
-Param           -> ParamA| ParamB, Param                    OK
-ParamB          -> ParamA |\epsilon                         OK
-ParamA          -> Type Idf                                 OK                              
-Stm             -> Type Idf = Exp; | Type Idf = Arr;| Idf = Exp | Idf = Arr | StmStm| return Exp; | break; | if(Exp){Stm}else{Stm}| while(Exp){Stm} |                     
-Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
+
+                                                                FÆLLES PRÆFIX(FP)
+                                                                VENSTRE REKURSIV(VR)
+Prog            -> FuncList                                     OK                             
+FuncList        -> FuncDef | FuncListA FuncList                 OK
+FuncListA       -> FuncDef |\epsilon                            OK
+FuncDef         -> Type Idf (ParamList){Stm}                    OK            
+ParamList       -> Param | \epsilon                             OK
+Param           -> ParamA| ParamB, Param                        OK
+ParamB          -> ParamA |\epsilon                             OK
+ParamA          -> Type Idf                                     OK                              
+Stm             -> StmBStm |StmA                                OK
+StmB            -> StmA |\epsilon                               OK
+StmA            -> Type Idf = Def; | Idf = Def                  OK
+                    | return Exp; | break;                      OK
+                    | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK    
+Def             -> Arr | Exp                                    OK
+Exp             -> Int | Idf | DoubleFloat |Char | Bool         OK
                     | Exp + Exp |Exp * Exp                  VR & FP
                     | Exp - Exp |Exp/Exp                    VR & FP
                     | Exp MOD Exp | (Exp)                   VR & FP
@@ -33,16 +40,16 @@ Exp             -> Int | Idf | DoubleFloat |Char | Bool     OK
                     | Exp AND Exp | Exp OR Exp              VR & FP
                     |!Exp                                   OK
 
-FormatString    -> "String"                                 OK
-String          -> StringA + String | Symbol                OK
-StringA         -> Symbol | \epsilon                        OK
-Symbol          -> ASCII | \epsilon                         OK
+FormatString    -> "String"                                     OK
+String          -> StringA + String | Symbol                    OK
+StringA         -> Symbol | \epsilon                            OK
+Symbol          -> ASCII | \epsilon                             OK
 
-Arr             -> [ArrLenght]                              OK
-ArrLenght       -> ArrList | \epsilon                       OK
-ArrList         -> ArrElems, ArrList | ArrElem              OK
-ArrElems        -> ArrElem                                  OK
-ArrElem         -> Exp | String | Arr                       OK
+Arr             -> [ArrLenght]                                  OK
+ArrLenght       -> ArrList | \epsilon                           OK
+ArrList         -> ArrElems, ArrList | ArrElem                  OK
+ArrElems        -> ArrElem                                      OK
+ArrElem         -> Exp | String | Arr                           OK
 
 NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
 INT             -> NAT | -INT                               OK
