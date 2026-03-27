@@ -66,68 +66,48 @@ TYPE            -> integer | doubleFloatingPoint            OK
 
 
 
+ExpAnd -> ExpAndA AND ExpAnd | ExpOr
+ExpAndA -> ExpOr | \epsilon
 
-
-
-
-
-
-
-
-Exp             ->     OK
-                    | Exp + Exp |Exp * Exp          
-                    | Exp - Exp |Exp/Exp            
-                    | Exp MOD Exp | (Exp)           
-                    | Exp == Exp | Exp != Exp       
-                    | Exp <= Exp | Exp >= Exp       
-                    | Exp < Exp | Exp > Exp         
-                    | Exp AND Exp | Exp OR Exp      
-                    |!Exp | Int | Idf | Double |Char | Bool 
-
-
-
-ExpAdd -> ExpAddA + ExpAdd |ExpMult
-ExpAddA -> ExpMult | \epsilon
-
-ExpMult -> ExpMultA * ExpMult | ExpSub 
-ExpMult -> ExpSub | \epsilon
-
-ExpSub -> ExpSubA - ExpSub | ExpDiv
-ExpSubA -> ExpDiv | \epsilon
-
-ExpDiv -> ExpDivA/ExpDiv | ExpMod
-ExpDivA -> ExpMod | \epsilon
-
-ExpMod -> ExpModA MOD ExpMod | ExpEqual
-ExpModA -> ExpEqual | \epsilon
+ExpOr -> ExpOrA OR ExpOr | ExpEqual
+ExpOrA -> ExpEqual | \epsilon 
 
 ExpEqual -> ExpEqualA == ExpEqual | ExpNotEq 
 ExpEqualA -> ExpNotEq | \epsilon
 
-ExpNotEq -> ExpNotEqA != ExpNotEq | ExpLessEq 
-ExpNotEqA -> ExpLessEq | \epsilon
+ExpNotEq -> ExpNotEqA != ExpNotEq | ExpGreatEq 
+ExpNotEqA -> ExpGreatEq | \epsilon
 
-ExpLessEq -> ExpLessEqA <= ExpLessEq | ExpGreatEq
-ExpLessEqA -> ExpGreatEq | \epsilon
+ExpGreatEq -> ExpGreatEqA >= ExpGreatEq | ExpGreat
+ExpGreatEqA -> ExpGreat | \epsilon
 
-ExpGreatEq -> ExpGreatEqA >= ExpGreatEq | ExpLess
-ExpGreatEqA -> ExpLess | \epsilon
+ExpGreat -> ExpGreatA > ExpGreat | ExpLessEq
+ExpGreatA -> ExpLessEq | \epsilon
 
-ExpLess -> ExpLessA < ExpLess | ExpGreat
-ExpLessA -> ExpGreat | \epsilon
+ExpLessEq -> ExpLessEqA <= ExpLessEq | ExpLess
+ExpLessEqA -> ExpLess | \epsilon
 
-ExpGreat -> ExpGreatA > ExpGreat | ExpAnd
-ExpGreatA -> ExpAnd | \epsilon
+ExpLess -> ExpLessA < ExpLess | ExpAdd
+ExpLessA -> ExpAdd | \epsilon
 
-ExpAnd -> ExpAndA AND ExpAnd | ExpOr
-ExpAndA -> ExpOr | \epsilon
+ExpAdd -> ExpAddA + ExpAdd |ExpSub
+ExpAddA -> ExpSub | \epsilon
 
-ExpOr -> ExpOrA OR ExpOr | ExpNot
-ExpOrA -> ExpNot | \epsilon 
+ExpSub -> ExpSubA - ExpSub | ExpMult
+ExpSubA -> ExpMult | \epsilon
+
+ExpMult -> ExpMultA * ExpMult | ExpDiv 
+ExpMult -> ExpDiv | \epsilon
+
+ExpDiv -> ExpDivA/ExpDiv | ExpMod
+ExpDivA -> ExpMod | \epsilon
+
+ExpMod -> ExpModA MOD ExpMod | ExpNot
+ExpModA -> ExpNot | \epsilon
 
 ExpNot -> !Term
 
-Term ->  Int | Idf | Double |Char | Bool |(ExpAdd)
+Term ->  Int | Idf | Double |Char | Bool |(ExpAnd)
 
 
 
