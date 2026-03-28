@@ -33,6 +33,6 @@ def test_read_word_type_string():
 def test_read_word_type_double():
     lexer = Lexer('double')
     token = lexer.read_word()
-
+    
     assert token.type == TokenType.TYPE
     assert token.value == "double"

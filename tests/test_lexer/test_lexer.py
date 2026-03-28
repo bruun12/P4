@@ -60,21 +60,30 @@ def test_lexer_if_statement():
 
 """
 
-"""
 
 def test_lexer_while_statement():
-    lex = Lexer("" "
+    lex = Lexer("""
                 integer i = 0;
-                float f = 2.0; 
-                while (i < 5){
-                    f = f * 2;
-                    i = i + 1;
-                }
-                "" ")
+                double f = 2.0; 
+                """)
+    
+    """
+        while (i < 5){
+            f = f * 2;
+            i = i + 1;
+        }
+    """
 
     lex.lexer()
 
-"""
+    assert lex.tokens[0].type == TokenType.TYPE
+    assert lex.tokens[0].value == "integer"
+    assert lex.tokens[1].type == TokenType.IDENTIFIER
+    assert lex.tokens[1].value == "i"
+    assert lex.tokens[2].type == TokenType.ASSIGN
+    assert lex.tokens[3].type == TokenType.INTEGER
+    assert lex.tokens[3].value == 0
+    assert lex.tokens[4].type == TokenType.SEMICOLON
 
 """
     This is inspiration on how to test the lexer

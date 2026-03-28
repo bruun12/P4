@@ -143,12 +143,62 @@ class Lexer:
                 token = self.read_word()
             elif char == '"':
                 token = self.read_string()
+            
+            #Arithmetic operators
+            elif char == '+':
+                token = Token(TokenType.PLUS, '+', self.line, self.column)
+                self.advance()
+            elif char == '-':
+                token = Token(TokenType.MINUS, '-', self.line, self.column)
+                self.advance()
+            elif char == '*':
+                token = Token(TokenType.STAR, '*', self.line, self.column)
+                self.advance()
+            elif char == '/':
+                token = Token(TokenType.SLASH, '/', self.line, self.column)
+                self.advance()
+            elif char == '%':
+                token = Token(TokenType.PERCENT, '%', self.line, self.column)
+                self.advance()
+
+
+
+            #boolean operators
+            elif char == '=' and peek == '=':
+                token = Token(TokenType.EQ, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '=' and peek == '!':
+                token = Token(TokenType.NE, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '=' and peek == '==':
+                token = Token(TokenType.EQ, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '<' and peek != '=':
+                token = Token(TokenType.LT, '<', self.line, self.column)
+                self.advance()
+            elif char == '<' and peek == '=':
+                token = Token(TokenType.LE, '<=', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek != '=':
+                token = Token(TokenType.GT, '>', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek == '=':
+                token = Token(TokenType.GE, '>=', self.line, self.column)
+                self.advance()
+
+            #Assign
             elif char == '=' and peek != '=':
                 token = Token(TokenType.ASSIGN, '=', self.line, self.column)
                 self.advance()
+
+            #Delimiters
             elif char == ';':
                 token = Token(TokenType.SEMICOLON, ';', self.line, self.column)
                 self.advance()
+
             else:
                 raise LexerError("Invalid token", 1, self.line, self.column)
             
