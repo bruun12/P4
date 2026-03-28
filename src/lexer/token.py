@@ -59,9 +59,6 @@ class TokenType(Enum):
     SEMICOLON = auto()
 
 KEYWORDS = {
-    "integer": TokenType.INTEGER,
-    "double floating point": TokenType.FLOAT,
-    "string": TokenType.STRING,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
     "and": TokenType.AND,
@@ -71,5 +68,11 @@ KEYWORDS = {
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "null": TokenType.NULL
+}
+
+TYPES = {
+    "integer": TokenType.INTEGER,
+    "double": TokenType.FLOAT,
+    "string": TokenType.STRING
 }
 
