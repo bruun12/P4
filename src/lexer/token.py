@@ -55,8 +55,8 @@ class TokenType(Enum):
     RPAREN = auto()
     LBRACE = auto()
     RBRACE = auto()
-    COMMA = auto()
     SEMICOLON = auto()
+    DOT = auto()
 
 KEYWORDS = {
     "if": TokenType.IF,
@@ -76,5 +76,22 @@ TYPES = {
     "string": TokenType.STRING
 }
 
+
+DELIMITERS = {
+    "(": TokenType.LPAREN,
+    ")": TokenType.RPAREN,
+    "{": TokenType.LBRACE,
+    "}": TokenType.RBRACE,
+    ";": TokenType.SEMICOLON,
+    ".": TokenType.DOT
+}
+
+OPERATORS = {
+    "+": TokenType.PLUS,
+    "-": TokenType.MINUS,
+    "*": TokenType.STAR,
+    "/": TokenType.SLASH,
+    "%": TokenType.PERCENT
+}
 
 

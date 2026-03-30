@@ -1,4 +1,4 @@
-from lexer.token import Token,TokenType,KEYWORDS,TYPES
+from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS
 
 from error_handling import LexerError
 
@@ -136,7 +136,7 @@ class Lexer:
             if char == '/' and peek == '*':
                 self.skip_comment()
                 continue
-            
+        
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
@@ -145,24 +145,10 @@ class Lexer:
                 token = self.read_string()
             
             #Arithmetic operators
-            elif char == '+':
-                token = Token(TokenType.PLUS, '+', self.line, self.column)
+            elif char in OPERATORS:
+                token = Token(OPERATORS[char], char, self.line, self.column)
                 self.advance()
-            elif char == '-':
-                token = Token(TokenType.MINUS, '-', self.line, self.column)
-                self.advance()
-            elif char == '*':
-                token = Token(TokenType.STAR, '*', self.line, self.column)
-                self.advance()
-            elif char == '/':
-                token = Token(TokenType.SLASH, '/', self.line, self.column)
-                self.advance()
-            elif char == '%':
-                token = Token(TokenType.PERCENT, '%', self.line, self.column)
-                self.advance()
-
-
-
+                
             #boolean operators
             elif char == '=' and peek == '=':
                 token = Token(TokenType.EQ, '==', self.line, self.column)
@@ -195,8 +181,8 @@ class Lexer:
                 self.advance()
 
             #Delimiters
-            elif char == ';':
-                token = Token(TokenType.SEMICOLON, ';', self.line, self.column)
+            elif char in DELIMITERS:
+                token = Token(DELIMITERS[char], char, self.line, self.column)
                 self.advance()
 
             else:
