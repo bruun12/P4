@@ -56,14 +56,10 @@ class TokenType(Enum):
     RPAREN = auto()
     LBRACE = auto()
     RBRACE = auto()
-    COMMA = auto()
     SEMICOLON = auto()
+    DOT = auto()
 
 KEYWORDS = {
-    "boolean": TokenType.BOOLEAN,
-    "integer": TokenType.INTEGER,
-    "double floating point": TokenType.FLOAT,
-    "string": TokenType.STRING,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
     "and": TokenType.AND,
@@ -74,4 +70,30 @@ KEYWORDS = {
     "false": TokenType.FALSE,
     "null": TokenType.NULL
 }
+
+TYPES = {
+    "integer": TokenType.INTEGER,
+    "double": TokenType.FLOAT,
+    "string": TokenType.STRING,
+    "boolean": TokenType.BOOLEAN
+}
+
+
+DELIMITERS = {
+    "(": TokenType.LPAREN,
+    ")": TokenType.RPAREN,
+    "{": TokenType.LBRACE,
+    "}": TokenType.RBRACE,
+    ";": TokenType.SEMICOLON,
+    ".": TokenType.DOT
+}
+
+OPERATORS = {
+    "+": TokenType.PLUS,
+    "-": TokenType.MINUS,
+    "*": TokenType.STAR,
+    "/": TokenType.SLASH,
+    "%": TokenType.PERCENT
+}
+
 

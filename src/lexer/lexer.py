@@ -1,14 +1,7 @@
-from lexer.token import Token,TokenType,KEYWORDS
+from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS
 
 from error_handling import LexerError
 
-class Token:
-
-    def __init__(self, type, value, line, column):
-        self.type = type
-        self.value = value
-        self.row = line
-        self.column = column
 
 class Lexer:
 
@@ -90,7 +83,7 @@ class Lexer:
         
 
     #Function to read identifier or other keyword and return Token
-    def read_identifier(self):
+    def read_word(self):
         start_line = self.line
         start_col = self.column
         start_pos = self.position
@@ -101,8 +94,11 @@ class Lexer:
         value = self.source[start_pos:self.position]
 
         if value in KEYWORDS:
+            return Token(KEYWORDS[value] , value, start_line, start_col)
+        elif value in TYPES:
             return Token(TokenType.TYPE, value, start_line, start_col)
-        return Token(TokenType.IDENTIFIER, value, start_line, start_col)
+        else:
+            return Token(TokenType.IDENTIFIER, value, start_line, start_col)
 
     #Function to read strings, denoted by quotes
     def read_string(self):
@@ -140,31 +136,55 @@ class Lexer:
             if char == '/' and peek == '*':
                 self.skip_comment()
                 continue
-            
+        
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
-                token = self.read_identifier()
+                token = self.read_word()
             elif char == '"':
                 token = self.read_string()
+            
+            #Arithmetic operators
+            elif char in OPERATORS:
+                token = Token(OPERATORS[char], char, self.line, self.column)
+                self.advance()
+                
+            #boolean operators
+            elif char == '=' and peek == '=':
+                token = Token(TokenType.EQ, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '=' and peek == '!':
+                token = Token(TokenType.NE, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '=' and peek == '==':
+                token = Token(TokenType.EQ, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '<' and peek != '=':
+                token = Token(TokenType.LT, '<', self.line, self.column)
+                self.advance()
+            elif char == '<' and peek == '=':
+                token = Token(TokenType.LE, '<=', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek != '=':
+                token = Token(TokenType.GT, '>', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek == '=':
+                token = Token(TokenType.GE, '>=', self.line, self.column)
+                self.advance()
+
+            #Assign
             elif char == '=' and peek != '=':
                 token = Token(TokenType.ASSIGN, '=', self.line, self.column)
                 self.advance()
-            elif char == ';':
-                token = Token(TokenType.SEMICOLON, ';', self.line, self.column)
+
+            #Delimiters
+            elif char in DELIMITERS:
+                token = Token(DELIMITERS[char], char, self.line, self.column)
                 self.advance()
-            elif char == '(':
-                token = Token(TokenType.LPAREN, '(', self.line, self.column)
-                self.advance()
-            elif char == ')':
-                token = Token(TokenType.RPAREN, ')', self.line, self.column)
-                self.advance()
-            elif char == '{':
-                token = Token(TokenType.LBRACE, '{', self.line, self.column)
-                self.advance()
-            elif char == '}':
-                token = Token(TokenType.RBRACE, '}', self.line, self.column)
-                self.advance()
+
             else:
                 raise LexerError("Invalid token", 1, self.line, self.column)
             
