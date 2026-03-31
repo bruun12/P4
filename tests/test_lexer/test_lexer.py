@@ -56,7 +56,8 @@ def test_lexer_if_statement():
                 }
                 """)
     lex.lexer()
-        # boolean b = True;
+    
+    # boolean b = True;
     assert lex.tokens[0].type == TokenType.TYPE
     assert lex.tokens[0].value == "boolean"
     assert lex.tokens[1].type == TokenType.IDENTIFIER
