@@ -48,11 +48,11 @@ def test_lexer_integer_assignment():
 
 def test_lexer_if_statement():
     lex = Lexer("""
-                boolean b = True;
+                boolean b = true;
                 if (b) {
-                    b = False;
+                    b = false;
                 } else {
-                    b = True;
+                    b = true;
                 }
                 """)
     lex.lexer()
