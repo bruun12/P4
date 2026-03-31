@@ -1,0 +1,118 @@
+Non terminaler skrives i CamelCase
+En samling terminaler skrives i ALL CAPS
+En enkelt terminal skrives med '..' ex. 'a'
+0-1 skrives med [] ex. 
+0-mange skrives med {} ex.
+En gruppe skrives med () ex. 
+Valg skrives med |
+? indicates an optional element
+* indicates zero or more repititions of an element
++ indicates one or more repititions of an element
+
+Introduction to compiler design p. 45
+
+
+
+
+                                                                FÆLLES PRÆFIX(FP)
+                                                                VENSTRE REKURSIV(VR)
+Prog            -> FuncList                                     OK                             
+FuncList        -> FuncDef | FuncListA FuncList                 OK
+FuncListA       -> FuncDef |\epsilon                            OK
+FuncDef         -> TYPE IDF (ParamList){Stm}                    OK            
+ParamList       -> Param | \epsilon                             OK
+Param           -> ParamA| ParamB, Param                        OK
+ParamB          -> ParamA |\epsilon                             OK
+ParamA          -> TYPE IDF                                     OK 
+
+Stm             -> StmBStm |StmA                                OK
+StmB            -> StmA |\epsilon                               OK
+StmA            -> TYPE IDF = Def; | IDF = Def                  OK
+                    | return Exp; | break;                      OK
+                    | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK    
+Def             -> Arr | Exp                                    OK
+
+Exp -> ExpAnd
+
+ExpAnd -> ExpAndA AND ExpAnd | ExpOr
+ExpAndA -> ExpOr | \epsilon
+
+ExpOr -> ExpOrA OR ExpOr | ExpEqual
+ExpOrA -> ExpEqual | \epsilon 
+
+ExpEqual -> ExpEqualA == ExpEqual | ExpNotEq 
+ExpEqualA -> ExpNotEq | \epsilon
+
+ExpNotEq -> ExpNotEqA != ExpNotEq | ExpGreatEq 
+ExpNotEqA -> ExpGreatEq | \epsilon
+
+ExpGreatEq -> ExpGreatEqA >= ExpGreatEq | ExpGreat
+ExpGreatEqA -> ExpGreat | \epsilon
+
+ExpGreat -> ExpGreatA > ExpGreat | ExpLessEq
+ExpGreatA -> ExpLessEq | \epsilon
+
+ExpLessEq -> ExpLessEqA <= ExpLessEq | ExpLess
+ExpLessEqA -> ExpLess | \epsilon
+
+ExpLess -> ExpLessA < ExpLess | ExpAdd
+ExpLessA -> ExpAdd | \epsilon
+
+ExpAdd -> ExpAddA + ExpAdd |ExpSub
+ExpAddA -> ExpSub | \epsilon
+
+ExpSub -> ExpSubA - ExpSub | ExpMult
+ExpSubA -> ExpMult | \epsilon
+
+ExpMult -> ExpMultA * ExpMult | ExpDiv 
+ExpMult -> ExpDiv | \epsilon
+
+ExpDiv -> ExpDivA/ExpDiv | ExpMod
+ExpDivA -> ExpMod | \epsilon
+
+ExpMod -> ExpModA MOD ExpMod | ExpNot
+ExpModA -> ExpNot | \epsilon
+
+ExpNot -> !Term
+
+Term ->  INT | IDF | DOUBLE | CHAR | BOOL |(Exp)                                 
+
+FormatString    -> "String"                                     OK
+String          -> StringA + String | Symbol                    OK
+StringA         -> Symbol | \epsilon                            OK
+Symbol          -> ASCII | \epsilon                             OK
+
+Arr             -> [ArrLenght]                                  OK
+ArrLenght       -> ArrList | \epsilon                           OK
+ArrList         -> ArrElems, ArrList | ArrElem                  OK
+ArrElems        -> ArrElem                                      OK
+ArrElem         -> Exp | String | Arr                           OK
+
+NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
+INT             -> NAT | -INT                               OK
+DOUBLE          -> INT.NAT                                  OK
+BOOL            -> TRUE | FALSE                             OK
+ASCII           -> Everything in ascii table                ??
+CHAR            -> 'ASCII'                                  OK
+IDF             -> ???                                      ??
+TYPE            -> integer | doubleFloatingPoint            OK
+                    | character | string                    OK
+                    | boolean | void                        OK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
