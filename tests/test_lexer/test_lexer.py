@@ -100,9 +100,7 @@ def test_lexer_if_statement():
     assert lex.tokens[22].type == TokenType.EOF
 
 
-"""
 
-"""
 
 def test_lexer_while_statement():
     lex = Lexer("""
