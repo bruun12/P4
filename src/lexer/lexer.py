@@ -83,7 +83,7 @@ class Lexer:
         
 
     #Function to read identifier or other keyword and return Token
-    def read_word(self):
+    def read_word(self) -> Token:
         start_line = self.line
         start_col = self.column
         start_pos = self.position
@@ -101,7 +101,7 @@ class Lexer:
             return Token(TokenType.IDENTIFIER, value, start_line, start_col)
 
     #Function to read strings, denoted by quotes
-    def read_string(self):
+    def read_string(self) -> Token:
         self.advance()
         start_line = self.line
         start_col = self.column
