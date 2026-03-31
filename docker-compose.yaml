@@ -5,14 +5,20 @@ services:
       dockerfile: Dockerfile
       target: production  
     volumes:
-      - .:/src  
-    command: python src/main.py
+      - .:/app
+    environment:
+      - PYTHONPATH=/app/src
+    working_dir: /app/src
+    command: python main.py
 
   test:
     build:
       context: .
       dockerfile: Dockerfile
-      target: test  # if you have a test stage
+      target: test
     volumes:
-      - .:/src
-    command: pytest tests/ -v
+      - .:/app
+    environment:
+      - PYTHONPATH=/app/src
+    working_dir: /app/tests
+    command: pytest -v
