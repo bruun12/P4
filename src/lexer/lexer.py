@@ -58,7 +58,7 @@ class Lexer:
         start = self.position
         
         # Check if we haven't reached the end of the source
-        while self.position < len(self.source):
+        while self.position < self.length:
             char = self.peek_next_char()
             # check is needed because we are peaking at a char that doesn't exist
             if char is None:
@@ -76,7 +76,6 @@ class Lexer:
             raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12, self.line, self.column)
 
         if '.' in number_str:
-
             return Token(TokenType.FLOAT, float(number_str), self.line, self.column)
         else:
             return Token(TokenType.INTEGER, int(number_str), self.line, self.column)
@@ -154,12 +153,8 @@ class Lexer:
                 token = Token(TokenType.EQ, '==', self.line, self.column)
                 self.advance()
                 self.advance()
-            elif char == '=' and peek == '!':
-                token = Token(TokenType.NE, '==', self.line, self.column)
-                self.advance()
-                self.advance()
-            elif char == '=' and peek == '==':
-                token = Token(TokenType.EQ, '==', self.line, self.column)
+            elif char == '!' and peek == '=':
+                token = Token(TokenType.NE, '!=', self.line, self.column)
                 self.advance()
                 self.advance()
             elif char == '<' and peek != '=':
