@@ -57,7 +57,6 @@ class TokenType(Enum):
     LBRACE = auto()
     RBRACE = auto()
     SEMICOLON = auto()
-    DOT = auto()
 
 KEYWORDS = {
     "if": TokenType.IF,
@@ -84,8 +83,7 @@ DELIMITERS = {
     ")": TokenType.RPAREN,
     "{": TokenType.LBRACE,
     "}": TokenType.RBRACE,
-    ";": TokenType.SEMICOLON,
-    ".": TokenType.DOT
+    ";": TokenType.SEMICOLON
 }
 
 OPERATORS = {
