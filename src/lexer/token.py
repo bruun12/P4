@@ -2,24 +2,27 @@ from enum import Enum, auto
 
 class Token:
 
-    def __init__(self, type, value, row, column):
+    def __init__(self, type, value, line, column):
         self.type = type
         self.value = value
-        self.row = row
+        self.row = line
         self.column = column
     
 
 class TokenType(Enum):
     # Special
     EOF = auto()
+    INVALID = auto()
 
     # Literals
+    TYPE = auto()
     IDENTIFIER = auto()
     INTEGER = auto()
     FLOAT = auto()
     STRING = auto()
 
     # Keywords
+    BOOLEAN = auto()
     LET = auto()
     IF = auto()
     ELSE = auto()
@@ -53,12 +56,9 @@ class TokenType(Enum):
     RPAREN = auto()
     LBRACE = auto()
     RBRACE = auto()
-    COMMA = auto()
     SEMICOLON = auto()
 
 KEYWORDS = {
-    "integer": TokenType.INTEGER,
-    "double floating point": TokenType.FLOAT,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
     "and": TokenType.AND,
@@ -69,4 +69,29 @@ KEYWORDS = {
     "false": TokenType.FALSE,
     "null": TokenType.NULL
 }
+
+TYPES = {
+    "integer": TokenType.INTEGER,
+    "double": TokenType.FLOAT,
+    "string": TokenType.STRING,
+    "boolean": TokenType.BOOLEAN
+}
+
+
+DELIMITERS = {
+    "(": TokenType.LPAREN,
+    ")": TokenType.RPAREN,
+    "{": TokenType.LBRACE,
+    "}": TokenType.RBRACE,
+    ";": TokenType.SEMICOLON
+}
+
+OPERATORS = {
+    "+": TokenType.PLUS,
+    "-": TokenType.MINUS,
+    "*": TokenType.STAR,
+    "/": TokenType.SLASH,
+    "%": TokenType.PERCENT
+}
+
 

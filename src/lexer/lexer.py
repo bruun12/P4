@@ -1,11 +1,6 @@
-from lexer.token import Token,TokenType
+from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS
 
 from error_handling import LexerError
-
-#source = "integer x = 5 ;"
-#tokens = []
-
-
 
 
 class Lexer:
@@ -50,7 +45,7 @@ class Lexer:
 
         while (self.current_char() != '*' or self.peek_next_char() != '/'):
             if self.position >= self.length:
-                raise LexerError("Comment is never ended, please put */", 420)
+                raise LexerError("Comment is never ended, please put */", 420, self.column, self.line)
             self.advance()  
         self.advance()
         self.advance()
@@ -63,7 +58,7 @@ class Lexer:
         start = self.position
         
         # Check if we haven't reached the end of the source
-        while self.position < len(self.source):
+        while self.position < self.length:
             char = self.peek_next_char()
             # check is needed because we are peaking at a char that doesn't exist
             if char is None:
@@ -78,7 +73,7 @@ class Lexer:
         number_str = self.source[start:self.position]
 
         if number_str.count(".") > 1:
-            raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12)
+            raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12, self.line, self.column)
 
         if '.' in number_str:
             return Token(TokenType.FLOAT, float(number_str), self.line, self.column)
@@ -86,8 +81,8 @@ class Lexer:
             return Token(TokenType.INTEGER, int(number_str), self.line, self.column)
         
 
-    #Function to read identifier and check if identifier is a keyword
-    def read_identifier(self):
+    #Function to read identifier or other keyword and return Token
+    def read_word(self) -> Token:
         start_line = self.line
         start_col = self.column
         start_pos = self.position
@@ -96,46 +91,101 @@ class Lexer:
             self.advance()
 
         value = self.source[start_pos:self.position]
-        
-        return token()
-        
 
-    #Function to read strings, denoted by quotes "hello"
-    def read_string(self):
+        if value in KEYWORDS:
+            return Token(KEYWORDS[value] , value, start_line, start_col)
+        elif value in TYPES:
+            return Token(TokenType.TYPE, value, start_line, start_col)
+        else:
+            return Token(TokenType.IDENTIFIER, value, start_line, start_col)
+
+    #Function to read strings, denoted by quotes
+    def read_string(self) -> Token:
         self.advance()
         start_line = self.line
         start_col = self.column
         start = self.position
         while (self.current_char() != '"'):
             if (self.position >= self.length):
-                raise LexerError("Missing """, 6969)
+                raise LexerError("Missing closing quote", 6969, self.line, self.column)
             self.advance()
-        self.advance
         string = self.source[start:self.position]
 
-        return Token[TokenType.STRING,string, start_line, start_col]
+        self.advance()
+
+        return Token(TokenType.STRING, string, start_line, start_col)
     
     def add_token(self, token):
         self.tokens.append(token)
 
+
     #
     def lexer(self):
         while(self.position < self.length):
-            char = self.source[self.position]
+            token = None
+            
+            char = self.current_char()
             peek = self.peek_next_char()
+            
+            # Skip to next token
+            if char.isspace():
+                self.advance()
+                continue
+            
+            if char == '/' and peek == '*':
+                self.skip_comment()
+                continue
+        
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
-                token = self.read_identifier()
+                token = self.read_word()
             elif char == '"':
                 token = self.read_string()
+            
+            #Arithmetic operators
+            elif char in OPERATORS:
+                token = Token(OPERATORS[char], char, self.line, self.column)
+                self.advance()
+                
+            #boolean operators
+            elif char == '=' and peek == '=':
+                token = Token(TokenType.EQ, '==', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '!' and peek == '=':
+                token = Token(TokenType.NE, '!=', self.line, self.column)
+                self.advance()
+                self.advance()
+            elif char == '<' and peek != '=':
+                token = Token(TokenType.LT, '<', self.line, self.column)
+                self.advance()
+            elif char == '<' and peek == '=':
+                token = Token(TokenType.LE, '<=', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek != '=':
+                token = Token(TokenType.GT, '>', self.line, self.column)
+                self.advance()
+            elif char == '>' and peek == '=':
+                token = Token(TokenType.GE, '>=', self.line, self.column)
+                self.advance()
+
+            #Assign
             elif char == '=' and peek != '=':
                 token = Token(TokenType.ASSIGN, '=', self.line, self.column)
-            elif char == '/' and peek == '*':
-                #If a comment is read continue to the next valid input
-                self.skip_comment()
-                continue
+                self.advance()
 
-            self.add_token(token)
+            #Delimiters
+            elif char in DELIMITERS:
+                token = Token(DELIMITERS[char], char, self.line, self.column)
+                self.advance()
 
-            self.advance()
+            else:
+                raise LexerError("Invalid token", 1, self.line, self.column)
+            
+            if token is not None:
+                self.add_token(token)
+            
+            
+        
+        self.add_token(Token(TokenType.EOF, "EOF", self.line, self.column))

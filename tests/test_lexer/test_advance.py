@@ -1,6 +1,6 @@
 from lexer.lexer import Lexer
 
-def test_advance():
+def test_advance_one_line():
     string = "int x = 20 // initilizing x\ny = x * 5"
     lex = Lexer(string)
 
@@ -9,3 +9,4 @@ def test_advance():
 
     assert lex.line == 2
     assert lex.column == 9
+
