@@ -73,7 +73,7 @@ def test_lexer_if_statement():
     assert lex.tokens[7].type == TokenType.IDENTIFIER
     assert lex.tokens[7].value == "b"
     assert lex.tokens[8].type == TokenType.RPAREN
-    assert lex.tokens[9].type == TokenType.LBRACE
+    assert lex.tokens[9].type == TokenType.LCBRACE
 
     # b = False;
     assert lex.tokens[10].type == TokenType.IDENTIFIER
@@ -84,9 +84,9 @@ def test_lexer_if_statement():
     assert lex.tokens[13].type == TokenType.SEMICOLON
 
     # } else {
-    assert lex.tokens[14].type == TokenType.RBRACE
+    assert lex.tokens[14].type == TokenType.RCBRACE
     assert lex.tokens[15].type == TokenType.ELSE
-    assert lex.tokens[16].type == TokenType.LBRACE
+    assert lex.tokens[16].type == TokenType.LCBRACE
     
     # b = True;
     assert lex.tokens[17].type == TokenType.IDENTIFIER
@@ -97,7 +97,7 @@ def test_lexer_if_statement():
     assert lex.tokens[20].type == TokenType.SEMICOLON
 
     # }
-    assert lex.tokens[21].type == TokenType.RBRACE
+    assert lex.tokens[21].type == TokenType.RCBRACE
     assert lex.tokens[22].type == TokenType.EOF
 
 
@@ -132,7 +132,7 @@ def test_lexer_while_statement():
         (TokenType.LT, "<"),
         (TokenType.INTEGER, 5),
         (TokenType.RPAREN, ")"),
-        (TokenType.LBRACE, "{"),
+        (TokenType.LCBRACE, "{"),
         (TokenType.IDENTIFIER, "f"),
         (TokenType.ASSIGN, "="),
         (TokenType.IDENTIFIER, "f"),
@@ -145,7 +145,7 @@ def test_lexer_while_statement():
         (TokenType.PLUS, "+"),
         (TokenType.INTEGER, 1),
         (TokenType.SEMICOLON, ";"),
-        (TokenType.RBRACE, "}"),
+        (TokenType.RCBRACE, "}"),
         (TokenType.EOF, "EOF")
     ]
     
