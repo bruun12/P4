@@ -33,11 +33,11 @@ class TokenType(Enum):
     NULL = auto()
 
     # Operators
-    PLUS = auto()
-    MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
-    PERCENT = auto()
+    PLUS = auto()         #+
+    MINUS = auto()        #-
+    STAR = auto()         #*
+    SLASH = auto()        #/
+    PERCENT = auto()      #%
 
     ASSIGN = auto()       # =
     EQ = auto()           # ==
@@ -52,11 +52,11 @@ class TokenType(Enum):
     NOT = auto()          # !
 
     # Delimiters
-    LPAREN = auto()
-    RPAREN = auto()
-    LBRACE = auto()
-    RBRACE = auto()
-    SEMICOLON = auto()
+    LPAREN = auto()       #(
+    RPAREN = auto()       #)
+    LBRACE = auto()       #[
+    RBRACE = auto()       #]
+    SEMICOLON = auto()    #:
 
 KEYWORDS = {
     "if": TokenType.IF,
