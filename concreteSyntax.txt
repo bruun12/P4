@@ -19,11 +19,17 @@ Introduction to compiler design p. 45
 Prog            -> FuncList                                     OK                             
 FuncList        -> FuncDef | FuncListA FuncList                 OK
 FuncListA       -> FuncDef |\epsilon                            OK
+
 FuncDef         -> TYPE IDF (ParamList){Stm}                    OK            
 ParamList       -> Param | \epsilon                             OK
 Param           -> ParamA| ParamB, Param                        OK
 ParamB          -> ParamA |\epsilon                             OK
 ParamA          -> TYPE IDF                                     OK 
+
+FuncCall        -> t x(ExpList);                                     OK
+ExpList         -> ExpElemA |\epsilon                           OK
+ExpElemA        -> Exp | ExpElemB, ExpElemA                     OK
+ExpElemB        -> Exp                                          OK 
 
 Stm             -> StmBStm |StmA                                OK
 StmB            -> StmA |\epsilon                               OK
