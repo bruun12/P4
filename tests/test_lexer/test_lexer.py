@@ -151,3 +151,30 @@ def test_lexer_while_statement():
     
     actual = [(t.type, t.value) for t in lex.tokens]
     assert actual == expected
+
+def test_lexer_array():
+    lex = Lexer("""
+                integer array = [1,2,3,4];     
+                """)
+    
+    lex.lexer()
+    
+    expected = [
+        (TokenType.TYPE, "integer"),
+        (TokenType.IDENTIFIER, "array"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.LBRACE, "["),
+        (TokenType.INTEGER, 1),
+        (TokenType.COMMA, ","),
+        (TokenType.INTEGER, 2),
+        (TokenType.COMMA, ","),
+        (TokenType.INTEGER, 3),
+        (TokenType.COMMA, ","),
+        (TokenType.INTEGER, 4),
+        (TokenType.RBRACE, "]"),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.EOF, "EOF")
+    ]
+    
+    actual = [(t.type, t.value) for t in lex.tokens]
+    assert actual == expected

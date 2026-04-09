@@ -51,13 +51,14 @@ class TokenType(Enum):
     NOT = auto()          # !
 
     # Delimiters
-    LPAREN = auto()
-    RPAREN = auto()
-    LBRACE = auto()
-    RBRACE = auto()
-    LCBRACE = auto()
-    RCBRACE = auto()
-    SEMICOLON = auto()
+    LPAREN = auto()       # (
+    RPAREN = auto()       # )
+    LBRACE = auto()       # [
+    RBRACE = auto()       # ]
+    LCBRACE = auto()      # {
+    RCBRACE = auto()      # }
+    SEMICOLON = auto()    # ;
+    COMMA = auto()        # ,
 
 KEYWORDS = {
     "if": TokenType.IF,
@@ -87,7 +88,8 @@ DELIMITERS = {
     "}": TokenType.RCBRACE,
     ";": TokenType.SEMICOLON,
     "[": TokenType.LBRACE,
-    "]": TokenType.RBRACE
+    "]": TokenType.RBRACE,
+    ",": TokenType.COMMA
 }
 
 OPERATORS = {
