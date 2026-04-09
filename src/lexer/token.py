@@ -32,11 +32,11 @@ class TokenType(Enum):
     NULL = auto()
 
     # Operators
-    PLUS = auto()
-    MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
-    PERCENT = auto()
+    PLUS = auto()         #+
+    MINUS = auto()        #-
+    STAR = auto()         #*
+    SLASH = auto()        #/
+    PERCENT = auto()      #%
 
     ASSIGN = auto()       # =
     EQ = auto()           # ==
