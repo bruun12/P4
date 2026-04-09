@@ -42,10 +42,12 @@ class Lexer:
 
     #Function to skip block comments
     def skip_comment(self):
+        startColumn = self.column
+        startLine = self.line
 
         while (self.current_char() != '*' or self.peek_next_char() != '/'):
             if self.position >= self.length:
-                raise LexerError("Comment is never ended, please put */", 420, self.column, self.line)
+                raise LexerError("Comment is never ended, please put */", 420, startColumn, startLine)
             self.advance()  
         self.advance()
         self.advance()
@@ -55,7 +57,10 @@ class Lexer:
     #Function to read number; can be integer or float
     ##
     def read_number(self) -> Token:
-        start = self.position
+        startPos = self.position
+        startColumn = self.column
+        startLine = self.line
+
         
         # Check if we haven't reached the end of the source
         while self.position < self.length:
@@ -70,50 +75,52 @@ class Lexer:
         
         self.advance()
 
-        number_str = self.source[start:self.position]
+        number_str = self.source[startPos:self.position]
 
         if number_str.count(".") > 1:
-            raise LexerError("A error on line: " + str(self.line) + " Invalid number: a number can only have one punctuation", 12, self.line, self.column)
+            raise LexerError("A error on line: " + str(startLine) + " Invalid number: a number can only have one punctuation", 12, startLine, startColumn)
 
         if '.' in number_str:
-            return Token(TokenType.FLOAT, float(number_str), self.line, self.column)
+            return Token(TokenType.FLOAT, float(number_str), startLine, startColumn)
         else:
-            return Token(TokenType.INTEGER, int(number_str), self.line, self.column)
+            return Token(TokenType.INTEGER, int(number_str), startLine, startColumn)
         
 
     #Function to read identifier or other keyword and return Token
     def read_word(self) -> Token:
-        start_line = self.line
-        start_col = self.column
-        start_pos = self.position
+        startLine = self.line
+        startColumn = self.column
+        startPos = self.position
 
         while (self.current_char() is not None and (self.current_char().isalnum() or self.current_char() == "_")):
             self.advance()
 
-        value = self.source[start_pos:self.position]
+        #Slice [self.source[startPos:self.position]] is a subarray of the full array
+        #self.source[] from position "startPos" to "self.position"
+        value = self.source[startPos:self.position]
 
         if value in KEYWORDS:
-            return Token(KEYWORDS[value] , value, start_line, start_col)
+            return Token(KEYWORDS[value] , value, startLine, startColumn)
         elif value in TYPES:
-            return Token(TokenType.TYPE, value, start_line, start_col)
+            return Token(TokenType.TYPE, value, startLine, startColumn)
         else:
-            return Token(TokenType.IDENTIFIER, value, start_line, start_col)
+            return Token(TokenType.IDENTIFIER, value, startLine, startColumn)
 
     #Function to read strings, denoted by quotes
     def read_string(self) -> Token:
         self.advance()
-        start_line = self.line
-        start_col = self.column
-        start = self.position
+        startLine = self.line
+        startColumn = self.column
+        startPos = self.position
         while (self.current_char() != '"'):
             if (self.position >= self.length):
-                raise LexerError("Missing closing quote", 6969, self.line, self.column)
+                raise LexerError("Missing closing quote", 6969, startLine, startColumn)
             self.advance()
-        string = self.source[start:self.position]
+        value = self.source[startPos:self.position]
 
         self.advance()
 
-        return Token(TokenType.STRING, string, start_line, start_col)
+        return Token(TokenType.STRING, value, startLine, startColumn)
     
     def add_token(self, token):
         self.tokens.append(token)
