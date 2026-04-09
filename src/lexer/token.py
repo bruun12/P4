@@ -55,6 +55,8 @@ class TokenType(Enum):
     RPAREN = auto()
     LBRACE = auto()
     RBRACE = auto()
+    LCBRACE = auto()
+    RCBRACE = auto()
     SEMICOLON = auto()
 
 KEYWORDS = {
