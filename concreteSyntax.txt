@@ -92,7 +92,7 @@ Arr             -> [ArrLenght]                                  OK
 ArrLenght       -> ArrList | \epsilon                           OK
 ArrList         -> ArrElems, ArrList | ArrElem                  OK
 ArrElems        -> ArrElem                                      OK
-ArrElem         -> Exp | String | Arr                           OK
+ArrElem         -> Exp | String                                 OK
 
 NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
 INT             -> NAT | -INT                               OK
