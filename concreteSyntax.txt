@@ -26,7 +26,7 @@ Param           -> ParamA| ParamB, Param                        OK
 ParamB          -> ParamA |\epsilon                             OK
 ParamA          -> TYPE IDF                                     OK 
 
-FuncCall        -> t x(ExpList);                                     OK
+FuncCall        -> t x(ExpList);                                OK
 ExpList         -> ExpElemA |\epsilon                           OK
 ExpElemA        -> Exp | ExpElemB, ExpElemA                     OK
 ExpElemB        -> Exp                                          OK 
