@@ -1,3 +1,4 @@
+
 class Node:
     pass
 
@@ -68,3 +69,8 @@ class Binary(Expression):
 class Grouping(Expression):
     def __init__(self, expression: Expression):
         self.expression = expression
+
+
+#Error class
+class ParserError(Exception):
+    pass
