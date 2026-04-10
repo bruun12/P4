@@ -40,48 +40,51 @@ Def             -> Arr | Exp                                    OK
 
 Exp -> ExpAnd
 
-ExpAnd -> ExpAndA AND ExpAnd | ExpOr
-ExpAndA -> ExpOr | \epsilon
+ExpAnd      -> ExpAndA AND ExpAnd | ExpOr
+ExpAndA     -> ExpOr | \epsilon
 
-ExpOr -> ExpOrA OR ExpOr | ExpEqual
-ExpOrA -> ExpEqual | \epsilon 
+ExpOr       -> ExpOrA OR ExpOr | ExpEqual
+ExpOrA      -> ExpEqual | \epsilon 
 
-ExpEqual -> ExpEqualA == ExpEqual | ExpNotEq 
-ExpEqualA -> ExpNotEq | \epsilon
+ExpEqual    -> ExpEqualA == ExpEqual | ExpNotEq 
+ExpEqualA   -> ExpNotEq | \epsilon
 
-ExpNotEq -> ExpNotEqA != ExpNotEq | ExpGreatEq 
-ExpNotEqA -> ExpGreatEq | \epsilon
+ExpNotEq    -> ExpNotEqA != ExpNotEq | ExpGreatEq 
+ExpNotEqA   -> ExpGreatEq | \epsilon
 
-ExpGreatEq -> ExpGreatEqA >= ExpGreatEq | ExpGreat
+ExpGreatEq  -> ExpGreatEqA >= ExpGreatEq | ExpGreat
 ExpGreatEqA -> ExpGreat | \epsilon
 
-ExpGreat -> ExpGreatA > ExpGreat | ExpLessEq
-ExpGreatA -> ExpLessEq | \epsilon
+ExpGreat    -> ExpGreatA > ExpGreat | ExpLessEq
+ExpGreatA   -> ExpLessEq | \epsilon
 
-ExpLessEq -> ExpLessEqA <= ExpLessEq | ExpLess
-ExpLessEqA -> ExpLess | \epsilon
+ExpLessEq   -> ExpLessEqA <= ExpLessEq | ExpLess
+ExpLessEqA  -> ExpLess | \epsilon
 
-ExpLess -> ExpLessA < ExpLess | ExpAdd
-ExpLessA -> ExpAdd | \epsilon
+ExpLess     -> ExpLessA < ExpLess | ExpAdd
+ExpLessA    -> ExpAdd | \epsilon
 
-ExpAdd -> ExpAddA + ExpAdd |ExpSub
-ExpAddA -> ExpSub | \epsilon
+ExpAdd      -> ExpAddA + ExpAdd |ExpSub
+ExpAddA     -> ExpSub | \epsilon
 
-ExpSub -> ExpSubA - ExpSub | ExpMult
-ExpSubA -> ExpMult | \epsilon
+ExpSub      -> ExpSubA - ExpSub | ExpNeg
+ExpSubA     -> ExpNeg | \epsilon
 
-ExpMult -> ExpMultA * ExpMult | ExpDiv 
-ExpMult -> ExpDiv | \epsilon
+ExpNeg      -> - ExpNegA | ExpMult
+ExpNegA     -> ExpMult | \epsilon
 
-ExpDiv -> ExpDivA/ExpDiv | ExpMod
-ExpDivA -> ExpMod | \epsilon
+ExpMult     -> ExpMultA * ExpMult | ExpDiv 
+ExpMultA    -> ExpDiv | \epsilon
 
-ExpMod -> ExpModA MOD ExpMod | ExpNot
-ExpModA -> ExpNot | \epsilon
+ExpDiv      -> ExpDivA/ExpDiv | ExpMod
+ExpDivA     -> ExpMod | \epsilon
 
-ExpNot -> !Term
+ExpMod      -> ExpModA MOD ExpMod | ExpNot
+ExpModA     -> ExpNot | \epsilon
 
-Term ->  INT | IDF | DOUBLE | CHAR | BOOL |(Exp)                                 
+ExpNot      -> !Term
+
+Term        ->  INT | IDF | DOUBLE | CHAR | BOOL |(Exp)                                 
 
 FormatString    -> "String"                                     OK
 String          -> StringA + String | Symbol                    OK
