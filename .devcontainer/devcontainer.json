@@ -1,0 +1,30 @@
+{
+  "name": "Development",
+  "dockerComposeFile": "../docker-compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/app",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.mypy-type-checker",
+        "charliermarsh.ruff"
+        ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.extraPaths": ["/app/src"],
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "always"
+        }
+      }
+    }
+  },
+  
+  "remoteUser": "root"
+}
