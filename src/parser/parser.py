@@ -89,13 +89,37 @@ class Parser:
         return left
     
     def parse_and(self):
-        left = self.parse_or
+        left = self.parse_equality()
         while self.match(TokenType.AND):
             op = self.advance().value
-            left = Binary(left, op, self.parse_or())
+            left = Binary(left, op, self.parse_equality())
         return left
     
-    def 
+    def parse_equality(self):
+        left = self.parse_comparison()
+        while self.match(TokenType.EQ, TokenType.NE):
+            op = self.advance().value
+            left = Binary(left, op, self.parse_comparison())
+        return left
+    
+    def parse_comparison(self):
+        left = self.parse_additive()
+        while self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
+            op = self.advance.value
+            left = Binary(left, op, self.parse_additive())
+        return left
+    
+    def parse_additive(self):
+        left = self.parse_multiplicative()
+        while self.match(TokenType.PLUS, TokenType.MINUS):
+            op = self.advance.value
+            left = Binary(left, op, self.parse_multiplicative())
+        return left
+    
+    def parse_multiplicative(): # Fejl ikke det samme som det andet OBS!!!
+        left = self.parse_unary()
+        while self.match(TokenType.)
+
     
 
 
