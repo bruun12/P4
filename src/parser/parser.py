@@ -25,36 +25,52 @@ class Parser:
 
     #Return current token
     def current(self) -> Token:
-        return
+        return self.tokens[self.position]
 
     #Return previous token
     def previous(self) -> Token:
-        return
+        return self.tokens[self.position-1]
 
     #Advance position and return previous token
     def advance(self) -> Token:
-        return
 
-    #Advance position and return previous token if token is of specific type.
-    #If not of specific type, raise error with argument message.
+        if not self.is_at_end():
+            self.position+=1
+        return self.previous()
+
+    #If token is of specific type; advance position and return previous token.
+    #If not of specific type; raise error with argument message.
     def consume(self, token_type: TokenType, message: str) -> Token:
-        return
+        if self.current().type == token_type:
+            return self.advance()
+        raise self.error(token_type, message)
 
     #Return true if current token is of type "EOF"
-    def is_at_end(self) -> bool:
-        return
+    def is_at_end(self) -> bool: 
+        if self.current().type == TokenType.EOF:
+            return True
+        return False
 
     #Return true if current token is of specific type
     def check(self, token_type: TokenType) -> bool:
-        return
+        if self.current().type == token_type:
+            return True
+        return False 
 
     #Return true if current token is of specific types
     def match(self, *types: TokenType) -> bool:
-        return
+        
+        for type in types:
+            if self.check(type):
+                self.advance()
+                return True
+        return False
 
     #Return parser error with costum message
     def error(self, token: Token, message: str) -> ParserError:
-        return
+        return ParserError(
+            f"[line {token.line}, col {token.column}] Error at {token.value!r}: {message}"
+        ) 
 
     def parse(self) -> Program:
         statements = []
