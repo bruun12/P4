@@ -75,3 +75,27 @@ class Parser:
     def parse(self) -> Program:
         statements = []
         return Program(statements)
+    
+
+    #Expressions
+    def parse_expression(self):
+        return self.parse_or()
+
+    def parse_or(self):
+        left = self.parse_and
+        while self.match(TokenType.OR):
+            op = self.advance().value
+            left = Binary(left, op, self.parse_and())
+        return left
+    
+    def parse_and(self):
+        left = self.parse_or
+        while self.match(TokenType.AND):
+            op = self.advance().value
+            left = Binary(left, op, self.parse_or())
+        return left
+    
+    def 
+    
+
+
