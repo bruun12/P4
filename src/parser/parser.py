@@ -82,7 +82,7 @@ class Parser:
         return self.parse_or()
 
     def parse_or(self):
-        left = self.parse_and
+        left = self.parse_and()
         while self.match(TokenType.OR):
             op = self.advance().value
             left = Binary(left, op, self.parse_and())
@@ -116,10 +116,67 @@ class Parser:
             left = Binary(left, op, self.parse_multiplicative())
         return left
     
-    def parse_multiplicative(): # Fejl ikke det samme som det andet OBS!!!
+    def parse_multiplicative(self): # Fejl ikke det samme som det andet OBS!!!
         left = self.parse_unary()
-        while self.match(TokenType.)
+        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
+            op = self.advance.value
+            left = Binary(left, op, self.parse_unary())
+        return left
+    
+    def parse_unary(self):
+        if self.match(TokenType.NOT):
+            op = self.advance().value
+            return Unary(op, self.parse_unary())
+        return self.parse_primary()
+    
+    def parse_primary(self):
+        tok = self.current()
 
+        if tok.type == TokenType.INTEGER:
+            self.advance
+            return Literal(tok.value)
+        
+        if tok.type == TokenType.FLOAT:
+            self.advance
+            return Literal(tok.value)
+        
+        if tok.type == TokenType.TRUE:
+            self.advance
+            return Literal(True)
+        
+        if tok.type == TokenType.FALSE:
+            self.advance
+            return Literal(False)
+        
+        if tok.type == TokenType.STRING:
+            self.advance
+            return Literal(tok.value)
+        
+        #Parenteser
+        if tok.type == TokenType.LPAREN:
+            self.advance
+            expr = self.parse_expression()
+            self.expect(TokenType.RPAREN)
+            return expr
+        
+        #array (Mangler lidt mere arbejde)
+        if tok.value == TokenType.LBRACE:
+            return ArrayLiteral(self.parse_array_literal())
+
+
+        # Identifier, funktionskald eller array-access (work in progress)
+        if tok.type == TokenType.IDENTIFIER:
+            name = self.advance().value
+            if self.match(TokenType.LPAREN):
+                return self.parse_funccall(name)
+            if self.match(TokenType.LBRACE):
+                self.advance()
+                idx = self.parse_expression()
+                self.expect(TokenType.RBRACE)
+                return ArrayAccess(name, idx)
+            return Variable(name)
+
+        raise ParserError("Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)
     
 
 
