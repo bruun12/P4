@@ -125,9 +125,6 @@ class Parser:
         return
     
     
-    
-    
-
     #Expressions
     def parse_expression(self):
         print(self.current())
@@ -137,48 +134,48 @@ class Parser:
     def parse_or(self):
         left = self.parse_and()
         while self.match(TokenType.OR):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_and())
         return left
     
     def parse_and(self):
         left = self.parse_equality()
         while self.match(TokenType.AND):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_equality())
         return left
     
     def parse_equality(self):
         left = self.parse_comparison()
         while self.match(TokenType.EQ, TokenType.NE):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_comparison())
         return left
     
     def parse_comparison(self):
         left = self.parse_additive()
         while self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_additive())
         return left
     
     def parse_additive(self):
         left = self.parse_multiplicative()
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_multiplicative())
         return left
     
     def parse_multiplicative(self):
         left = self.parse_unary()
         while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
-            op = self.advance().value
+            op = self.previous().value
             left = Binary(left, op, self.parse_unary())
         return left
     
     def parse_unary(self):
         if self.match(TokenType.NOT):
-            op = self.advance().value
+            op = self.previous().value
             return Unary(op, self.parse_unary())
         return self.parse_primary()
     
@@ -213,7 +210,6 @@ class Parser:
             expr = self.parse_expression()
             if not self.match(TokenType.RPAREN):
                 raise ParserError("Missing )", tok.line, tok.column)
-            self.advance()
             return expr
       
 

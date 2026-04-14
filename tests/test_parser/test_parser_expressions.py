@@ -5,12 +5,18 @@ from parser.ASTNodes import ParserError
 from parser.parser import Parser
 
 
-# Helper function
+# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens
 def parse_expr(source: str):
     lex = Lexer(source)
     lex.lexer()
     p = Parser(lex.tokens)
-    return p.parse_expression()
+    expr = p.parse_expression()
+
+    if not p.is_at_end():
+        tok = p.current()
+        raise ParserError(f"Unexpected token '{tok.value}'", tok.line, tok.column)
+    
+    return expr
 
 
 # Empty / missing expressions
