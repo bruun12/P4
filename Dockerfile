@@ -15,3 +15,7 @@ CMD ["pytest", "-v", "tests/"]
 FROM base AS production
 
 CMD [ "python", "main.py" ]
+
+FROM base AS dev
+
+CMD [ "tail -f", "/dev/null" ]

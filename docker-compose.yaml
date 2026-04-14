@@ -22,3 +22,17 @@ services:
       - PYTHONPATH=/app/src
     working_dir: /app/tests
     command: pytest -v
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app/src
+    working_dir: /app/
+    command: tail -f /dev/null  # Keeps container alive
+    stdin_open: true
+    tty: true
