@@ -45,4 +45,4 @@ def test_parser_primary_LPAREN_RPAREN():
     lex.lexer()
     parser = Parser(lex.tokens)
 
-    assert parser.parse_primary().getValue() == "1"
+    assert parser.parse_primary().getValue() == 1

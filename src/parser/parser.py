@@ -130,6 +130,8 @@ class Parser:
 
     #Expressions
     def parse_expression(self):
+        print(self.current())
+
         return self.parse_or()
 
     def parse_or(self):
@@ -156,21 +158,21 @@ class Parser:
     def parse_comparison(self):
         left = self.parse_additive()
         while self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
-            op = self.advance.value
+            op = self.advance().value
             left = Binary(left, op, self.parse_additive())
         return left
     
     def parse_additive(self):
         left = self.parse_multiplicative()
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            op = self.advance.value
+            op = self.advance().value
             left = Binary(left, op, self.parse_multiplicative())
         return left
     
     def parse_multiplicative(self):
         left = self.parse_unary()
         while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
-            op = self.advance.value
+            op = self.advance().value
             left = Binary(left, op, self.parse_unary())
         return left
     
@@ -180,34 +182,38 @@ class Parser:
             return Unary(op, self.parse_unary())
         return self.parse_primary()
     
+
+    
     def parse_primary(self):
         tok = self.current()
 
         if tok.type == TokenType.INTEGER:
-            self.advance
+            self.advance()
             return Literal(tok.value)
         
         if tok.type == TokenType.FLOAT:
-            self.advance
+            self.advance()
             return Literal(tok.value)
         
         if tok.type == TokenType.TRUE:
-            self.advance
+            self.advance()
             return Literal(True)
         
         if tok.type == TokenType.FALSE:
-            self.advance
+            self.advance()
             return Literal(False)
         
         if tok.type == TokenType.STRING:
-            self.advance
+            self.advance()
             return Literal(tok.value)
         
         #Parenteser
         if tok.type == TokenType.LPAREN:
-            self.advance
+            self.advance()
             expr = self.parse_expression()
-            self.check(TokenType.RPAREN)
+            if not self.match(TokenType.RPAREN):
+                raise ParserError("Missing )", tok.line, tok.column)
+            self.advance()
             return expr
       
 
