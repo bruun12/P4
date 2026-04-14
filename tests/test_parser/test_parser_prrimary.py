@@ -41,4 +41,8 @@ def test_parser_primary_string():
     assert parser.parse_primary().getValue() == "Hey"
 
 def test_parser_primary_LPAREN_RPAREN():
-    lex = Lexer
+    lex = Lexer("(1)")
+    lex.lexer()
+    parser = Parser(lex.tokens)
+
+    assert parser.parse_primary().getValue() == "1"
