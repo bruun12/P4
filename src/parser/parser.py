@@ -45,7 +45,7 @@ class Parser:
         raise self.error(token_type, message)
 
     #Return true if current token is of type "EOF"
-    def is_at_end(self) -> bool: 
+    def is_at_end(self) -> bool:
         if self.current().type == TokenType.EOF:
             return True
         return False
@@ -54,42 +54,66 @@ class Parser:
     def check(self, token_type: TokenType) -> bool:
         if self.current().type == token_type:
             return True
-        return False 
+        return False
 
     #Return true if current token is of specific types
     def match(self, *types: TokenType) -> bool:
-        
         for type in types:
             if self.check(type):
                 self.advance()
                 return True
         return False
 
+    def peek(self) -> Token | None:
+
+        if self.position+1 > len(self.tokens):
+            return None
+        return self.tokens[self.position+1]
+
     #Return parser error with costum message
     def error(self, token: Token, message: str) -> ParserError:
         return ParserError(
             f"[line {token.line}, col {token.column}] Error at {token.value!r}: {message}"
-        ) 
+        )
 
     def parse(self) -> Program:
         statements = []
 
-        while not is_at_end():
+        while not self.is_at_end():
             statements.append(self.statement())
         return Program(statements)
 
     def statement(self) -> Statement:
-        if self.current().type == TokenType.
+        if self.match(TokenType.LCBRACE):
+            return self.block_statement()
+
+        if self.match(TokenType.WHILE):
+            return self.while_statement()
+
+        if self.match(TokenType.IF):
+            return self.if_statement()
+
+        if self.match(TokenType.RETURN):
+            return self.return_statement()
+
+        if self.check(TokenType.IDENTIFIER) and self.peek() == TokenType.ASSIGN:
+            return self.assign_statement()
+
+        return self.expression_statement()
+
+    def block_statement(self) -> BlockStatement:
+        statements = []
+        while not self.check(TokenType.RCBRACE) and self.is_at_end():
+            statements.append(self.statement())
+        self.comsume(TokenType.RCBRACE)
+
 
     def while_statement(self) -> WhileStatement:
         return
-    
-    def block_statement(self) -> BlockStatement:
-        return
-    
+
     def assign_statement(self) -> AssignStatement:
         return 
-    
+
     def if_statement(self) -> IfStatement:
         return
     
