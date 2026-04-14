@@ -1,3 +1,0 @@
-from tests.test_parser.test_parser_primary import test_parser_primary_LPAREN_RPAREN
-
-test_parser_primary_LPAREN_RPAREN()
