@@ -24,6 +24,11 @@ ParamList       -> Param | \epsilon                             OK
 Param           -> ParamA| ParamB, Param                        OK
 ParamB          -> ParamA |\epsilon                             OK
 ParamA          -> TYPE IDF                                     OK 
+FuncCall        -> TYPE IDF(ExpList)                            OK
+ExpList         -> ExpListElem | \epsilon                       OK
+ExpListElem     -> ExpA |Exp, ExpListElem                       OK     
+ExpA            -> Exp                                          OK
+
 
 Stm             -> StmBStm |StmA                                OK
 StmB            -> StmA |\epsilon                               OK
@@ -75,7 +80,7 @@ ExpModA -> ExpNot | \epsilon
 
 ExpNot -> !Term
 
-Term ->  INT | IDF | DOUBLE | CHAR | BOOL |(Exp)                                 
+Term ->  INT | IDF | DOUBLE | CHAR | BOOL | ArrCall | (Exp)                                 
 
 FormatString    -> "String"                                     OK
 String          -> StringA + String | Symbol                    OK
@@ -83,10 +88,10 @@ StringA         -> Symbol | \epsilon                            OK
 Symbol          -> ASCII | \epsilon                             OK
 
 Arr             -> [ArrLenght]                                  OK
-ArrLenght       -> ArrList | \epsilon                           OK
-ArrList         -> ArrElems, ArrList | ArrElem                  OK
-ArrElems        -> ArrElem                                      OK
-ArrElem         -> Exp | String | Arr                           OK
+ArrLenght       -> ArrElem | \epsilon                           OK
+ArrElem         -> ArrElemA, ArrElem                            OK
+ArrElemA        -> Exp | FormatString                           OK
+ArrCall         -> IDF[NAT]
 
 NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
 INT             -> NAT | -INT                               OK
