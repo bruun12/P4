@@ -7,6 +7,9 @@ class Token:
         self.value = value
         self.line = line
         self.column = column
+    #Printer function
+    def __repr__(self):
+        return f"Token(type={self.type}, value='{self.value}', line={self.line}, col={self.column})"
     
 
 class TokenType(Enum):
@@ -32,11 +35,11 @@ class TokenType(Enum):
     NULL = auto()
 
     # Operators
-    PLUS = auto()
-    MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
-    PERCENT = auto()
+    PLUS = auto()         #+
+    MINUS = auto()        #-
+    STAR = auto()         #*
+    SLASH = auto()        #/
+    PERCENT = auto()      #%
 
     ASSIGN = auto()       # =
     EQ = auto()           # ==

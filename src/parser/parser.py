@@ -1,5 +1,25 @@
+from lexer.token import TokenType, Token
+from parser.ASTNodes import (
+    Program, 
+    BlockStatement, 
+    AssignStatement, 
+    IfStatement, 
+    WhileStatement, 
+    ReturnStatement, 
+    ExpressionStatement,
+    Literal, 
+    Variable, 
+    Unary, 
+    Binary, 
+    Grouping,
+    Node,
+    Statement,
+    Expression,
+    ParserError
+)
+
 class Parser:
-    def __init__(self, tokens):
+    def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.position = 0
 
@@ -54,14 +74,14 @@ class Parser:
 
     def parse(self) -> Program:
         statements = []
-        
+
         while not is_at_end():
             statements.append(self.statement())
         return Program(statements)
-    
+
     def statement(self) -> Statement:
         if self.current().type == TokenType.
-    
+
     def while_statement(self) -> WhileStatement:
         return
     
