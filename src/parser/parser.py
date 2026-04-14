@@ -33,7 +33,6 @@ class Parser:
 
     #Advance position and return previous token
     def advance(self) -> Token:
-
         if not self.is_at_end():
             self.position+=1
         return self.previous()
