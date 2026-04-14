@@ -51,6 +51,9 @@ class Literal(Expression):
     def __init__(self, value: object):
         self.value = value
 
+    def getValue(self):
+        return self.value
+
 class Variable(Expression):
     def __init__(self, name: str):
         self.name = name
@@ -61,10 +64,10 @@ class Unary(Expression):
         self.right = right
 
 class Binary(Expression):
-    def __init__(self, right: Expression, operator: str, left: Expression):
-        self.right = right
-        self.operator = operator
+    def __init__(self, left: Expression, operator: str, right: Expression):
         self.left = left
+        self.operator = operator
+        self.right = right
 
 class Grouping(Expression):
     def __init__(self, expression: Expression):
