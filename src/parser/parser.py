@@ -1,22 +1,23 @@
-from lexer.token import TokenType, Token
+from lexer.token import Token, TokenType
 from parser.ASTNodes import (
-    Program, 
-    BlockStatement, 
-    AssignStatement, 
-    IfStatement, 
-    WhileStatement, 
-    ReturnStatement, 
-    ExpressionStatement,
-    Literal, 
-    Variable, 
-    Unary, 
-    Binary, 
-    Grouping,
-    Node,
-    Statement,
+    AssignStatement,
+    Binary,
+    BlockStatement,
     Expression,
-    ParserError
+    ExpressionStatement,
+    Grouping,
+    IfStatement,
+    Literal,
+    Node,
+    ParserError,
+    Program,
+    ReturnStatement,
+    Statement,
+    Unary,
+    Variable,
+    WhileStatement,
 )
+
 
 class Parser:
     def __init__(self, tokens: list[Token]):
@@ -116,7 +117,7 @@ class Parser:
             left = Binary(left, op, self.parse_multiplicative())
         return left
     
-    def parse_multiplicative(self): # Fejl ikke det samme som det andet OBS!!!
+    def parse_multiplicative(self):
         left = self.parse_unary()
         while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
             op = self.advance.value
@@ -156,25 +157,10 @@ class Parser:
         if tok.type == TokenType.LPAREN:
             self.advance
             expr = self.parse_expression()
-            self.expect(TokenType.RPAREN)
+            self.check(TokenType.RPAREN)
             return expr
-        
-        #array (Mangler lidt mere arbejde)
-        if tok.value == TokenType.LBRACE:
-            return ArrayLiteral(self.parse_array_literal())
+      
 
-
-        # Identifier, funktionskald eller array-access (work in progress)
-        if tok.type == TokenType.IDENTIFIER:
-            name = self.advance().value
-            if self.match(TokenType.LPAREN):
-                return self.parse_funccall(name)
-            if self.match(TokenType.LBRACE):
-                self.advance()
-                idx = self.parse_expression()
-                self.expect(TokenType.RBRACE)
-                return ArrayAccess(name, idx)
-            return Variable(name)
 
         raise ParserError("Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)
     

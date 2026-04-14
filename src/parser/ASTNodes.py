@@ -51,6 +51,9 @@ class Literal(Expression):
     def __init__(self, value: object):
         self.value = value
 
+    def getValue(self):
+        return self.value
+
 class Variable(Expression):
     def __init__(self, name: str):
         self.name = name

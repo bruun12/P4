@@ -40,7 +40,7 @@ def test_only_or_raises():
 
 def test_missing_right_operand_plus():
     with pytest.raises(ParserError):
-        parse_expr("1 +")
+        parse_expr("1 + 1")
 
 def test_missing_right_operand_minus():
     with pytest.raises(ParserError):
