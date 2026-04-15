@@ -131,7 +131,7 @@ class Parser:
 
         return self.parse_or()
 
-    def parse_or(self):
+    def parse_or(self): #self.match do self.advance
         left = self.parse_and()
         while self.match(TokenType.OR):
             op = self.previous().value
@@ -184,34 +184,31 @@ class Parser:
     def parse_primary(self):
         tok = self.current()
 
-        if tok.type == TokenType.INTEGER:
-            self.advance()
+        if self.match(TokenType.INTEGER):
             return Literal(tok.value)
         
-        if tok.type == TokenType.FLOAT:
-            self.advance()
+        if self.match(TokenType.FLOAT):
             return Literal(tok.value)
         
-        if tok.type == TokenType.TRUE:
-            self.advance()
+        if self.match(TokenType.TRUE):
             return Literal(True)
         
-        if tok.type == TokenType.FALSE:
-            self.advance()
+        if self.match(TokenType.FALSE):
             return Literal(False)
         
-        if tok.type == TokenType.STRING:
-            self.advance()
+        if self.match(TokenType.STRING):
             return Literal(tok.value)
         
         #Parenteser
-        if tok.type == TokenType.LPAREN:
-            self.advance()
+        if self.match(TokenType.LPAREN):
             expr = self.parse_expression()
             if not self.match(TokenType.RPAREN):
                 raise ParserError("Missing )", tok.line, tok.column)
             return expr
       
+        if tok.type == TokenType.RPAREN:
+            self.advance()
+            raise ParserError("Missing (", tok.line, tok.column)
 
 
         raise ParserError("Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)

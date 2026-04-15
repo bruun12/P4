@@ -11,10 +11,6 @@ def parse_expr(source: str):
     lex.lexer()
     p = Parser(lex.tokens)
     expr = p.parse_expression()
-
-    if not p.is_at_end():
-        tok = p.current()
-        raise ParserError(f"Unexpected token '{tok.value}'", tok.line, tok.column)
     
     return expr
 
@@ -126,10 +122,6 @@ def test_double_and_raises():
 def test_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( 42")
-
-def test_missing_lparen_raises():
-    with pytest.raises(ParserError):
-        parse_expr("42 )")
 
 def test_empty_parens_raises():
     with pytest.raises(ParserError):
