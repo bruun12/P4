@@ -46,7 +46,6 @@ class ExpressionStatement(Statement):
         self.expression = expression
 
 #Expression nodes
-
 class Literal(Expression):
     def __init__(self, value: object):
         self.value = value
