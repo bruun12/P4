@@ -353,6 +353,7 @@ class TypeEnvironment:
         raise TypeCheckError(f"Undefined variable '{name}'.")
 
 
+
 # ============================================================
 # TYPE CHECKER
 # ============================================================
