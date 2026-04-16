@@ -16,6 +16,7 @@ from parser.ASTNodes import (
     Unary,
     Variable,
     WhileStatement,
+    VarDeclaration,
 )
 
 
@@ -187,6 +188,11 @@ class Parser:
 
         return self.expression_statement()
 
+    def var_declaration(self) -> VarDeclaration:
+        name = self.advance()
+        self.consume()
+        
+
     def block_statement(self) -> BlockStatement:
         statements = []
         while not self.check(TokenType.RCBRACE) and not self.is_at_end():
@@ -203,7 +209,7 @@ class Parser:
         return WhileStatement(condition, body)
 
     def assign_statement(self) -> AssignStatement:
-        name = self.advance
+        name = self.advance()
         self.consume(TokenType.ASSIGN, "Expected '=' after name")
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON, "Expected ';' after assignment")
