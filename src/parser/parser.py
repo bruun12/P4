@@ -151,7 +151,6 @@ class Parser:
         return False
 
     def peek(self) -> Token | None:
-
         if self.position+1 > len(self.tokens):
             return None
         return self.tokens[self.position+1]
@@ -182,18 +181,20 @@ class Parser:
         if self.match(TokenType.RETURN):
             return self.return_statement()
         
-
-        if self.check(TokenType.IDENTIFIER) and self.peek and self.peek().type == TokenType.ASSIGN:
+        if self.match(TokenType.TYPE):
+            return self.var_declaration()
+        
+        if self.match(TokenType.IDENTIFIER):
             return self.assign_statement()
 
         return self.expression_statement()
 
     def var_declaration(self) -> VarDeclaration:
-        type = self.advance()
+        type = self.previous()
         name = self.advance()
         expr = self.expression_statement()
         self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
-        return VarDeclaration(type, name, expr)
+        return VarDeclaration(type, name, expr)        
 
     def block_statement(self) -> BlockStatement:
         statements = []
@@ -211,7 +212,8 @@ class Parser:
         return WhileStatement(condition, body)
 
     def assign_statement(self) -> AssignStatement:
-        name = self.advance()
+        #match() advances the the cursor, meaning the name is present on previous instead of present token 
+        name = self.previous()
         self.consume(TokenType.ASSIGN, "Expected '=' after name")
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON, "Expected ';' after assignment")
