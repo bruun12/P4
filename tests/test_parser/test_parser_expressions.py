@@ -14,6 +14,7 @@ def parse_expr(source: str):
     
     return expr
 
+# Lav hvor vi ikke forventer errors
 
 # Empty / missing expressions
 
@@ -130,3 +131,7 @@ def test_empty_parens_raises():
 def test_nested_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( ( 1 + 2 )")
+
+def test_expr():
+    print(parse_expr("2").value)
+    print("test")
