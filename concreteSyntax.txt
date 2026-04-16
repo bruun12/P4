@@ -20,7 +20,7 @@ Prog            -> FuncList                                     OK
 FuncList        -> FuncDef | FuncListA FuncList                 OK
 FuncListA       -> FuncDef |\epsilon                            OK
 
-FuncDef         -> TYPE IDF (ParamList){Stm}                    OK            
+FuncDef         -> TYPE IDF (ParamList){Stm return e;} Stm      OK            
 ParamList       -> Param | \epsilon                             OK
 Param           -> ParamA| ParamB, Param                        OK
 ParamB          -> ParamA |\epsilon                             OK
