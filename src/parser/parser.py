@@ -79,7 +79,6 @@ class Parser:
 
     def parse(self) -> Program:
         statements = []
-
         while not self.is_at_end():
             statements.append(self.statement())
         return Program(statements)
@@ -102,28 +101,7 @@ class Parser:
 
         return self.expression_statement()
 
-    def block_statement(self) -> BlockStatement:
         
-from lexer.token import Token, TokenType
-from parser.ASTNodes import (
-    AssignStatement,
-    Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    Grouping,
-    IfStatement,
-    Literal,
-    Node,
-    ParserError,
-    Program,
-    ReturnStatement,
-    Statement,
-    Unary,
-    Variable,
-    WhileStatement,
-)
-
 
 class Parser:
     def __init__(self, tokens: list[Token]):

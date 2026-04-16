@@ -1,6 +1,6 @@
 FROM python:3.14 AS base
 
-WORKDIR /src
+WORKDIR /app
 COPY requirements.txt .
 
 # Install main dependencies
