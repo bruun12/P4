@@ -7,6 +7,7 @@ from parser.ASTNodes import (
     ExpressionStatement,
     Grouping,
     IfStatement,
+    VarDeclaration,
     Literal,
     Node,
     ParserError,
@@ -24,9 +25,10 @@ class TypeCheckError(Exception):
     pass
 
 #Base class for all types
+@dataclass(frozen=True)
 class Type:
-    pass
-
+    line: int
+    column: int
 
 @dataclass(frozen=True)
 class IntType(Type):
@@ -53,6 +55,40 @@ class NullType(Type):
     pass
 
 
+# Reusable singleton-like values for primitive types.
+IntType()
+FloatType()
+BoolType()
+StringType()
+NullType()
+
+@dataclass(frozen=True)
+class FlowResult:
+    guaranteed_returns: bool
+    breaks_loop: bool
+    unreachable: bool
+
+NO_GUARANTEED_RETURN = FlowResult(
+    guaranteed_returns=False,
+    breaks_loop=False,
+    unreachable=False
+)
+GUARANTEED_RETURN = FlowResult(
+    guaranteed_returns=True,
+    breaks_loop=False,
+    unreachable=False
+)
+HAS_BREAK = FlowResult(
+    guaranteed_returns=False,
+    breaks_loop=True,
+    unreachable=False
+)
+IS_UNREACHABLE = FlowResult(
+    guaranteed_returns=False,
+    breaks_loop=False,
+    unreachable=True
+)
+#!!Maybe include HAS_NO_BREAK and IS_REACHABLE
 
 #Helper function when printing error message. 
 def type_to_string(t: Type) -> str:
@@ -73,4 +109,14 @@ def can_assign(target: Type, value: Type) -> bool:
 #Function to check expected result type of an arithmetic operation
 def common_numeric_type(left: Type, right: Type) -> Type:
     return
+
+
+class TypeEnvironment:
+    def __init__(self, parent: "TypeEnvironment | None" = None):
+        self.parent = parent
+        self.values: dict[str, Type] = {}
+        
+    def define(self, name: str, type: Type):
+        self.values[name] = type
+
 

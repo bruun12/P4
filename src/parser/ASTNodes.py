@@ -1,7 +1,14 @@
 from parser.datatype import DataType
 
+
+# -------------------------
+# Base classes
+# -------------------------
+
 class Node:
-    pass
+    def __init__(self, line: int, column: int):
+        self.line = line
+        self.column = column
 
 
 class Statement(Node):
@@ -12,74 +19,109 @@ class Expression(Node):
     pass
 
 
+# ============================================================
+# Statement nodes
+# ============================================================
 
-#Statement nodes:
 class Program(Node):
     def __init__(self, statements: list):
+        # Program doesn't really have a meaningful position
+        # but we keep 0,0 for consistency
+        super().__init__(line=0, column=0)
         self.statements = statements
+
 
 class BlockStatement(Statement):
-    def __init__(self, statements: list):
+    def __init__(self, statements: list, line: int, column: int):
+        super().__init__(line, column)
         self.statements = statements
 
+
 class VarDeclaration(Statement):
-    def __init__(self, type: DataType, name: str, value: Expression):
+    def __init__(self, type: DataType, name: str, value: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.name = name
         self.type = type
         self.value = value
 
+
 class AssignStatement(Statement):
-    def __init__(self, name: str, value: Expression):
+    def __init__(self, name: str, value: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.name = name
         self.value = value
 
+
 class IfStatement(Statement):
-    def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None):
+    def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
+        super().__init__(line, column)
         self.condition = condition
         self.then_branch = then_branch
         self.else_branch = else_branch
 
+
 class WhileStatement(Statement):
-    def __init__(self, condition: Expression, body: Statement):
+    def __init__(self, condition: Expression, body: Statement, line: int, column: int):
+        super().__init__(line, column)
         self.condition = condition
         self.body = body
 
+
 class ReturnStatement(Statement):
-    def __init__(self, value: Expression):
+    def __init__(self, value: Expression | None, line: int, column: int):
+        super().__init__(line, column)
         self.value = value
 
+
 class ExpressionStatement(Statement):
-    def __init__(self, expression: Expression):
+    def __init__(self, expression: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.expression = expression
 
-#Expression nodes
+
+# ============================================================
+# Expression nodes
+# ============================================================
+
 class Literal(Expression):
-    def __init__(self, value: object):
+    def __init__(self, value: object, line: int, column: int):
+        super().__init__(line, column)
         self.value = value
 
     def getValue(self):
         return self.value
 
+
 class Variable(Expression):
-    def __init__(self, name: str):
+    def __init__(self, name: str, line: int, column: int):
+        super().__init__(line, column)
         self.name = name
 
+
 class Unary(Expression):
-    def __init__(self, operator: str, right: Expression):
+    def __init__(self, operator: str, right: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.operator = operator
         self.right = right
 
+
 class Binary(Expression):
-    def __init__(self, left: Expression, operator: str, right: Expression):
+    def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.left = left
         self.operator = operator
         self.right = right
 
+
 class Grouping(Expression):
-    def __init__(self, expression: Expression):
+    def __init__(self, expression: Expression, line: int, column: int):
+        super().__init__(line, column)
         self.expression = expression
 
 
-#Error class
+# ============================================================
+# Error class
+# ============================================================
+
 class ParserError(Exception):
     pass

@@ -317,7 +317,7 @@ class TypeEnvironment:
 
     def __init__(self, parent: "TypeEnvironment | None" = None):
         self.parent = parent
-        self.values: dict[str, Type] = {}
+        self.values: dict[str, Type, line] = {}
 
     def define(self, name: str, typ: Type) -> None:
         """
@@ -654,7 +654,7 @@ class TypeChecker:
                 return NULL
 
             if isinstance(value, bool):
-                return BOOL
+                return BoolType(expr.line, expr.column)
 
             if isinstance(value, int):
                 return INT
