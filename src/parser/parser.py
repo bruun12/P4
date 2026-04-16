@@ -128,7 +128,7 @@ class Parser:
     def consume(self, token_type: TokenType, message: str) -> Token:
         if self.current().type == token_type:
             return self.advance()
-        raise self.error(token_type, message)
+        raise self.error(self.current(), message)
 
     #Return true if current token is of type "EOF"
     def is_at_end(self) -> bool:
@@ -194,7 +194,8 @@ class Parser:
         name = self.advance()
         expr = self.expression_statement()
         self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
-        return VarDeclaration(type, name, expr)        
+        return VarDeclaration(type, name, expr)
+        
 
     def block_statement(self) -> BlockStatement:
         statements = []
@@ -236,7 +237,7 @@ class Parser:
     def return_statement(self) -> ReturnStatement:
         value = None
         if not self.check(TokenType.SEMICOLON):
-            value = self.parse_expression
+            value = self.parse_expression()
         self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
         return ReturnStatement(value)
     
