@@ -189,9 +189,11 @@ class Parser:
         return self.expression_statement()
 
     def var_declaration(self) -> VarDeclaration:
+        type = self.advance()
         name = self.advance()
-        self.consume()
-        
+        expr = self.expression_statement()
+        self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
+        return VarDeclaration(type, name, expr)
 
     def block_statement(self) -> BlockStatement:
         statements = []

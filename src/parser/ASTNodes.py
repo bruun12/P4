@@ -24,8 +24,8 @@ class BlockStatement(Statement):
 
 class VarDeclaration(Statement):
     def __init__(self, type: DataType, name: str, value: Expression):
-        self.name = name
         self.type = type
+        self.name = name
         self.value = value
 
 class AssignStatement(Statement):
