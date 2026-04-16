@@ -1,3 +1,4 @@
+from parser.datatype import DataType
 
 class Node:
     pass
@@ -20,6 +21,12 @@ class Program(Node):
 class BlockStatement(Statement):
     def __init__(self, statements: list):
         self.statements = statements
+
+class VarDeclaration(Statement):
+    def __init__(self, type: DataType, name: str, value: Expression):
+        self.name = name
+        self.type = type
+        self.value = value
 
 class AssignStatement(Statement):
     def __init__(self, name: str, value: Expression):
@@ -46,7 +53,6 @@ class ExpressionStatement(Statement):
         self.expression = expression
 
 #Expression nodes
-
 class Literal(Expression):
     def __init__(self, value: object):
         self.value = value
