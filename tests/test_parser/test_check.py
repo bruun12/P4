@@ -1,13 +1,16 @@
 from parser.parser import Parser
-from lexer.lexer import Lexer, TokenType
+from lexer.lexer import Token, TokenType
 
-def test_check():
-    string = "integer x = 20 // initilizing x\ny = x * 5"
-    lex = Lexer(string)
+def test_check_stopper():
+    tokens = [Token(TokenType.TYPE, "string", 1, 1), 
+              Token(TokenType.IDENTIFIER, "x", 2, 1),
+              Token(TokenType.EQ, "=", 3, 1),
+              Token(TokenType.STRING, "hello world", 4, 1),
+              Token(TokenType.SEMICOLON, ";", 5, 1),
+              Token(TokenType.EOF, "EOF", 6, 1)
+              ]
 
-    lex.lexer()
-
-    parser = Parser(lex.tokens)
+    parser = Parser(tokens)
     assert parser.check(TokenType.TYPE)
 
     while parser.current().type != TokenType.EOF:
