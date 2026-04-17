@@ -1,7 +1,24 @@
 import pytest
 
 from lexer.lexer import Lexer
-from error_handling import ParserError
+from parser.ASTNodes import (
+    AssignStatement,
+    Binary,
+    BlockStatement,
+    Expression,
+    ExpressionStatement,
+    IfStatement,
+    Literal,
+    Node,
+    ParserError,
+    Program,
+    ReturnStatement,
+    Statement,
+    Unary,
+    Variable,
+    WhileStatement,
+    VarDeclaration,
+)
 from parser.parser import Parser
 
 
@@ -135,3 +152,190 @@ def test_nested_missing_rparen_raises():
 def test_expr():
     print(parse_expr("2").value)
     print("test")
+
+# Expression, is it working?
+
+# Primary
+###############################################################################################
+def test_expression_integer_literal():
+    lex = Lexer("return 42;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Literal)
+    assert node.value.value == 42
+
+def test_expression_float_literal():
+    lex = Lexer("return 42.11;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Literal)
+    assert node.value.value == 42.11
+
+def test_expression_true_literal():
+    lex = Lexer("return true;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Literal)
+    assert node.value.value
+
+def test_expression_false_literal():
+    lex = Lexer("return false;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Literal)
+    assert node.value.value == False
+
+def test_expression_string_literal():
+    lex = Lexer('return "Hello";')
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Literal)
+    assert node.value.value
+
+def test_expression_identifier():
+    lex = Lexer("return x;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Variable)
+    assert node.value.name == "x"
+
+# Unary
+###################################################################################################
+
+def test_expression_unary_not():
+    lex = Lexer("return !true;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Unary)
+    assert node.value.operator == "!"
+    assert isinstance(node.value.right, Literal)
+    assert node.value.right.value == True
+
+
+#Multiplicative
+######################################################################################################
+
+def test_expression_multiplicative():
+    lex = Lexer("return x * 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Binary)
+    assert node.value.operator == "*"
+    assert isinstance(node.value.left, Variable)
+    assert node.value.left.name == "x"
+    assert isinstance(node.value.right, Literal)
+    assert node.value.right.value == 2
+
+def test_expression_division():
+    lex = Lexer("return x / 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.value, Binary)
+    assert node.value.operator == "/"
+
+def test_expression_modulo():
+    lex = Lexer("return x MOD 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.value, Binary)
+    assert node.value.operator == "MOD"
+
+# Additive
+########################################################################################################
+
+def test_expression_addition():
+    lex = Lexer("return x + 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.value, Binary)
+    assert node.value.operator == "+"
+    assert isinstance(node.value.left, Variable)
+    assert node.value.left.name == "x"
+    assert isinstance(node.value.right, Literal)
+    assert node.value.right.value == 2
+
+def test_expression_subtration():
+    lex = Lexer("return x - 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.value, Binary)
+    assert node.value.operator == "-"
+    assert isinstance(node.value.left, Variable)
+    assert node.value.left.name == "x"
+    assert isinstance(node.value.right, Literal)
+    assert node.value.right.value == 2
+
+# Comparison
+#############################################################################################################
+
+def test_expression_less_than(): 
+    lex = Lexer("if (x < 10) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, IfStatement)
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "<"
+    assert isinstance(node.condition.left, Variable)
+    assert node.condition.left.name == "x"
+    assert isinstance(node.condition.right, Literal)
+    assert node.condition.right.value == 10
+
+def test_expression_less_than_or_equal():
+    lex = Lexer("if (x <= 10) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, IfStatement)
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "<="
+    assert isinstance (node.condition.left, Variable)
+    assert node.condition.left.name == "x"
+    assert isinstance(node.condition.right, Literal)
+    assert node.condition.right.value == 10
+
+def test_expression_greater_than():
+    lex = Lexer("if (x > 10) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, IfStatement)
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == ">"
+    assert isinstance(node.condition.left, Variable)
+    assert node.condition.left.name == "x"
+    assert isinstance(node.condition.right, Literal)
+    assert node.condition.right.value == 10
+
+def test_expression_greater_than_or_equal():
+    lex = Lexer("if (x >= 10) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, IfStatement)
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == ">="
+    assert isinstance (node.condition.left, Variable)
+    assert node.condition.left.name == "x"
+    assert isinstance(node.condition.right, Literal)
+    assert node.condition.right.value == 10

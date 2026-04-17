@@ -60,7 +60,6 @@ def test_statements_expression():
 
 
 # Errors for statements
-
 def parse_stmt(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -103,3 +102,27 @@ def test_assign_missing_assign_operator():
 def test_assign_missing_semicolon():
     with pytest.raises(ParserError):
         parse_stmt("x = 5")
+
+# IF statement 
+def test_if_missing_lparen():
+    with pytest.raises(ParserError):
+        parse_stmt("if x<3){}")
+
+def test_if_missing_rparen():
+    with pytest.raises(ParserError):
+        parse_stmt("if (x<3 {}")
+
+def test_if_missing_lcbrace():
+    with pytest.raises(ParserError):
+        parse_stmt("if (x<3)")
+
+def test_if_else_missing_lcbrace():
+    with pytest.raises(ParserError):
+        parse_stmt("if (x > 0) {} else integer y = 1;")
+
+# Return
+def test_return_missing_semicolon():
+    with pytest.raises(ParserError):
+        parse_stmt("return x + 2")
+
+

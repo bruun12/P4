@@ -39,7 +39,7 @@ class TokenType(Enum):
     MINUS = auto()        #-
     STAR = auto()         #*
     SLASH = auto()        #/
-    MOD = auto()      #%
+    MOD = auto()          #%
 
     ASSIGN = auto()       # =
     EQ = auto()           # ==
