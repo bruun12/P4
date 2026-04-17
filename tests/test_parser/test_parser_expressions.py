@@ -363,3 +363,49 @@ def test_expression_not_equals():
 
 # AND / OR 
 ##################################################################################################################
+
+def test_expression_and():
+    lex = Lexer("if (x == 1 AND y == 2) { z = 0; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "AND"
+    assert isinstance(node.condition.left, Binary)   
+    assert isinstance(node.condition.right, Binary)  
+
+def test_expression_or():
+    lex = Lexer("if (x == 1 OR y == 2) { z = 0; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "OR"
+
+def test_expression_and_before_than_or():
+    # x OR y AND z  bør parses som  x OR (y AND z)
+    lex = Lexer("if (x == 1 OR y == 2 AND z == 3) { w = 0; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert node.condition.operator == "OR"           
+    assert node.condition.right.operator == "AND"    
+
+#Precedence
+#############################################################################################################
+
+def test_expression_precedence_mul_over_add():
+    lex = Lexer("return x + y * 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert node.value.operator == "+"
+    assert node.value.right.operator == "*"
+
+def test_expression_precedence_min_over_add():
+    lex = Lexer("return x - y + 2;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert node.value.operator == "+"
+    assert node.value.left.operator == "-"
