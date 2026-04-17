@@ -204,7 +204,7 @@ class Parser:
     
     def parse_multiplicative(self):
         left = self.parse_unary()
-        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
+        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.MOD):
             op = self.previous().value
             left = Binary(left, op, self.parse_unary())
         return left
@@ -245,6 +245,6 @@ class Parser:
                 raise ParserError("Missing )", tok.line, tok.column)
             return expr
 
-        raise ParserError("Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)
+        raise ParserError(f"Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)
 
 

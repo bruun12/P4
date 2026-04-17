@@ -39,7 +39,7 @@ class TokenType(Enum):
     MINUS = auto()        #-
     STAR = auto()         #*
     SLASH = auto()        #/
-    PERCENT = auto()      #%
+    MOD = auto()          #%
 
     ASSIGN = auto()       # =
     EQ = auto()           # ==
@@ -73,7 +73,7 @@ KEYWORDS = {
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "null": TokenType.NULL,
-    "MOD": TokenType.PERCENT 
+    "MOD": TokenType.MOD 
 }
 
 TYPES = {
