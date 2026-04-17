@@ -13,7 +13,8 @@ def test_check_stopper():
     parser = Parser(tokens)
     assert parser.check(TokenType.TYPE)
 
-    while parser.current().type != TokenType.EOF:
+    # ensure that it tries to advance further than the token array 
+    for x in range(1 , 20):
         parser.advance()
 
     assert parser.check(TokenType.EOF)
