@@ -1,4 +1,5 @@
 from lexer.token import Token, TokenType
+from error_handling import ParserError, ErrorCode
 from parser.ASTNodes import (
     AssignStatement,
     Binary,
@@ -8,7 +9,6 @@ from parser.ASTNodes import (
     IfStatement,
     Literal,
     Node,
-    ParserError,
     Program,
     ReturnStatement,
     Statement,
@@ -39,10 +39,10 @@ class Parser:
 
     #If token is of specific type; advance position and return previous token.
     #If not of specific type; raise error with argument message.
-    def consume(self, token_type: TokenType, message: str) -> Token:
+    def consume(self, token_type: TokenType) -> Token:
         if self.current().type == token_type:
             return self.advance()
-        raise self.error(self.current(), message)
+        raise self.error(ErrorCode.STRUCTURE_ERROR)
 
     #Return true if current token is of type "EOF"
     def is_at_end(self) -> bool:
@@ -70,10 +70,8 @@ class Parser:
         return self.tokens[self.position+1]
 
     #Return parser error with costum message
-    def error(self, token: Token, message: str) -> ParserError:
-        return ParserError(
-            f"[line {token.line}, col {token.column}] Error at {token.value!r}: {message}"
-        )
+    def error(self, error_code: int) -> ParserError:
+        return ParserError(error_code, self.current(), self.previous())
 
     def parse(self) -> Program:
         statements = []
@@ -107,44 +105,44 @@ class Parser:
         type = self.previous()
         self.advance()
         name = self.previous()
-        self.consume(TokenType.ASSIGN, "Expected '=' after name")
+        self.consume(TokenType.ASSIGN)
         value = self.parse_expression()
-        self.consume(TokenType.SEMICOLON, "Expected ';' after assignment")
+        self.consume(TokenType.SEMICOLON)
         return VarDeclaration(type.value, name.value, value) 
     
     def block_statement(self) -> BlockStatement:
         statements = []
         while not self.check(TokenType.RCBRACE) and not self.is_at_end():
             statements.append(self.statement())
-        self.consume(TokenType.RCBRACE, "Expected '}' after")
+        self.consume(TokenType.RCBRACE)
         return BlockStatement(statements)
 
     def while_statement(self) -> WhileStatement:
-        self.consume(TokenType.LPAREN, "Expected '(' after 'while'")
+        self.consume(TokenType.LPAREN)
         condition = self.parse_expression()
-        self.consume(TokenType.RPAREN, "Expected ')' after 'condition'")
-        self.consume(TokenType.LCBRACE, "Expected '{' after 'while'")
+        self.consume(TokenType.RPAREN)
+        self.consume(TokenType.LCBRACE)
         body = self.block_statement()
         return WhileStatement(condition, body)
 
     def assign_statement(self) -> AssignStatement:
         #match() advances the the cursor, meaning the name is present on previous instead of present token 
         name = self.previous()
-        self.consume(TokenType.ASSIGN, "Expected '=' after name")
+        self.consume(TokenType.ASSIGN)
         value = self.parse_expression()
-        self.consume(TokenType.SEMICOLON, "Expected ';' after assignment")
+        self.consume(TokenType.SEMICOLON)
         return AssignStatement(name.value, value) 
 
     def if_statement(self) -> IfStatement:
-        self.consume(TokenType.LPAREN, "Expected '(' after 'if'")
+        self.consume(TokenType.LPAREN)
         condition = self.parse_expression()
-        self.consume(TokenType.RPAREN, "Expected ')' after condition")
-        self.consume(TokenType.LCBRACE, "Expected '{' before if-body")
+        self.consume(TokenType.RPAREN)
+        self.consume(TokenType.LCBRACE)
         then_branch = self.block_statement()
 
         else_branch = None
         if self.match(TokenType.ELSE):
-            self.consume(TokenType.LCBRACE, "Expected '{' after 'else'")
+            self.consume(TokenType.LCBRACE)
             else_branch = self.block_statement()
         
         return IfStatement(condition, then_branch, else_branch)
@@ -153,12 +151,12 @@ class Parser:
         value = None
         if not self.check(TokenType.SEMICOLON):
             value = self.parse_expression()
-        self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
+        self.consume(TokenType.SEMICOLON)
         return ReturnStatement(value)
     
     def expression_statement(self) -> ExpressionStatement:
         expr = self.parse_expression()
-        self.consume(TokenType.SEMICOLON, "Expected ';'")
+        self.consume(TokenType.SEMICOLON)
         return ExpressionStatement(expr)
     
     #Expressions
@@ -204,7 +202,7 @@ class Parser:
     
     def parse_multiplicative(self):
         left = self.parse_unary()
-        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
+        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.MOD):
             op = self.previous().value
             left = Binary(left, op, self.parse_unary())
         return left
@@ -242,9 +240,9 @@ class Parser:
         if self.match(TokenType.LPAREN):
             expr = self.parse_expression()
             if not self.match(TokenType.RPAREN):
-                raise ParserError("Missing )", tok.line, tok.column)
+                raise self.error(ErrorCode.STRUCTURE_ERROR) 
             return expr
 
-        raise ParserError("Unexpected Token used: '{tok.value}' in expressions", tok.line, tok.column)
+        raise self.error(ErrorCode.UNEXPECTED_TOKEN_ERROR)
 
 
