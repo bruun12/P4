@@ -105,12 +105,13 @@ class Parser:
 
     def var_declaration(self) -> VarDeclaration:
         type = self.previous()
-        name = self.advance()
-        expr = self.expression_statement()
-        self.consume(TokenType.SEMICOLON, "Excepted ';' after return")
-        return VarDeclaration(type, name, expr)
-        
-
+        self.advance()
+        name = self.previous()
+        self.consume(TokenType.ASSIGN, "Expected '=' after name")
+        value = self.parse_expression()
+        self.consume(TokenType.SEMICOLON, "Expected ';' after assignment")
+        return VarDeclaration(type.value, name.value, value) 
+    
     def block_statement(self) -> BlockStatement:
         statements = []
         while not self.check(TokenType.RCBRACE) and not self.is_at_end():
@@ -233,6 +234,9 @@ class Parser:
         
         if self.match(TokenType.STRING):
             return Literal(tok.value)
+        
+        if self.match(TokenType.IDENTIFIER):
+            return Variable(tok.value)
         
         #Parenteser
         if self.match(TokenType.LPAREN):
