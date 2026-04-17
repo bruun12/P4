@@ -339,3 +339,27 @@ def test_expression_greater_than_or_equal():
     assert node.condition.left.name == "x"
     assert isinstance(node.condition.right, Literal)
     assert node.condition.right.value == 10
+
+# Equality
+##########################################################################################################
+
+def test_expression_equals():
+    lex = Lexer("if (x == 5) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "=="
+    assert isinstance(node.condition.right, Literal)
+    assert node.condition.right.value == 5
+
+def test_expression_not_equals():
+    lex = Lexer("if (x != 5) { y = 1; }")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node.condition, Binary)
+    assert node.condition.operator == "!="
+
+# AND / OR 
+##################################################################################################################
