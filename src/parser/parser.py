@@ -3,6 +3,7 @@ from parser.ASTNodes import (
     AssignStatement,
     Binary,
     BlockStatement,
+    Expression,
     ExpressionStatement,
     IfStatement,
     Literal,
@@ -64,7 +65,7 @@ class Parser:
         return False
 
     def peek(self) -> Token | None:
-        if self.position+1 > len(self.tokens):
+        if self.position+1 > len(self.tokens) - 1:
             return None
         return self.tokens[self.position+1]
 
@@ -158,7 +159,6 @@ class Parser:
         expr = self.parse_expression()
         self.consume(TokenType.SEMICOLON, "Expected ';'")
         return ExpressionStatement(expr)
-    
     
     #Expressions
     def parse_expression(self):
