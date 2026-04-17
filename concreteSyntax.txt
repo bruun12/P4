@@ -38,10 +38,11 @@ ExpElemB        -> Exp                                          OK
 
 Stm             -> StmBStm |StmA                                OK
 StmB            -> StmA |\epsilon                               OK
-StmA            -> TYPE IDF = Def; | IDF = Def                  OK
+StmA            -> TYPE Def                                     OK
+                    | IDF = Exp |AIDF = [Exp,...,Exp]           OK
                     | return Exp; | break;                      OK
-                    | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK    
-Def             -> Arr | Exp                                    OK
+                    | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK
+Def             -> IDF = Exp; | AIDF = [Exp,...,Exp]; 
 
 Exp -> ExpAnd
 
@@ -87,9 +88,9 @@ ExpDivA     -> ExpMod | \epsilon
 ExpMod      -> ExpModA MOD ExpMod | ExpNot
 ExpModA     -> ExpNot | \epsilon
 
-ExpNot      -> !Term
-                           
-Term        ->  INT | IDF | DOUBLE | CHAR | BOOL | ArrCall | (Exp)                                 
+ExpNot -> !Term
+
+Term ->  INT | IDF | DOUBLE | CHAR | BOOL | AIDF[NAT]|(Exp)                                 
 
 FormatString    -> FormatStringA + FormatString | "String"      OK
 FormatStringA   -> "String" | \epsilon                          OK
@@ -97,11 +98,6 @@ String          -> StringA String | Symbol                      OK
 StringA         -> Symbol | \epsilon                            OK
 Symbol          -> ASCII | \epsilon                             OK
 
-Arr             -> [ArrLenght]                                  OK
-ArrLenght       -> ArrElem | \epsilon                           OK
-ArrElem         -> ArrElemA, ArrElem                            OK
-ArrElemA        -> Exp | FormatString                           OK
-ArrCall         -> IDF[NAT]
 
 NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
 INT             -> NAT | -INT                               OK
