@@ -1,7 +1,7 @@
 import pytest
 from parser.parser import Parser
 from lexer.lexer import TokenType, Token
-from parser.ASTNodes import ParserError
+from error_handling import ParserError, ErrorCode
 
 def test_consume_success():
     tokens = [Token(TokenType.TYPE, "integer", 1, 1), 
@@ -10,10 +10,10 @@ def test_consume_success():
 
     parser = Parser(tokens)
     
-    parser.consume(TokenType.TYPE, "error message")
+    parser.consume(TokenType.TYPE)
     consumedToken = parser.previous() #needs to be previous because consume self advance 
     assert consumedToken.type == TokenType.TYPE
-    parser.consume(TokenType.IDENTIFIER, "error message")
+    parser.consume(TokenType.IDENTIFIER)
     consumedToken = parser.previous() 
     assert consumedToken.type == TokenType.IDENTIFIER
 
@@ -23,9 +23,9 @@ def test_consume_fail():
 
     parser = Parser(tokens)
     
-    parser.consume(TokenType.TYPE, "error message")
+    parser.consume(TokenType.TYPE)
     consumedToken = parser.previous() #needs to be previous because consume self advance 
     assert consumedToken.type == TokenType.TYPE
     #Raises error if there is a mistake
     with pytest.raises(ParserError):
-        parser.consume(TokenType.IDENTIFIER, "error message")
+        parser.consume(TokenType.IDENTIFIER)
