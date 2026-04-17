@@ -29,6 +29,8 @@ class Parser:
 
     #Return previous token
     def previous(self) -> Token:
+        if self.position-1 is None:
+            return None
         return self.tokens[self.position-1]
 
     #Advance position and return previous token
@@ -70,7 +72,7 @@ class Parser:
         return self.tokens[self.position+1]
 
     #Return parser error with costum message
-    def error(self, error_code: int) -> ParserError:
+    def error(self, error_code: ErrorCode) -> ParserError:
         return ParserError(error_code, self.current(), self.previous())
 
     def parse(self) -> Program:
@@ -244,5 +246,3 @@ class Parser:
             return expr
 
         raise self.error(ErrorCode.UNEXPECTED_TOKEN_ERROR)
-
-

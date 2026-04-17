@@ -22,6 +22,11 @@ class ParserError(Exception):
     def __init__(self, error_code: ErrorCode, token, previous_token):
         if error_code == ErrorCode.STRUCTURE_ERROR:
             super().__init__(f"Parser Error: Expected '{token.value}' after '{previous_token.value}'")
+        elif error_code == ErrorCode.SEMICOLON_ERROR:
+            super().__init__(f"Parser Error: Expected '{token.value}' after '{previous_token.value}'")
+        elif error_code == ErrorCode.UNEXPECTED_TOKEN_ERROR:
+            super().__init__(f"Parser Error: Unexpected Token '{token.value}'")
+
         self.error_code = error_code
         self.token = token
         self.previous_token = previous_token

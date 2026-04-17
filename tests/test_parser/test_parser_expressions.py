@@ -10,7 +10,6 @@ from parser.ASTNodes import (
     IfStatement,
     Literal,
     Node,
-    ParserError,
     Program,
     ReturnStatement,
     Statement,
@@ -20,7 +19,7 @@ from parser.ASTNodes import (
     VarDeclaration,
 )
 from parser.parser import Parser
-
+from error_handling import ParserError
 
 # Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens
 def parse_expr(source: str):
