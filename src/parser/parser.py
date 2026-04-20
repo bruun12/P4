@@ -263,6 +263,10 @@ class Parser:
         if self.match(TokenType.STRING):
             return Literal(tok.value)
         
+        if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
+            pass
+            #Her skal vi så så have lavet en ny klasse, hvor vi kan parse funktionen og dens argumenter
+
         if self.match(TokenType.IDENTIFIER):
             return Variable(tok.value)
         
