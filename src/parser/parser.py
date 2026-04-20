@@ -16,6 +16,8 @@ from parser.ASTNodes import (
     Variable,
     WhileStatement,
     VarDeclaration,
+    Function,
+    Parameter
 )
 
 class Parser:
@@ -75,13 +77,39 @@ class Parser:
     def error(self, error_code: ErrorCode) -> ParserError:
         return ParserError(error_code, self.current(), self.previous())
 
-    def parse(self) -> Program:
+#    def parse(self) -> Program:
         statements = []
 
         while not self.is_at_end():
             statements.append(self.statement())
         return Program(statements)
+    
+    def parse(self) -> Program:
+        functions = []
+        while not self.is_at_end():
+            functions.append(self.function())
+        return Program(functions)
 
+    def function(self) -> Function:
+        type = self.consume(TokenType.TYPE)
+        name = self.consume(TokenType.IDENTIFIER)
+        parameters = self.parameters()
+        body = self.statement()
+        return Function(type.value, name.value, parameters, body)
+
+    def parameters(self) -> list:
+        parameters = []
+        self.consume(TokenType.LPAREN)
+        while self.current().type is not TokenType.RPAREN:
+            type = self.consume(TokenType.TYPE)
+            name = self.consume(TokenType.IDENTIFIER)
+            parameters.append(Parameter(type.value, name.value))
+            #if we haven't reached the end of the parameters consume the commas 
+            if self.current().type is not TokenType.RPAREN:
+                self.consume(TokenType.COMMA)
+        self.consume(TokenType.RPAREN)
+        return parameters
+            
     def statement(self) -> Statement:
         if self.match(TokenType.LCBRACE):
             return self.block_statement()

@@ -222,7 +222,7 @@ def test_expression_unary_not():
     assert isinstance(node.value, Unary)
     assert node.value.operator == "!"
     assert isinstance(node.value.right, Literal)
-    assert node.value.right.value == True
+    assert node.value.right.value
 
 
 #Multiplicative

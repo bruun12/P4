@@ -23,6 +23,7 @@ class TokenType(Enum):
     INTEGER = auto()
     FLOAT = auto()
     STRING = auto()
+    VOID = auto()
 
     # Keywords
     BOOLEAN = auto()
@@ -80,7 +81,8 @@ TYPES = {
     "integer": TokenType.INTEGER,
     "double": TokenType.FLOAT,
     "string": TokenType.STRING,
-    "boolean": TokenType.BOOLEAN
+    "boolean": TokenType.BOOLEAN,
+    "void" : TokenType.VOID
 }
 
 
