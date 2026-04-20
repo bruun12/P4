@@ -1,5 +1,5 @@
 import pytest
-
+from error_handling import ParserError
 from lexer.lexer import Lexer
 from parser.ASTNodes import (
     AssignStatement,
