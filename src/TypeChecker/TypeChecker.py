@@ -92,23 +92,23 @@ IS_UNREACHABLE = FlowResult(
 
 #Helper function when printing error message. 
 def type_to_string(t: Type) -> str:
-    return
+    return 
 
 #Function to return true if type is int or float
 def is_numeric(t: Type) -> bool:
-    return
+    return t == TokenType.INT or t == TokenType.FLOAT
 
 #Function to return true if types are the same
 def same_type(a: Type, b: Type) -> bool:
-    return
+    return a == b
 
 #Function to return true if a value is allowed to get assigned to a target variable
 def can_assign(target: Type, value: Type) -> bool:
-    return
+    return 
 
 #Function to check expected result type of an arithmetic operation
 def common_numeric_type(left: Type, right: Type) -> Type:
-    return
+    return 
 
 
 class TypeEnvironment:
