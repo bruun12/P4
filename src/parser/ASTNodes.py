@@ -1,10 +1,3 @@
-from parser.datatype import DataType
-
-
-# -------------------------
-# Base classes
-# -------------------------
-
 class Node:
     def __init__(self, line: int, column: int):
         self.line = line
@@ -24,13 +17,21 @@ class Expression(Node):
 # ============================================================
 
 class Program(Node):
-    def __init__(self, statements: list):
-        # Program doesn't really have a meaningful position
-        # but we keep 0,0 for consistency
-        super().__init__(line=0, column=0)
-        self.statements = statements
+    def __init__(self, functions: list):
+        self.functions = functions
 
-
+class Function(Node):
+    def __init__(self, return_type: str, name: str, parameters: list, statement: Statement):
+        self.return_type = return_type
+        self.name = name
+        self.parameters = parameters
+        self.statement = statement
+        
+class Parameter(Node):
+    def __init__(self, type: str, name: str):
+        self.type = type
+        self.name = name
+        
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
         super().__init__(line, column)
@@ -38,10 +39,8 @@ class BlockStatement(Statement):
 
 
 class VarDeclaration(Statement):
-    def __init__(self, type: DataType, name: str, value: Expression, line: int, column: int):
-        super().__init__(line, column)
+    def __init__(self, type: DataType, name: str, value: Expression):
         self.name = name
-        self.type = type
         self.value = value
 
 
@@ -78,14 +77,22 @@ class ExpressionStatement(Statement):
         super().__init__(line, column)
         self.expression = expression
 
+class ArrayDeclaration(Statement): # integer arr = [1, 2, 3];
+    def __init__(self, type: DataType, name: str, elements: list):
+        self.type = type
+        self.name = name 
+        self.elements = elements # list[expression]
 
-# ============================================================
-# Expression nodes
-# ============================================================
+class ArrayDeclarationEmpty(Statement): # integer arr[3];
+    def __init__(self, type: str, name: str, size: Expression):
+        self.type = type
+        self.name = name
+        self.size = size
+        
 
+#Expression nodes
 class Literal(Expression):
-    def __init__(self, value: object, line: int, column: int):
-        super().__init__(line, column)
+    def __init__(self, value):
         self.value = value
 
     def getValue(self):

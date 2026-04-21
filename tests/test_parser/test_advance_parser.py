@@ -1,16 +1,12 @@
 from parser.parser import Parser
-from lexer.lexer import Lexer, TokenType
+from lexer.lexer import TokenType, Token
 
-def test_advance():
-    string = "integer x = 20 // initilizing x\ny = x * 5"
-    lex = Lexer(string)
+def test_advance_success():
+    tokens = [Token(TokenType.TYPE, "string", 1, 1),
+              Token(TokenType.IDENTIFIER, "x", 2, 1)]
 
-    lex.lexer()
-
-    parser = Parser(lex.tokens)
+    parser = Parser(tokens)
     assert parser.current().type == TokenType.TYPE
+    parser.advance()
+    assert parser.current().type == TokenType.IDENTIFIER
 
-    while parser.current().type != TokenType.EOF:
-        parser.advance()
-
-    assert parser.current().type == TokenType.EOF

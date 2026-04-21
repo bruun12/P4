@@ -164,17 +164,22 @@ class Lexer:
                 token = Token(TokenType.NE, '!=', self.line, self.column)
                 self.advance()
                 self.advance()
+            elif char == '!' and peek != '=':
+                token = Token(TokenType.NOT, '!', self.line, self.column)
+                self.advance()
             elif char == '<' and peek != '=':
                 token = Token(TokenType.LT, '<', self.line, self.column)
                 self.advance()
             elif char == '<' and peek == '=':
                 token = Token(TokenType.LE, '<=', self.line, self.column)
                 self.advance()
+                self.advance()
             elif char == '>' and peek != '=':
                 token = Token(TokenType.GT, '>', self.line, self.column)
                 self.advance()
             elif char == '>' and peek == '=':
                 token = Token(TokenType.GE, '>=', self.line, self.column)
+                self.advance()
                 self.advance()
 
             #Assign

@@ -1,19 +1,31 @@
+import pytest
 from parser.parser import Parser
-from lexer.lexer import Lexer, TokenType, Token
+from lexer.lexer import TokenType, Token
+from error_handling import ParserError
 
-def test_comsume():
-    string = "integer x = 20 // initilizing x\ny = x * 5"
-    lex = Lexer(string)
+def test_consume_success():
+    tokens = [Token(TokenType.TYPE, "integer", 1, 1), 
+            Token(TokenType.IDENTIFIER, "x", 2, 1)
+            ]
 
-    lex.lexer()
-
-    parser = Parser(lex.tokens)
+    parser = Parser(tokens)
     
-    expected_current_token = Token(TokenType.TYPE, "integer", 0, 1)
+    parser.consume(TokenType.TYPE)
+    consumedToken = parser.previous() #needs to be previous because consume self advance 
+    assert consumedToken.type == TokenType.TYPE
+    parser.consume(TokenType.IDENTIFIER)
+    consumedToken = parser.previous() 
+    assert consumedToken.type == TokenType.IDENTIFIER
+
+def test_consume_fail():
+    tokens = [Token(TokenType.TYPE, "integer", 1, 1), 
+              Token(TokenType.INTEGER, "4", 2, 1)]
+
+    parser = Parser(tokens)
     
-    assert parser.consume(expected_current_token, "error message") == expected_current_token
-
-    #while parser.current().type != TokenType.EOF:
-    #    parser.advance()
-
-    #assert parser.check(TokenType.EOF)
+    parser.consume(TokenType.TYPE)
+    consumedToken = parser.previous() #needs to be previous because consume self advance 
+    assert consumedToken.type == TokenType.TYPE
+    #Raises error if there is a mistake
+    with pytest.raises(ParserError):
+        parser.consume(TokenType.IDENTIFIER)
