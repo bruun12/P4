@@ -178,10 +178,15 @@ class Parser:
     def assign_statement(self) -> AssignStatement:
         #match() advances the the cursor, meaning the name is present on previous instead of present token 
         name = self.previous()
+        offset = None
+        if self.current().type == TokenType.LBRACE:
+            self.consume(TokenType.LBRACE)
+            offset = self.parse_expression()
+            self.consume(TokenType.RBRACE)
         self.consume(TokenType.ASSIGN)
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return AssignStatement(name.value, value, name.line, name.column) 
+        return AssignStatement(name.value, offset, value, name.line, name.column) 
 
     def if_statement(self) -> IfStatement:
         if_token = self.previous()

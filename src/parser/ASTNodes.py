@@ -90,17 +90,25 @@ class VarDeclaration(Statement):
         }
 
 class AssignStatement(Statement):
-    def __init__(self, name: str, value: Expression, line: int, column: int):
+    def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
         self.name = name
+        self.offset = offset
         self.value = value
     
     def to_dict(self):
+        if self.offset is None:
+            return {
+                "type": "Assign",
+                "name": self.name,
+                "value": self.value.to_dict()
+            }
         return {
-            "type": "Assign",
-            "name": self.name,
-            "value": self.value.to_dict()
-        }
+                "type": "Assign",
+                "name": self.name,
+                "offset": self.offset.to_dict(),
+                "value": self.value.to_dict()
+            }
 
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
