@@ -141,17 +141,17 @@ class Parser:
             size = self.parse_expression()
             self.advance()
             self.consume(TokenType.SEMICOLON)
-            return ArrayDeclarationEmpty(type, name, size)
+            return ArrayDeclarationEmpty(type.value, name.value, size.value)
         
         self.consume(TokenType.ASSIGN)
         if self.check(TokenType.LBRACE):
             elements = self.parse_array_literal()
             self.consume(TokenType.SEMICOLON)
-            return ArrayDeclaration(name, type, elements)
+            return ArrayDeclaration(type.value, name.value, elements)
         
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return VarDeclaration(type, name, value)
+        return VarDeclaration(type.value, name.value, value.value)
     
     def parse_array_literal(self) -> list:
         self.advance()  # spiser [
