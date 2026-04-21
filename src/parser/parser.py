@@ -80,25 +80,19 @@ class Parser:
     def error(self, error_code: ErrorCode) -> ParserError:
         return ParserError(error_code, self.current(), self.previous())
 
-#    def parse(self) -> Program:
-        statements = []
 
-        while not self.is_at_end():
-            statements.append(self.statement())
-        return Program(statements)
-    
     def parse(self) -> Program:
         functions = []
         while not self.is_at_end():
             functions.append(self.function())
-        return Program(functions)
+        return Program(functions, self.current().line, self.current().column)
 
     def function(self) -> Function:
         type = self.consume(TokenType.TYPE)
         name = self.consume(TokenType.IDENTIFIER)
         parameters = self.parameters()
         body = self.statement()
-        return Function(type.value, name.value, parameters, body)
+        return Function(type.value, name.value, parameters, body, name.line, name.column)
 
     def parameters(self) -> list:
         parameters = []
@@ -106,7 +100,7 @@ class Parser:
         while self.current().type is not TokenType.RPAREN:
             type = self.consume(TokenType.TYPE)
             name = self.consume(TokenType.IDENTIFIER)
-            parameters.append(Parameter(type.value, name.value))
+            parameters.append(Parameter(type.value, name.value, name.line, name.column))
             #if we haven't reached the end of the parameters consume the commas 
             if self.current().type is not TokenType.RPAREN:
                 self.consume(TokenType.COMMA)
@@ -140,19 +134,19 @@ class Parser:
         
         if self.match(TokenType.LBRACE): # Integer arr[3]
             size = self.parse_expression()
-            self.advance()
+            self.consume(TokenType.RBRACE)
             self.consume(TokenType.SEMICOLON)
-            return ArrayDeclarationEmpty(type.value, name.value, size.value)
+            return ArrayDeclarationEmpty(type.value, name.value, size.value, name.line, name.column)
         
         self.consume(TokenType.ASSIGN)
         if self.check(TokenType.LBRACE):
             elements = self.parse_array_literal()
             self.consume(TokenType.SEMICOLON)
-            return ArrayDeclaration(type.value, name.value, elements)
+            return ArrayDeclaration(type.value, name.value, elements, name.line, name.column)
         
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return VarDeclaration(type.value, name.value, value)
+        return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
     def parse_array_literal(self) -> list:
         self.advance()  # spiser [
@@ -161,23 +155,25 @@ class Parser:
             elements.append(self.parse_expression())
         while self.match(TokenType.COMMA):
             elements.append(self.parse_expression())
-        self.advance()  # spiser ]
+        self.consume(TokenType.RBRACE)  # spiser ]
         return elements
     
     def block_statement(self) -> BlockStatement:
+        lbrace = self.previous()
         statements = []
         while not self.check(TokenType.RCBRACE) and not self.is_at_end():
             statements.append(self.statement())
         self.consume(TokenType.RCBRACE)
-        return BlockStatement(statements)
+        return BlockStatement(statements, lbrace.line, lbrace.column)
 
     def while_statement(self) -> WhileStatement:
+        while_token = self.previous()
         self.consume(TokenType.LPAREN)
         condition = self.parse_expression()
         self.consume(TokenType.RPAREN)
         self.consume(TokenType.LCBRACE)
         body = self.block_statement()
-        return WhileStatement(condition, body)
+        return WhileStatement(condition, body, while_token.line, while_token.column)
 
     def assign_statement(self) -> AssignStatement:
         #match() advances the the cursor, meaning the name is present on previous instead of present token 
@@ -185,9 +181,10 @@ class Parser:
         self.consume(TokenType.ASSIGN)
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return AssignStatement(name.value, value) 
+        return AssignStatement(name.value, value, name.line, name.column) 
 
     def if_statement(self) -> IfStatement:
+        if_token = self.previous()
         self.consume(TokenType.LPAREN)
         condition = self.parse_expression()
         self.consume(TokenType.RPAREN)
@@ -199,19 +196,20 @@ class Parser:
             self.consume(TokenType.LCBRACE)
             else_branch = self.block_statement()
         
-        return IfStatement(condition, then_branch, else_branch)
+        return IfStatement(condition, then_branch, else_branch, if_token.line, if_token.column)
 
     def return_statement(self) -> ReturnStatement:
+        return_token = self.previous()
         value = None
         if not self.check(TokenType.SEMICOLON):
             value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return ReturnStatement(value)
+        return ReturnStatement(value, return_token.line, return_token.column)
     
     def expression_statement(self) -> ExpressionStatement:
         expr = self.parse_expression()
-        self.consume(TokenType.SEMICOLON)
-        return ExpressionStatement(expr)
+        semi = self.consume(TokenType.SEMICOLON)
+        return ExpressionStatement(expr, semi.line, semi.column)
     
     #Expressions
     def parse_expression(self):
@@ -222,49 +220,49 @@ class Parser:
     def parse_or(self): #self.match do self.advance
         left = self.parse_and()
         while self.match(TokenType.OR):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_and())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_and(), op.line, op.column)
         return left
     
     def parse_and(self):
         left = self.parse_equality()
         while self.match(TokenType.AND):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_equality())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_equality(), op.line, op.column)
         return left
     
     def parse_equality(self):
         left = self.parse_comparison()
         while self.match(TokenType.EQ, TokenType.NE):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_comparison())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_comparison(), op.line, op.column)
         return left
     
     def parse_comparison(self):
         left = self.parse_additive()
         while self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_additive())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_additive(), op.line, op.column)
         return left
     
     def parse_additive(self):
         left = self.parse_multiplicative()
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_multiplicative())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_multiplicative(), op.line, op.column)
         return left
     
     def parse_multiplicative(self):
         left = self.parse_unary()
         while self.match(TokenType.STAR, TokenType.SLASH, TokenType.MOD):
-            op = self.previous().value
-            left = Binary(left, op, self.parse_unary())
+            op = self.previous()
+            left = Binary(left, op.value, self.parse_unary(), op.line, op.column)
         return left
     
     def parse_unary(self):
         if self.match(TokenType.NOT):
-            op = self.previous().value
-            return Unary(op, self.parse_unary())
+            op = self.previous()
+            return Unary(op.value, self.parse_unary(), op.line, op.column)
         return self.parse_primary()
     
     def arguments(self) -> list:
@@ -281,27 +279,27 @@ class Parser:
         tok = self.current()
 
         if self.match(TokenType.INTEGER):
-            return Literal(tok.value)
+            return Literal(tok.value, tok.line, tok.column)
         
         if self.match(TokenType.FLOAT):
-            return Literal(tok.value)
+            return Literal(tok.value, tok.line, tok.column)
         
         if self.match(TokenType.TRUE):
-            return Literal(True)
+            return Literal(True, tok.line, tok.column)
         
         if self.match(TokenType.FALSE):
-            return Literal(False)
+            return Literal(False, tok.line, tok.column)
         
         if self.match(TokenType.STRING):
-            return Literal(tok.value)
+            return Literal(tok.value, tok.line, tok.column)
         
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
             name = self.consume(TokenType.IDENTIFIER)
             arguments = self.arguments() 
-            return FunctionCall(name.value, arguments)
+            return FunctionCall(name.value, arguments, name.line, name.column)
 
         if self.match(TokenType.IDENTIFIER):
-            return Variable(tok.value)
+            return Variable(tok.value, tok.line, tok.column)
         
         #Parenteser
         if self.match(TokenType.LPAREN):
