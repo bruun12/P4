@@ -65,15 +65,22 @@ def test_statements_array_declaration_with_values():
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
-    parser.statement()
+    node = parser.statement()
+    assert node.type == "integer"
+    assert node.name == "arr"
+    assert node.size == 3
 
 def test_statements_array_declaration_empty():
     lex = Lexer("""
-                integer arr[3];
+                double arr[3];
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
-    parser.statement()
+    node = parser.statement()
+    assert node.type == "double"
+    assert node.name == "arr"
+    assert node.size == 3
+
 
 def test_statements_array_declaration_single_element():
     lex = Lexer("""
@@ -81,7 +88,10 @@ def test_statements_array_declaration_single_element():
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
-    parser.statement()
+    node = parser.statement()
+    assert node.type == "integer"
+    assert node.name == "arr"
+    assert node.size == 1
 
 # Errors for statements
 def parse_stmt(source: str):
