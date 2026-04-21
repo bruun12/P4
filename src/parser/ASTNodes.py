@@ -62,6 +62,19 @@ class ExpressionStatement(Statement):
     def __init__(self, expression: Expression):
         self.expression = expression
 
+class ArrayDeclaration(Statement): # integer arr = [1, 2, 3];
+    def __init__(self, type: DataType, name: str, elements: list):
+        self.type = type
+        self.name = name 
+        self.elements = elements # list[expression]
+
+class ArrayDeclarationEmpty(Statement): # integer arr[3];
+    def __init__(self, type: str, name: str, size: Expression):
+        self.type = type
+        self.name = name
+        self.size = size
+        
+
 #Expression nodes
 class Literal(Expression):
     def __init__(self, value):

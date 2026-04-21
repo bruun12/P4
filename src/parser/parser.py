@@ -17,7 +17,9 @@ from parser.ASTNodes import (
     WhileStatement,
     VarDeclaration,
     Function,
-    Parameter
+    Parameter,
+    ArrayDeclaration,
+    ArrayDeclarationEmpty
 )
 
 class Parser:
@@ -131,14 +133,35 @@ class Parser:
 
         return self.expression_statement()
 
-    def var_declaration(self) -> VarDeclaration:
+    def var_declaration(self) -> VarDeclaration | ArrayDeclaration | ArrayDeclarationEmpty:
         type = self.previous()
-        self.advance()
-        name = self.previous()
+        name = self.advance()
+        
+        if self.match(TokenType.LBRACE): # Integer arr[3]
+            size = self.parse_expression()
+            self.advance()
+            self.consume(TokenType.SEMICOLON)
+            return ArrayDeclarationEmpty(type, name, size)
+        
         self.consume(TokenType.ASSIGN)
+        if self.check(TokenType.LBRACE):
+            elements = self.parse_array_literal()
+            self.consume(TokenType.SEMICOLON)
+            return ArrayDeclaration(name, type, elements)
+        
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return VarDeclaration(type.value, name.value, value) 
+        return VarDeclaration(type, name, value)
+    
+    def parse_array_literal(self) -> list:
+        self.advance()  # spiser [
+        elements = []
+        if not self.check(TokenType.RBRACE):
+            elements.append(self.parse_expression())
+        while self.match(TokenType.COMMA):
+            elements.append(self.parse_expression())
+        self.advance()  # spiser ]
+        return elements
     
     def block_statement(self) -> BlockStatement:
         statements = []

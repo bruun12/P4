@@ -1,7 +1,7 @@
 import pytest
 from parser.parser import Parser
 from lexer.lexer import TokenType, Token
-from error_handling import ParserError, ErrorCode
+from error_handling import ParserError
 
 def test_consume_success():
     tokens = [Token(TokenType.TYPE, "integer", 1, 1), 

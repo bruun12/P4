@@ -58,6 +58,30 @@ def test_statements_expression():
     parser = Parser(lex.tokens)
     parser.statement()
 
+# Array declaration
+def test_statements_array_declaration_with_values():
+    lex = Lexer("""
+                integer arr = [1,2,3];
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    parser.statement()
+
+def test_statements_array_declaration_empty():
+    lex = Lexer("""
+                integer arr[3];
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    parser.statement()
+
+def test_statements_array_declaration_single_element():
+    lex = Lexer("""
+                integer arr = [1];
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    parser.statement()
 
 # Errors for statements
 def parse_stmt(source: str):
@@ -125,4 +149,19 @@ def test_return_missing_semicolon():
     with pytest.raises(ParserError):
         parse_stmt("return x + 2")
 
+# Errors for array declaration
+def test_array_declaration_missing_semicolon():
+    with pytest.raises(ParserError):
+        parse_stmt("integer arr = [1,2,3]")
 
+def test_array_declaration_missing_closing_bracket():
+    with pytest.raises(ParserError):
+        parse_stmt("integer arr = [1,2,3;")
+
+def test_array_declaration_empty_missing_closing_bracket():
+    with pytest.raises(ParserError):
+        parse_stmt("integer arr[3;")
+
+def test_array_declaration_empty_missing_semicolon():
+    with pytest.raises(ParserError):
+        parse_stmt("integer arr[3]")
