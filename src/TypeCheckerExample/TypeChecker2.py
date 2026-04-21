@@ -479,8 +479,16 @@ def type_name(t: Type) -> str:
     if isinstance(t, ArrayType):
         return f"{type_name(t.element_type)}[]"
     if isinstance(t, FunctionType):
-        params = ", ".join(type_name(p) for p in t.parameter_types)
-        return f"function({params}) -> {type_name(t.return_type)}"
+        # 1. Convert each type object into its string name (e.g., [integer, float])
+        name_list = []
+        for p in t.parameter_types:
+            name_list.append(type_name(p))
+
+        # 2. Join them with commas (e.g., "integer, float")
+        params_string = ", ".join(name_list)
+
+        # 3. Build the final function signature
+        return f"function({params_string}) -> {type_name(t.return_type)}"
     return repr(t)
 
 
@@ -573,6 +581,20 @@ class TypeChecker:
     def has_errors(self) -> bool:
         return len(self.errors) > 0
 
+    # --------------------------------------------------------
+    # Type parsing helper
+    # --------------------------------------------------------
+
+    def parse_type_node(self, declared_type: str, node: Node) -> Type:
+        """
+        Parse a declared type and tie errors to the node that
+        declared it.
+        """
+        try:
+            return parse_declared_type(declared_type)
+        except TypeCheckError as err:
+            self.errors.append(TypeCheckError(err.message, node.line, node.column))
+            return ERROR
     # --------------------------------------------------------
     # Public entry point
     # --------------------------------------------------------
@@ -1006,20 +1028,7 @@ class TypeChecker:
         self.report(expr, f"Unknown expression node: {expr!r}")
         return ERROR
 
-    # --------------------------------------------------------
-    # Type parsing helper
-    # --------------------------------------------------------
 
-    def parse_type_node(self, declared_type: str, node: Node) -> Type:
-        """
-        Parse a declared type and tie errors to the node that
-        declared it.
-        """
-        try:
-            return parse_declared_type(declared_type)
-        except TypeCheckError as err:
-            self.errors.append(TypeCheckError(err.message, node.line, node.column))
-            return ERROR
 
 
 # ============================================================
