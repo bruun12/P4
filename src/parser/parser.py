@@ -152,7 +152,7 @@ class Parser:
         
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
-        return VarDeclaration(type.value, name.value, value.value)
+        return VarDeclaration(type.value, name.value, value)
     
     def parse_array_literal(self) -> list:
         self.advance()  # spiser [
