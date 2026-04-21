@@ -88,6 +88,11 @@ class Variable(Expression):
     def __init__(self, name: str):
         self.name = name
 
+class FunctionCall(Expression):
+    def __init__(self, name: str, arguments: list):
+        self.name = name
+        self.arguments = arguments
+
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression):
         self.operator = operator

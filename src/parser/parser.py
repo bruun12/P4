@@ -19,7 +19,8 @@ from parser.ASTNodes import (
     Function,
     Parameter,
     ArrayDeclaration,
-    ArrayDeclarationEmpty
+    ArrayDeclarationEmpty,
+    FunctionCall
 )
 
 class Parser:
@@ -266,7 +267,15 @@ class Parser:
             return Unary(op, self.parse_unary())
         return self.parse_primary()
     
-
+    def arguments(self) -> list:
+        arguments = []
+        self.consume(TokenType.LPAREN)
+        while self.current().type is not TokenType.RPAREN:
+            arguments.append(self.parse_expression())
+            if self.current().type is not TokenType.RPAREN:
+                self.consume(TokenType.COMMA)
+        self.consume(TokenType.RPAREN)
+        return arguments
     
     def parse_primary(self):
         tok = self.current()
@@ -287,8 +296,9 @@ class Parser:
             return Literal(tok.value)
         
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
-            pass
-            #Her skal vi så så have lavet en ny klasse, hvor vi kan parse funktionen og dens argumenter
+            name = self.consume(TokenType.IDENTIFIER)
+            arguments = self.arguments() 
+            return FunctionCall(name.value, arguments)
 
         if self.match(TokenType.IDENTIFIER):
             return Variable(tok.value)
