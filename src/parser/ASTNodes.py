@@ -96,9 +96,6 @@ class Literal(Expression):
         super().__init__(line, column)
         self.value = value
 
-    def getValue(self):
-        return self.value
-
 class Variable(Expression):
     def __init__(self, name: str, line: int, column: int):
         super().__init__(line, column)
