@@ -494,12 +494,7 @@ class TypeChecker:
     # Statement checking
     # --------------------------------------------------------
 
-    def check_statement(
-        self,
-        stmt: Statement,
-        env: TypeEnvironment,
-        inside_loop: bool,
-    ) -> FlowResult:
+    def check_statement(self, stmt: Statement, env: TypeEnvironment, inside_loop: bool) -> FlowResult:
         """
         Check a single statement.
 

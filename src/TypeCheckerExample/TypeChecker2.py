@@ -1,118 +1,283 @@
-"""
-advanced_typechecker.py
-
-An advanced type checker for the AST shape produced by your parser.
-
-This version is more sophisticated than the beginner version because it adds:
-
-1. A richer type system:
-   - int
-   - float
-   - bool
-   - string
-   - null
-   - nullable[T]
-
-2. Assignment compatibility rules:
-   - exact type matches
-   - int can be assigned to float
-   - null can be assigned to nullable[T]
-
-3. Proper lexical block scoping
-
-4. Return-flow analysis:
-   - we track whether statements definitely return
-   - this helps detect missing returns in function-like contexts
-
-5. Better helper methods and clearer structure
-
-This is still not a full compiler-grade type checker, but it is much closer
-to one than the minimal tutorial version.
-
---------------------------------------------------------------------
-IMPORTANT LIMITATION
---------------------------------------------------------------------
-Your AST currently has no function declaration node and no explicit type
-annotation syntax.
-
-That means:
-- variable types come from initializer inference
-- return checking only works if the caller tells the checker what the
-  expected return type is
-
-For example, if you later add function nodes, you could type-check a
-function body using:
-    checker = TypeChecker(expected_return_type=INT, require_all_paths_return=True)
-
-For now, you can still use that manually on a Program or BlockStatement.
-"""
-
-try:
-    from .ASTNodes import (
-        AssignStatement,
-        Binary,
-        BlockStatement,
-        Expression,
-        ExpressionStatement,
-        Grouping,
-        IfStatement,
-        LetStatement,
-        Literal,
-        Program,
-        ReturnStatement,
-        Statement,
-        Unary,
-        Variable,
-        WhileStatement,
-    )
-except ImportError:
-    from ASTNodes import (
-        AssignStatement,
-        Binary,
-        BlockStatement,
-        Expression,
-        ExpressionStatement,
-        Grouping,
-        IfStatement,
-        LetStatement,
-        Literal,
-        Program,
-        ReturnStatement,
-        Statement,
-        Unary,
-        Variable,
-        WhileStatement,
-    )
+from __future__ import annotations
 
 from dataclasses import dataclass
 
 
 # ============================================================
-# TYPE CHECK ERROR
+# AST NODES
 # ============================================================
-# Raised whenever the program violates a typing rule.
+# These AST nodes are rewritten to fix the structural problems
+# in the previous version.
+#
+# IMPORTANT CHANGES APPLIED HERE:
+#
+# 1. Every concrete node now stores line/column properly.
+#    This fixes the earlier issue where several nodes did not
+#    call Node.__init__ and therefore had no source position.
+#
+# 2. Program, Function, Parameter, VarDeclaration,
+#    ArrayDeclaration, ArrayDeclarationEmpty, and Literal now
+#    all carry line/column.
+#
+# 3. VarDeclaration now correctly stores its declared type.
+#    The earlier version accepted a type but did not store it.
+#
+# 4. Literal now carries line/column so diagnostics can point
+#    to the exact literal location.
+#
+# 5. Parameter uses "param_type" instead of "type" to avoid
+#    shadowing Python's built-in name "type".
+#
+# 6. Function uses "body" instead of "statement" because
+#    "body" is clearer and more conventional.
 # ============================================================
 
-class TypeCheckError(Exception):
+
+# ------------------------------------------------------------
+# Base node classes
+# ------------------------------------------------------------
+
+class Node:
+    """
+    Base AST node.
+
+    Every node carries line/column so the type checker can
+    report precise diagnostics.
+    """
+    def __init__(self, line: int, column: int):
+        self.line = line
+        self.column = column
+
+
+class Statement(Node):
+    """Base class for all statement nodes."""
     pass
 
 
+class Expression(Node):
+    """Base class for all expression nodes."""
+    pass
+
+
+# ------------------------------------------------------------
+# Program / function-level nodes
+# ------------------------------------------------------------
+
+class Program(Node):
+    """
+    Top-level program node.
+
+    CHANGE APPLIED:
+    The program is now function-centered. A program contains
+    functions, because your language design now treats functions
+    as the top-level units.
+    """
+    def __init__(self, functions: list["Function"], line: int = 1, column: int = 1):
+        super().__init__(line, column)
+        self.functions = functions
+
+
+class Function(Node):
+    """
+    Function declaration.
+
+    CHANGE APPLIED:
+    - now calls super().__init__(line, column)
+    - uses 'body' instead of 'statement'
+    """
+    def __init__(
+        self,
+        return_type: str,
+        name: str,
+        parameters: list["Parameter"],
+        body: Statement,
+        line: int,
+        column: int,
+    ):
+        super().__init__(line, column)
+        self.return_type = return_type
+        self.name = name
+        self.parameters = parameters
+        self.body = body
+
+
+class Parameter(Node):
+    """
+    Function parameter.
+
+    CHANGE APPLIED:
+    - now calls super().__init__(line, column)
+    - field renamed from 'type' to 'param_type'
+    """
+    def __init__(self, param_type: str, name: str, line: int, column: int):
+        super().__init__(line, column)
+        self.param_type = param_type
+        self.name = name
+
+
+# ------------------------------------------------------------
+# Statement nodes
+# ------------------------------------------------------------
+
+class BlockStatement(Statement):
+    def __init__(self, statements: list[Statement], line: int, column: int):
+        super().__init__(line, column)
+        self.statements = statements
+
+
+class VarDeclaration(Statement):
+    """
+    Variable declaration.
+
+    CHANGE APPLIED:
+    The earlier version accepted a declared type but did not
+    store it. This version stores it correctly in self.var_type.
+    """
+    def __init__(self, var_type: str, name: str, value: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.var_type = var_type
+        self.name = name
+        self.value = value
+
+
+class AssignStatement(Statement):
+    def __init__(self, name: str, value: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.name = name
+        self.value = value
+
+
+class IfStatement(Statement):
+    def __init__(
+        self,
+        condition: Expression,
+        then_branch: Statement,
+        else_branch: Statement | None,
+        line: int,
+        column: int,
+    ):
+        super().__init__(line, column)
+        self.condition = condition
+        self.then_branch = then_branch
+        self.else_branch = else_branch
+
+
+class WhileStatement(Statement):
+    def __init__(self, condition: Expression, body: Statement, line: int, column: int):
+        super().__init__(line, column)
+        self.condition = condition
+        self.body = body
+
+
+class ReturnStatement(Statement):
+    def __init__(self, value: Expression | None, line: int, column: int):
+        super().__init__(line, column)
+        self.value = value
+
+
+class BreakStatement(Statement):
+    def __init__(self, line: int, column: int):
+        super().__init__(line, column)
+
+
+class ExpressionStatement(Statement):
+    def __init__(self, expression: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.expression = expression
+
+
+class ArrayDeclaration(Statement):
+    """
+    Array declaration with explicit elements.
+
+    Example:
+        integer[] arr = [1, 2, 3];
+
+    CHANGE APPLIED:
+    - stores line/column
+    - stores declared element type as array_type
+    """
+    def __init__(self, array_type: str, name: str, elements: list[Expression], line: int, column: int):
+        super().__init__(line, column)
+        self.array_type = array_type
+        self.name = name
+        self.elements = elements
+
+
+class ArrayDeclarationEmpty(Statement):
+    """
+    Empty-sized array declaration.
+
+    Example:
+        integer[] arr[3];
+
+    CHANGE APPLIED:
+    - stores line/column
+    """
+    def __init__(self, array_type: str, name: str, size: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.array_type = array_type
+        self.name = name
+        self.size = size
+
+
+# ------------------------------------------------------------
+# Expression nodes
+# ------------------------------------------------------------
+
+class Literal(Expression):
+    """
+    Literal value.
+
+    CHANGE APPLIED:
+    Literal now carries line/column, so errors involving a
+    literal can point to the exact source position.
+    """
+    def __init__(self, value: object, line: int, column: int):
+        super().__init__(line, column)
+        self.value = value
+
+    def get_value(self):
+        return self.value
+
+
+class Variable(Expression):
+    def __init__(self, name: str, line: int, column: int):
+        super().__init__(line, column)
+        self.name = name
+
+
+class Unary(Expression):
+    def __init__(self, operator: str, right: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.operator = operator
+        self.right = right
+
+
+class Binary(Expression):
+    def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.left = left
+        self.operator = operator
+        self.right = right
+
+
+class Grouping(Expression):
+    def __init__(self, expression: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.expression = expression
+
+
 # ============================================================
-# TYPE SYSTEM
-# ============================================================
-# We represent language types as Python dataclasses.
-#
-# This is nicer than raw strings once the checker gets bigger.
-# It lets us represent richer structures like nullable[T].
+# TYPE OBJECTS
 # ============================================================
 
 class Type:
-    """Base class for all types."""
     pass
 
 
 @dataclass(frozen=True)
-class IntType(Type):
+class IntegerType(Type):
     pass
 
 
@@ -122,7 +287,7 @@ class FloatType(Type):
 
 
 @dataclass(frozen=True)
-class BoolType(Type):
+class BooleanType(Type):
     pass
 
 
@@ -137,250 +302,276 @@ class NullType(Type):
 
 
 @dataclass(frozen=True)
-class NullableType(Type):
+class ErrorType(Type):
+    pass
+
+
+@dataclass(frozen=True)
+class ArrayType(Type):
     """
-    Represents a nullable version of another type.
+    Array type with an element type.
 
-    Examples:
-        nullable[int]
-        nullable[string]
-
-    This lets us express "null is allowed here" in a more explicit way
-    than just treating null as compatible with everything.
+    Example:
+        ArrayType(INTEGER)
     """
-    inner: Type
+    element_type: Type
 
 
-# Reusable singleton-like values for primitive types.
-INT = IntType()
+@dataclass(frozen=True)
+class FunctionType(Type):
+    """
+    Function signature type.
+
+    CHANGE APPLIED IN TYPECHECKER DESIGN:
+    Because programs are now function-centered, the checker
+    stores function signatures separately from local variables.
+    """
+    parameter_types: tuple[Type, ...]
+    return_type: Type
+
+
+INTEGER = IntegerType()
 FLOAT = FloatType()
-BOOL = BoolType()
+BOOLEAN = BooleanType()
 STRING = StringType()
 NULL = NullType()
-
-
-# ============================================================
-# TYPE DISPLAY HELPERS
-# ============================================================
-# Makes error messages readable.
-# ============================================================
-
-def type_to_string(t: Type) -> str:
-    """Convert a type object into a friendly readable string."""
-    if t == INT:
-        return "int"
-    if t == FLOAT:
-        return "float"
-    if t == BOOL:
-        return "bool"
-    if t == STRING:
-        return "string"
-    if t == NULL:
-        return "null"
-    if isinstance(t, NullableType):
-        return f"nullable[{type_to_string(t.inner)}]"
-    return repr(t)
-
-
-def is_numeric(t: Type) -> bool:
-    """Return True if the type is int or float."""
-    return t == INT or t == FLOAT
-
-
-def is_nullable_type(t: Type) -> bool:
-    """Return True if the type is explicitly nullable."""
-    return isinstance(t, NullableType)
-
-
-def unwrap_nullable(t: Type) -> Type:
-    """
-    If t is nullable[T], return T.
-    Otherwise return t unchanged.
-
-    Useful in places where we want to look at the underlying type.
-    """
-    if isinstance(t, NullableType):
-        return t.inner
-    return t
-
-
-# ============================================================
-# TYPE COMPATIBILITY
-# ============================================================
-# These rules define what assignments and operations are allowed.
-# ============================================================
-
-def same_type(a: Type, b: Type) -> bool:
-    """
-    Structural type equality.
-
-    Because these are dataclasses, == already works well, but wrapping
-    the check in a helper gives us one place to change the behavior later.
-    """
-    return a == b
-
-
-def can_assign(target: Type, value: Type) -> bool:
-    """
-    Return True if a value of type 'value' can be assigned to a variable
-    or return slot of type 'target'.
-
-    Current rules:
-    - exact match: allowed
-    - int -> float: allowed
-    - null -> nullable[T]: allowed
-    - T -> nullable[T]: allowed
-    """
-    # Exact match always works.
-    if same_type(target, value):
-        return True
-
-    # Numeric widening: int can be stored in float.
-    if target == FLOAT and value == INT:
-        return True
-
-    # null may be assigned only to nullable types.
-    if isinstance(target, NullableType) and value == NULL:
-        return True
-
-    # A non-null T can be assigned into nullable[T].
-    if isinstance(target, NullableType) and can_assign(target.inner, value):
-        return True
-
-    return False
-
-
-def common_numeric_type(left: Type, right: Type) -> Type:
-    """
-    Determine the result type of a numeric expression involving left/right.
-
-    Rules:
-    - int + int -> int
-    - int + float -> float
-    - float + int -> float
-    - float + float -> float
-    """
-    if left == FLOAT or right == FLOAT:
-        return FLOAT
-    return INT
+ERROR = ErrorType()
 
 
 # ============================================================
 # FLOW RESULT
 # ============================================================
-# Instead of having statement checking return nothing, we return a small
-# object that tells us whether control definitely returns from that statement.
-#
-# This is very useful for:
-# - if/else return analysis
-# - checking whether all paths return in a function body
-# ============================================================
 
 @dataclass(frozen=True)
 class FlowResult:
-    """
-    Result of checking a statement.
-
-    definitely_returns:
-        True if execution cannot continue past this statement because all
-        possible paths return.
-
-    Example:
-        return 1;                    -> definitely_returns = True
-        x = 1;                       -> definitely_returns = False
-        if (...) return 1; else return 2;
-                                    -> definitely_returns = True
-    """
     definitely_returns: bool
+    breaks_loop: bool
+    unreachable: bool
 
 
-NO_RETURN = FlowResult(definitely_returns=False)
-ALWAYS_RETURNS = FlowResult(definitely_returns=True)
+NO_FLOW = FlowResult(
+    definitely_returns=False,
+    breaks_loop=False,
+    unreachable=False,
+)
+
+RETURNS = FlowResult(
+    definitely_returns=True,
+    breaks_loop=False,
+    unreachable=False,
+)
+
+BREAKS = FlowResult(
+    definitely_returns=False,
+    breaks_loop=True,
+    unreachable=False,
+)
+
+UNREACHABLE = FlowResult(
+    definitely_returns=False,
+    breaks_loop=False,
+    unreachable=True,
+)
 
 
 # ============================================================
-# TYPE ENVIRONMENT
+# TYPE ERROR + FORMATTING
 # ============================================================
-# Stores variable names and their declared types, with lexical scoping.
+
+class TypeCheckError(Exception):
+    def __init__(self, message: str, line: int, column: int):
+        super().__init__(message)
+        self.message = message
+        self.line = line
+        self.column = column
+
+
+def format_type_error(error: TypeCheckError, source_lines: list[str]) -> str:
+    """
+    Pretty-print a type error with source context.
+    """
+    line = error.line
+    column = error.column
+
+    if line < 1 or line > len(source_lines):
+        return f"Type error: {error.message} [line {line}, col {column}]"
+
+    code_line = source_lines[line - 1]
+    caret_line = " " * max(column - 1, 0) + "^"
+
+    return (
+        f"Type error: {error.message}\n"
+        f" --> line {line}, col {column}\n"
+        f"  |\n"
+        f"{line} | {code_line}\n"
+        f"  | {caret_line}"
+    )
+
+
+# ============================================================
+# ENVIRONMENTS
 # ============================================================
 
 class TypeEnvironment:
     """
-    A nested scope environment.
-
-    Each environment has:
-    - a current-scope dictionary
-    - an optional parent environment
-
-    Lookup walks outward through parents.
+    Nested variable environment for parameters and local variables.
     """
-
     def __init__(self, parent: "TypeEnvironment | None" = None):
         self.parent = parent
-        self.values: dict[str, Type, line] = {}
+        self.values: dict[str, Type] = {}
 
     def define(self, name: str, typ: Type) -> None:
-        """
-        Define a variable in the current scope.
-
-        Example:
-            let x = 10;
-        """
         self.values[name] = typ
 
     def contains_in_current_scope(self, name: str) -> bool:
-        """
-        True only if the variable exists in THIS scope, not parent scopes.
-        """
         return name in self.values
 
     def get(self, name: str) -> Type:
-        """
-        Look up a variable type by name.
-
-        Search order:
-        - current scope
-        - parent scope
-        - parent's parent
-        - ...
-        """
         if name in self.values:
             return self.values[name]
 
         if self.parent is not None:
             return self.parent.get(name)
 
-        raise TypeCheckError(f"Undefined variable '{name}'.")
+        raise TypeCheckError(f"Undefined variable '{name}'.", 0, 0)
 
+
+class FunctionEnvironment:
+    """
+    Global function environment.
+
+    CHANGE APPLIED:
+    Functions are now top-level program nodes, so they get their
+    own environment separate from variable scopes.
+    """
+    def __init__(self):
+        self.values: dict[str, FunctionType] = {}
+
+    def define(self, name: str, typ: FunctionType) -> None:
+        self.values[name] = typ
+
+    def contains(self, name: str) -> bool:
+        return name in self.values
+
+    def get(self, name: str) -> FunctionType:
+        if name in self.values:
+            return self.values[name]
+        raise TypeCheckError(f"Undefined function '{name}'.", 0, 0)
+
+
+# ============================================================
+# HELPERS
+# ============================================================
+
+def type_name(t: Type) -> str:
+    if t == INTEGER:
+        return "integer"
+    if t == FLOAT:
+        return "float"
+    if t == BOOLEAN:
+        return "boolean"
+    if t == STRING:
+        return "string"
+    if t == NULL:
+        return "null"
+    if t == ERROR:
+        return "<error>"
+    if isinstance(t, ArrayType):
+        return f"{type_name(t.element_type)}[]"
+    if isinstance(t, FunctionType):
+        params = ", ".join(type_name(p) for p in t.parameter_types)
+        return f"function({params}) -> {type_name(t.return_type)}"
+    return repr(t)
+
+
+def is_numeric(t: Type) -> bool:
+    return t == INTEGER or t == FLOAT
+
+
+def can_assign(target: Type, value: Type) -> bool:
+    """
+    Assignment compatibility.
+
+    Rules:
+    - exact same type is allowed
+    - integer can be assigned to float
+    - arrays must have matching element type
+    """
+    if target == value:
+        return True
+
+    if target == FLOAT and value == INTEGER:
+        return True
+
+    if isinstance(target, ArrayType) and isinstance(value, ArrayType):
+        return can_assign(target.element_type, value.element_type)
+
+    return False
+
+
+def numeric_result_type(left: Type, right: Type) -> Type:
+    if left == FLOAT or right == FLOAT:
+        return FLOAT
+    return INTEGER
+
+
+def parse_declared_type(declared_type: str) -> Type:
+    """
+    Parse a declared primitive type string.
+    """
+    if declared_type == "integer":
+        return INTEGER
+    if declared_type == "float":
+        return FLOAT
+    if declared_type == "boolean":
+        return BOOLEAN
+    if declared_type == "string":
+        return STRING
+    if declared_type == "null":
+        return NULL
+
+    raise TypeCheckError(f"Unknown declared type '{declared_type}'.", 0, 0)
 
 
 # ============================================================
 # TYPE CHECKER
 # ============================================================
+# This checker is rewritten around the corrected AST.
+#
+# MAJOR DESIGN CHANGE APPLIED:
+# The top-level driver no longer iterates through program
+# statements. It now:
+#   1. collects function signatures
+#   2. checks each function body
+#
+# This matches your updated language design much better.
+# ============================================================
 
 class TypeChecker:
-    """
-    Advanced type checker.
+    def __init__(self, source_code: str):
+        self.source_code = source_code
+        self.source_lines = source_code.splitlines()
+        self.errors: list[TypeCheckError] = []
 
-    Parameters
-    ----------
-    expected_return_type:
-        If not None, return statements are allowed and must match this type.
+        # Global function signatures live here.
+        self.function_env = FunctionEnvironment()
 
-    require_all_paths_return:
-        If True, then after checking a whole program/body, the checker will
-        require that control cannot fall off the end.
+        # These are set while checking a function body.
+        self.current_function_name: str | None = None
+        self.expected_return_type: Type | None = None
 
-        This is mostly useful when checking function bodies.
-    """
+    # --------------------------------------------------------
+    # Error helpers
+    # --------------------------------------------------------
 
-    def __init__(
-        self,
-        expected_return_type: Type | None = None,
-        require_all_paths_return: bool = False,
-    ):
-        self.expected_return_type = expected_return_type
-        self.require_all_paths_return = require_all_paths_return
+    def report(self, node: Node, message: str) -> None:
+        self.errors.append(TypeCheckError(message, node.line, node.column))
+
+    def formatted_errors(self) -> list[str]:
+        return [format_type_error(err, self.source_lines) for err in self.errors]
+
+    def has_errors(self) -> bool:
+        return len(self.errors) > 0
 
     # --------------------------------------------------------
     # Public entry point
@@ -388,276 +579,323 @@ class TypeChecker:
 
     def check(self, program: Program) -> None:
         """
-        Type-check the whole program.
+        Type-check a complete program.
 
-        If the program is invalid, raise TypeCheckError.
-        If not, return successfully.
+        CHANGE APPLIED:
+        Program is function-centered, so checking now happens in
+        two passes:
+          pass 1: collect all function signatures
+          pass 2: check each function body
         """
-        env = TypeEnvironment()
-        flow = self.check_program(program, env)
+        self.collect_function_signatures(program)
+        self.check_all_functions(program)
 
-        # If we are simulating a function body and every path is required
-        # to return, then the final flow result must say so.
-        if self.require_all_paths_return and not flow.definitely_returns:
-            if self.expected_return_type is None:
-                raise TypeCheckError(
-                    "Internal checker configuration error: "
-                    "require_all_paths_return=True but no expected return type set."
+    # --------------------------------------------------------
+    # Pass 1: collect function signatures
+    # --------------------------------------------------------
+
+    def collect_function_signatures(self, program: Program) -> None:
+        for function in program.functions:
+            if self.function_env.contains(function.name):
+                self.report(function, f"Function '{function.name}' is already declared.")
+                continue
+
+            return_type = self.parse_type_node(function.return_type, function)
+
+            parameter_types: list[Type] = []
+            for parameter in function.parameters:
+                param_type = self.parse_type_node(parameter.param_type, parameter)
+                parameter_types.append(param_type)
+
+            self.function_env.define(
+                function.name,
+                FunctionType(
+                    parameter_types=tuple(parameter_types),
+                    return_type=return_type,
                 )
-            raise TypeCheckError(
-                f"Not all control paths return a value of type "
-                f"{type_to_string(self.expected_return_type)}."
             )
 
     # --------------------------------------------------------
-    # Program checking
+    # Pass 2: check each function body
     # --------------------------------------------------------
 
-    def check_program(self, program: Program, env: TypeEnvironment) -> FlowResult:
+    def check_all_functions(self, program: Program) -> None:
+        for function in program.functions:
+            self.check_function(function)
+
+    def check_function(self, function: Function) -> None:
         """
-        Check all top-level statements in order.
+        Type-check one function.
 
-        Flow behavior:
-        - if a statement definitely returns, everything after it is unreachable
-          in a strict compiler.
-        - here we simply stop and return ALWAYS_RETURNS.
-
-        You could later upgrade this to also report unreachable code.
+        CHANGE APPLIED:
+        Parameters are introduced into a fresh function-local
+        environment, and the function's body is checked with its
+        declared expected return type.
         """
-        for stmt in program.statements:
-            flow = self.check_statement(stmt, env)
-            if flow.definitely_returns:
-                return ALWAYS_RETURNS
+        previous_function_name = self.current_function_name
+        previous_expected_return_type = self.expected_return_type
 
-        return NO_RETURN
+        self.current_function_name = function.name
+        self.expected_return_type = self.parse_type_node(function.return_type, function)
+
+        local_env = TypeEnvironment()
+
+        # Add parameters as local variables
+        for parameter in function.parameters:
+            param_type = self.parse_type_node(parameter.param_type, parameter)
+
+            if local_env.contains_in_current_scope(parameter.name):
+                self.report(parameter, f"Duplicate parameter '{parameter.name}' in function '{function.name}'.")
+                continue
+
+            local_env.define(parameter.name, param_type)
+
+        flow = self.check_statement(function.body, local_env, inside_loop=False)
+
+        # Enforce that the function returns on all paths.
+        if self.expected_return_type != NULL and not flow.definitely_returns:
+            self.report(
+                function,
+                f"Function '{function.name}' may not return a value on all paths."
+            )
+
+        self.current_function_name = previous_function_name
+        self.expected_return_type = previous_expected_return_type
 
     # --------------------------------------------------------
     # Statement checking
     # --------------------------------------------------------
 
-    def check_statement(self, stmt: Statement, env: TypeEnvironment) -> FlowResult:
-        """
-        Check one statement and return flow information.
-        """
+    def check_statement(
+        self,
+        stmt: Statement,
+        env: TypeEnvironment,
+        inside_loop: bool,
+    ) -> FlowResult:
 
-        # ====================================================
-        # BLOCK STATEMENT
-        # ====================================================
-        # A block creates a child scope.
-        #
-        # Important:
-        # If the block has no statements, the for-loop runs zero times,
-        # which is perfectly valid.
-        #
-        # Flow rule:
-        # - if any statement definitely returns, then the whole block
-        #   definitely returns from that point onward
-        # ====================================================
+        # ----------------------------------------------------
+        # BlockStatement
+        # ----------------------------------------------------
         if isinstance(stmt, BlockStatement):
             block_env = TypeEnvironment(parent=env)
+            saw_terminal_flow = False
 
             for inner_stmt in stmt.statements:
-                flow = self.check_statement(inner_stmt, block_env)
+                if saw_terminal_flow:
+                    self.report(inner_stmt, "Unreachable statement.")
+                    continue
+
+                flow = self.check_statement(inner_stmt, block_env, inside_loop)
+
+                if flow.unreachable:
+                    self.report(inner_stmt, "Unreachable statement.")
+
                 if flow.definitely_returns:
-                    return ALWAYS_RETURNS
+                    saw_terminal_flow = True
+                    return RETURNS
 
-            return NO_RETURN
+                if flow.breaks_loop:
+                    saw_terminal_flow = True
+                    return BREAKS
 
-        # ====================================================
-        # LET STATEMENT
-        # ====================================================
-        # Syntax:
-        #   let x = initializer;
-        #
-        # We infer x's type from the initializer.
-        # ====================================================
-        if isinstance(stmt, LetStatement):
-            init_type = self.check_expression(stmt.initializer, env)
+            return NO_FLOW
 
-            if env.contains_in_current_scope(stmt.name):
-                raise TypeCheckError(
-                    f"Variable '{stmt.name}' is already declared in this scope."
-                )
-
-            env.define(stmt.name, init_type)
-            return NO_RETURN
-
-        # ====================================================
-        # ASSIGN STATEMENT
-        # ====================================================
-        # Syntax:
-        #   x = value;
-        #
-        # Rules:
-        # - x must already exist
-        # - value type must be assignable to x's declared type
-        # ====================================================
-        if isinstance(stmt, AssignStatement):
-            target_type = env.get(stmt.name)
+        # ----------------------------------------------------
+        # VarDeclaration
+        # ----------------------------------------------------
+        if isinstance(stmt, VarDeclaration):
+            declared_type = self.parse_type_node(stmt.var_type, stmt)
             value_type = self.check_expression(stmt.value, env)
 
-            if not can_assign(target_type, value_type):
-                raise TypeCheckError(
-                    f"Cannot assign value of type {type_to_string(value_type)} "
-                    f"to variable '{stmt.name}' of type {type_to_string(target_type)}."
+            if env.contains_in_current_scope(stmt.name):
+                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
+
+            if declared_type != ERROR and value_type != ERROR:
+                if not can_assign(declared_type, value_type):
+                    self.report(
+                        stmt.value,
+                        f"Cannot initialize variable '{stmt.name}' of type "
+                        f"{type_name(declared_type)} with value of type {type_name(value_type)}."
+                    )
+
+            env.define(stmt.name, declared_type)
+            return NO_FLOW
+
+        # ----------------------------------------------------
+        # ArrayDeclaration
+        # ----------------------------------------------------
+        if isinstance(stmt, ArrayDeclaration):
+            element_type = self.parse_type_node(stmt.array_type, stmt)
+            array_type = ArrayType(element_type)
+
+            if env.contains_in_current_scope(stmt.name):
+                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
+
+            for element in stmt.elements:
+                element_expr_type = self.check_expression(element, env)
+                if element_type != ERROR and element_expr_type != ERROR:
+                    if not can_assign(element_type, element_expr_type):
+                        self.report(
+                            element,
+                            f"Cannot place element of type {type_name(element_expr_type)} "
+                            f"into array '{stmt.name}' of element type {type_name(element_type)}."
+                        )
+
+            env.define(stmt.name, array_type)
+            return NO_FLOW
+
+        # ----------------------------------------------------
+        # ArrayDeclarationEmpty
+        # ----------------------------------------------------
+        if isinstance(stmt, ArrayDeclarationEmpty):
+            element_type = self.parse_type_node(stmt.array_type, stmt)
+            array_type = ArrayType(element_type)
+
+            if env.contains_in_current_scope(stmt.name):
+                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
+
+            size_type = self.check_expression(stmt.size, env)
+            if size_type != ERROR and size_type != INTEGER:
+                self.report(
+                    stmt.size,
+                    f"Array size must be integer, got {type_name(size_type)}."
                 )
 
-            return NO_RETURN
+            env.define(stmt.name, array_type)
+            return NO_FLOW
 
-        # ====================================================
-        # IF STATEMENT
-        # ====================================================
-        # Syntax:
-        #   if (condition) then_branch else else_branch
-        #
-        # Rules:
-        # - condition must be bool
-        # - then / else are checked in child scopes
-        #
-        # Flow rule:
-        # - if both branches definitely return, then the if-statement
-        #   definitely returns
-        # - if there is no else branch, it cannot definitely return
-        # ====================================================
+        # ----------------------------------------------------
+        # AssignStatement
+        # ----------------------------------------------------
+        if isinstance(stmt, AssignStatement):
+            try:
+                target_type = env.get(stmt.name)
+            except TypeCheckError:
+                self.report(stmt, f"Undefined variable '{stmt.name}'.")
+                target_type = ERROR
+
+            value_type = self.check_expression(stmt.value, env)
+
+            if target_type != ERROR and value_type != ERROR:
+                if not can_assign(target_type, value_type):
+                    self.report(
+                        stmt.value,
+                        f"Cannot assign value of type {type_name(value_type)} "
+                        f"to variable '{stmt.name}' of type {type_name(target_type)}."
+                    )
+
+            return NO_FLOW
+
+        # ----------------------------------------------------
+        # IfStatement
+        # ----------------------------------------------------
         if isinstance(stmt, IfStatement):
-            cond_type = self.check_expression(stmt.condition, env)
+            condition_type = self.check_expression(stmt.condition, env)
 
-            if cond_type != BOOL:
-                raise TypeCheckError(
-                    f"If condition must be bool, got {type_to_string(cond_type)}."
+            if condition_type != ERROR and condition_type != BOOLEAN:
+                self.report(
+                    stmt.condition,
+                    f"If condition must be boolean, got {type_name(condition_type)}."
                 )
 
             then_env = TypeEnvironment(parent=env)
-            then_flow = self.check_statement(stmt.then_branch, then_env)
+            then_flow = self.check_statement(stmt.then_branch, then_env, inside_loop)
 
             if stmt.else_branch is None:
-                return NO_RETURN
+                return NO_FLOW
 
             else_env = TypeEnvironment(parent=env)
-            else_flow = self.check_statement(stmt.else_branch, else_env)
+            else_flow = self.check_statement(stmt.else_branch, else_env, inside_loop)
 
-            if then_flow.definitely_returns and else_flow.definitely_returns:
-                return ALWAYS_RETURNS
+            return FlowResult(
+                definitely_returns=(
+                    then_flow.definitely_returns and else_flow.definitely_returns
+                ),
+                breaks_loop=(
+                    then_flow.breaks_loop and else_flow.breaks_loop
+                ),
+                unreachable=False,
+            )
 
-            return NO_RETURN
-
-        # ====================================================
-        # WHILE STATEMENT
-        # ====================================================
-        # Syntax:
-        #   while (condition) body
-        #
-        # Rules:
-        # - condition must be bool
-        #
-        # Flow analysis note:
-        # Even if the loop body returns, we generally do NOT say the whole
-        # while definitely returns, because the loop may execute zero times.
-        #
-        # Example:
-        #   while (false) { return 1; }
-        #
-        # So the safe rule is:
-        #   while never definitely returns
-        # ====================================================
+        # ----------------------------------------------------
+        # WhileStatement
+        # ----------------------------------------------------
         if isinstance(stmt, WhileStatement):
-            cond_type = self.check_expression(stmt.condition, env)
+            condition_type = self.check_expression(stmt.condition, env)
 
-            if cond_type != BOOL:
-                raise TypeCheckError(
-                    f"While condition must be bool, got {type_to_string(cond_type)}."
+            if condition_type != ERROR and condition_type != BOOLEAN:
+                self.report(
+                    stmt.condition,
+                    f"While condition must be boolean, got {type_name(condition_type)}."
                 )
 
             body_env = TypeEnvironment(parent=env)
-            self.check_statement(stmt.body, body_env)
-            return NO_RETURN
+            self.check_statement(stmt.body, body_env, inside_loop=True)
 
-        # ====================================================
-        # RETURN STATEMENT
-        # ====================================================
-        # Syntax:
-        #   return;
-        #   return value;
-        #
-        # Rules:
-        # - allowed only if expected_return_type is set
-        # - bare return is only valid if expected return type is null
-        # - returned expression must be assignable to expected type
-        #
-        # Flow:
-        # - return definitely returns
-        # ====================================================
+            # Conservative choice:
+            # we do not claim that a while-loop definitely returns
+            # because it may execute zero times, many times, or end
+            # via break.
+            return NO_FLOW
+
+        # ----------------------------------------------------
+        # ReturnStatement
+        # ----------------------------------------------------
         if isinstance(stmt, ReturnStatement):
             if self.expected_return_type is None:
-                raise TypeCheckError(
-                    "Return statement is not allowed here because no expected "
-                    "return type was provided to the checker."
-                )
+                self.report(stmt, "Return statement is not allowed here.")
+                return RETURNS
 
-            # Bare return: return;
             if stmt.value is None:
-                if not can_assign(self.expected_return_type, NULL):
-                    raise TypeCheckError(
-                        f"Bare return is not compatible with expected return type "
-                        f"{type_to_string(self.expected_return_type)}."
-                    )
-                return ALWAYS_RETURNS
+                self.report(stmt, "Return statement must include a value.")
+                return RETURNS
 
             value_type = self.check_expression(stmt.value, env)
 
-            if not can_assign(self.expected_return_type, value_type):
-                raise TypeCheckError(
-                    f"Return type mismatch: expected "
-                    f"{type_to_string(self.expected_return_type)}, got "
-                    f"{type_to_string(value_type)}."
+            if value_type != ERROR and not can_assign(self.expected_return_type, value_type):
+                self.report(
+                    stmt.value,
+                    f"Return type mismatch in function '{self.current_function_name}': "
+                    f"expected {type_name(self.expected_return_type)}, got {type_name(value_type)}."
                 )
 
-            return ALWAYS_RETURNS
+            return RETURNS
 
-        # ====================================================
-        # EXPRESSION STATEMENT
-        # ====================================================
-        # Syntax:
-        #   expression;
-        #
-        # We still type-check the expression even though its value is discarded.
-        # ====================================================
+        # ----------------------------------------------------
+        # BreakStatement
+        # ----------------------------------------------------
+        if isinstance(stmt, BreakStatement):
+            if not inside_loop:
+                self.report(stmt, "'break' used outside of a loop.")
+            return BREAKS
+
+        # ----------------------------------------------------
+        # ExpressionStatement
+        # ----------------------------------------------------
         if isinstance(stmt, ExpressionStatement):
             self.check_expression(stmt.expression, env)
-            return NO_RETURN
+            return NO_FLOW
 
-        raise TypeCheckError(f"Unknown statement node: {stmt!r}")
+        self.report(stmt, f"Unknown statement node: {stmt!r}")
+        return NO_FLOW
 
     # --------------------------------------------------------
     # Expression checking
     # --------------------------------------------------------
 
     def check_expression(self, expr: Expression, env: TypeEnvironment) -> Type:
-        """
-        Infer and return the type of an expression.
-        """
-
-        # ====================================================
-        # LITERAL
-        # ====================================================
-        # We inspect the Python value inside Literal(value) and map it
-        # to one of our language types.
-        #
-        # IMPORTANT:
-        # In Python, bool is a subclass of int.
-        # So we must check bool BEFORE int.
-        # ====================================================
         if isinstance(expr, Literal):
             value = expr.value
 
             if value is None:
                 return NULL
 
+            # bool before int because Python bool is a subclass of int
             if isinstance(value, bool):
-                return BoolType(expr.line, expr.column)
+                return BOOLEAN
 
             if isinstance(value, int):
-                return INT
+                return INTEGER
 
             if isinstance(value, float):
                 return FLOAT
@@ -665,202 +903,216 @@ class TypeChecker:
             if isinstance(value, str):
                 return STRING
 
-            raise TypeCheckError(
-                f"Unsupported literal value {value!r} "
-                f"of Python type {type(value).__name__}."
-            )
+            self.report(expr, f"Unsupported literal value {value!r}.")
+            return ERROR
 
-        # ====================================================
-        # VARIABLE
-        # ====================================================
-        # Look up the variable's declared type from the environment.
-        # ====================================================
         if isinstance(expr, Variable):
-            return env.get(expr.name)
+            try:
+                return env.get(expr.name)
+            except TypeCheckError:
+                self.report(expr, f"Undefined variable '{expr.name}'.")
+                return ERROR
 
-        # ====================================================
-        # GROUPING
-        # ====================================================
-        # Parentheses do not change the type; they only affect parsing.
-        # ====================================================
         if isinstance(expr, Grouping):
             return self.check_expression(expr.expression, env)
 
-        # ====================================================
-        # UNARY
-        # ====================================================
-        # Supported operators:
-        #   -x   numeric negation
-        #   !x   boolean negation
-        #
-        # Rules:
-        # - '-' requires int or float; returns same type
-        # - '!' requires bool; returns bool
-        # ====================================================
         if isinstance(expr, Unary):
             right_type = self.check_expression(expr.right, env)
 
+            if right_type == ERROR:
+                return ERROR
+
             if expr.operator == "-":
                 if not is_numeric(right_type):
-                    raise TypeCheckError(
-                        f"Unary '-' requires int or float, got "
-                        f"{type_to_string(right_type)}."
+                    self.report(
+                        expr,
+                        f"Unary '-' requires integer or float, got {type_name(right_type)}."
                     )
+                    return ERROR
                 return right_type
 
             if expr.operator == "!":
-                if right_type != BOOL:
-                    raise TypeCheckError(
-                        f"Unary '!' requires bool, got "
-                        f"{type_to_string(right_type)}."
+                if right_type != BOOLEAN:
+                    self.report(
+                        expr,
+                        f"Unary '!' requires boolean, got {type_name(right_type)}."
                     )
-                return BOOL
+                    return ERROR
+                return BOOLEAN
 
-            raise TypeCheckError(f"Unknown unary operator '{expr.operator}'.")
+            self.report(expr, f"Unknown unary operator '{expr.operator}'.")
+            return ERROR
 
-        # ====================================================
-        # BINARY
-        # ====================================================
-        # This is where most expression typing rules live.
-        # ====================================================
         if isinstance(expr, Binary):
             left_type = self.check_expression(expr.left, env)
             right_type = self.check_expression(expr.right, env)
             op = expr.operator
 
-            # ------------------------------------------------
-            # ARITHMETIC
-            # ------------------------------------------------
-            # Operators:
-            #   + - * / %
-            #
-            # Rules:
-            # - string + string -> string
-            # - numeric op numeric -> numeric result
-            #
-            # Note:
-            # We do not allow string * int or similar in this language.
-            # ------------------------------------------------
+            if left_type == ERROR or right_type == ERROR:
+                return ERROR
+
+            # Arithmetic
             if op in {"+", "-", "*", "/", "%"}:
-                # Special case for string concatenation
                 if op == "+" and left_type == STRING and right_type == STRING:
                     return STRING
 
                 if not is_numeric(left_type) or not is_numeric(right_type):
-                    raise TypeCheckError(
+                    self.report(
+                        expr,
                         f"Operator '{op}' requires numeric operands "
-                        f"(except string + string), got "
-                        f"{type_to_string(left_type)} and "
-                        f"{type_to_string(right_type)}."
+                        f"(or string + string for '+'), got "
+                        f"{type_name(left_type)} and {type_name(right_type)}."
                     )
+                    return ERROR
 
-                # Division policy:
-                # For a more advanced language, you might choose:
-                #   int / int -> float
-                # But here we keep the same promotion rule used by the
-                # other numeric operators.
-                return common_numeric_type(left_type, right_type)
+                return numeric_result_type(left_type, right_type)
 
-            # ------------------------------------------------
-            # COMPARISON
-            # ------------------------------------------------
-            # Operators:
-            #   < <= > >=
-            #
-            # Rules:
-            # - both sides must be numeric
-            # - result is bool
-            # ------------------------------------------------
+            # Comparison
             if op in {"<", "<=", ">", ">="}:
                 if not is_numeric(left_type) or not is_numeric(right_type):
-                    raise TypeCheckError(
+                    self.report(
+                        expr,
                         f"Operator '{op}' requires numeric operands, got "
-                        f"{type_to_string(left_type)} and "
-                        f"{type_to_string(right_type)}."
+                        f"{type_name(left_type)} and {type_name(right_type)}."
                     )
-                return BOOL
+                    return ERROR
+                return BOOLEAN
 
-            # ------------------------------------------------
-            # EQUALITY
-            # ------------------------------------------------
-            # Operators:
-            #   == !=
-            #
-            # More advanced than the beginner version:
-            # - exact type match is allowed
-            # - int and float may be compared
-            # - nullable[T] may be compared with null
-            # - T may be compared with nullable[T]
-            #
-            # This is still intentionally conservative.
-            # ------------------------------------------------
+            # Equality
             if op in {"==", "!="}:
-                if self.are_comparable_for_equality(left_type, right_type):
-                    return BOOL
-
-                raise TypeCheckError(
-                    f"Operator '{op}' cannot compare values of type "
-                    f"{type_to_string(left_type)} and "
-                    f"{type_to_string(right_type)}."
-                )
-
-            # ------------------------------------------------
-            # LOGICAL
-            # ------------------------------------------------
-            # Operators:
-            #   && ||
-            #
-            # Both sides must be bool.
-            # ------------------------------------------------
-            if op in {"&&", "||"}:
-                if left_type != BOOL or right_type != BOOL:
-                    raise TypeCheckError(
-                        f"Operator '{op}' requires bool operands, got "
-                        f"{type_to_string(left_type)} and "
-                        f"{type_to_string(right_type)}."
+                if left_type != right_type:
+                    self.report(
+                        expr,
+                        f"Operator '{op}' requires both sides to have the same type, got "
+                        f"{type_name(left_type)} and {type_name(right_type)}."
                     )
-                return BOOL
+                    return ERROR
+                return BOOLEAN
 
-            raise TypeCheckError(f"Unknown binary operator '{op}'.")
+            # Logical
+            if op in {"&&", "||"}:
+                if left_type != BOOLEAN or right_type != BOOLEAN:
+                    self.report(
+                        expr,
+                        f"Operator '{op}' requires boolean operands, got "
+                        f"{type_name(left_type)} and {type_name(right_type)}."
+                    )
+                    return ERROR
+                return BOOLEAN
 
-        raise TypeCheckError(f"Unknown expression node: {expr!r}")
+            self.report(expr, f"Unknown binary operator '{op}'.")
+            return ERROR
+
+        self.report(expr, f"Unknown expression node: {expr!r}")
+        return ERROR
 
     # --------------------------------------------------------
-    # Equality comparability helper
+    # Type parsing helper
     # --------------------------------------------------------
 
-    def are_comparable_for_equality(self, left: Type, right: Type) -> bool:
+    def parse_type_node(self, declared_type: str, node: Node) -> Type:
         """
-        Return True if two types may be compared with == or !=.
-
-        Rules:
-        - same types are comparable
-        - int and float are comparable
-        - nullable[T] and null are comparable
-        - T and nullable[T] are comparable if T fits inside nullable[T]
-
-        This is stricter than some languages, but more flexible than
-        the beginner checker.
+        Parse a declared type and tie errors to the node that
+        declared it.
         """
-        if same_type(left, right):
-            return True
+        try:
+            return parse_declared_type(declared_type)
+        except TypeCheckError as err:
+            self.errors.append(TypeCheckError(err.message, node.line, node.column))
+            return ERROR
 
-        # int == float and float == int
-        if is_numeric(left) and is_numeric(right):
-            return True
 
-        # nullable[T] == null
-        if isinstance(left, NullableType) and right == NULL:
-            return True
+# ============================================================
+# OPTIONAL CONVENIENCE RUNNER
+# ============================================================
+# The earlier extra helper functions are no longer central to
+# the design, because the important notion of "functions" is
+# now represented in the AST itself. A small runner like this is
+# enough for most use cases.
+# ============================================================
 
-        if isinstance(right, NullableType) and left == NULL:
-            return True
+def run_typecheck(program: Program, source_code: str) -> None:
+    checker = TypeChecker(source_code)
+    checker.check(program)
 
-        # T == nullable[T] or nullable[T] == T
-        if isinstance(left, NullableType) and can_assign(left, right):
-            return True
+    if checker.errors:
+        for err in checker.formatted_errors():
+            print(err)
+            print()
+    else:
+        print("Type check passed.")
+        
+# ============================================================
+# DEMO PROGRAM
+# ============================================================
 
-        if isinstance(right, NullableType) and can_assign(right, left):
-            return True
+def build_error_program() -> Program:
+    """
+    Build this invalid program:
 
-        return False
+        integer main() {
+            integer x = 10;
+            x = "hello";
+            return true;
+        }
+    """
+    main_function = Function(
+        return_type="integer",
+        name="main",
+        parameters=[],
+        body=BlockStatement(
+            statements=[
+                VarDeclaration(
+                    var_type="integer",
+                    name="x",
+                    value=Literal(10, line=2, column=17),
+                    line=2,
+                    column=5,
+                ),
+                AssignStatement(
+                    name="x",
+                    value=Literal("hello", line=3, column=9),
+                    line=3,
+                    column=5,
+                ),
+                ReturnStatement(
+                    value=Literal(True, line=4, column=12),
+                    line=4,
+                    column=5,
+                ),
+            ],
+            line=1,
+            column=16,
+        ),
+        line=1,
+        column=1,
+    )
+
+    return Program(
+        functions=[main_function],
+        line=1,
+        column=1,
+    )
+
+
+def error_source_code() -> str:
+    return """integer main() {
+    integer x = 10;
+    x = "hello";
+    return true;
+}"""
+
+if __name__ == "__main__":
+    source_code = error_source_code()
+    program = build_error_program()
+
+    checker = TypeChecker(source_code)
+    checker.check(program)
+
+    if checker.errors:
+        print("Type check failed:\n")
+        for err in checker.formatted_errors():
+            print(err)
+            print()
+    else:
+        print("Type check passed.")
