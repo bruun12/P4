@@ -1,5 +1,3 @@
-Tomt array
-ændring af enkelt element i array
 funktionskald til expressions
 
 
@@ -24,10 +22,12 @@ ExpElemB        -> Exp
 Stm             -> StmBStm |StmA                             
 StmB            -> StmA |\epsilon                            
 StmA            -> TYPE Def                                  
-                   | IDF = Exp |AIDF = [Exp,...,Exp]        
+                   | IDF = Exp |AIDFArrChange      
                    | if(Exp){Stm}else{Stm}| while(Exp){Stm} 
                    | skip
-Def             -> IDF = Exp; | AIDF = [Exp,...,Exp]; 
+Def             -> IDF = Exp; | AIDF ArrDef
+ArrDef          -> [Exp,...,Exp];Stm | [NAT];Stm
+ArrChange       -> =[Exp,...,Exp] | [NAT] = Exp
 
 Exp             -> ExpAnd
 
@@ -75,7 +75,7 @@ ExpModA         -> ExpNot | \epsilon
 
 ExpNot          -> !Term
 
-Term            ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]|(Exp)                                 
+Term            ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]| IDF(Exp,...,Exp)|(Exp)                                 
 
 FormatString    -> FormatStringA + FormatString | "String"
 FormatStringA   -> "String" | \epsilon             
