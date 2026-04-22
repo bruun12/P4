@@ -1,15 +1,6 @@
-Non terminaler skrives i CamelCase
-En samling terminaler skrives i ALL CAPS
-En enkelt terminal skrives med '..' ex. 'a'
-0-1 skrives med [] ex. 
-0-mange skrives med {} ex.
-En gruppe skrives med () ex. 
-Valg skrives med |
-? indicates an optional element
-* indicates zero or more repititions of an element
-+ indicates one or more repititions of an element
-
-Introduction to compiler design p. 45
+Tomt array
+ændring af enkelt element i array
+funktionskald til expressions
 
 
 
@@ -38,7 +29,7 @@ StmB            -> StmA |\epsilon                               OK
 StmA            -> TYPE Def                                     OK
                     | IDF = Exp |AIDF = [Exp,...,Exp]                     OK
                     | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK
-                    | skip | IDF(Exp,...,Exp);
+                    | skip
 Def             -> IDF = Exp; | AIDF = [Exp,...,Exp]; 
 
 Exp -> ExpAnd
@@ -87,7 +78,7 @@ ExpModA     -> ExpNot | \epsilon
 
 ExpNot -> !Term
 
-Term ->  INT | IDF | DOUBLE | CHAR | BOOL | AIDF[NAT]|(Exp)                                 
+Term ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]|(Exp)                                 
 
 FormatString    -> FormatStringA + FormatString | "String"      OK
 FormatStringA   -> "String" | \epsilon                          OK
