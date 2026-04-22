@@ -2,275 +2,31 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from parser.ASTNodes import (
+    AssignStatement,
+    Binary,
+    BlockStatement,
+    Expression,
+    ExpressionStatement,
+    IfStatement,
+    Literal,
+    Node,
+    Program,
+    ReturnStatement,
+    BreakStatement,
+    Statement,
+    Unary,
+    Variable,
+    WhileStatement,
+    VarDeclaration,
+    Function,
+    Parameter,
+    ArrayDeclaration,
+    ArrayDeclarationEmpty,
+    FunctionCall,
+    Grouping
+)
 
-# ============================================================
-# AST NODES
-# ============================================================
-# These AST nodes are rewritten to fix the structural problems
-# in the previous version.
-#
-# IMPORTANT CHANGES APPLIED HERE:
-#
-# 1. Every concrete node now stores line/column properly.
-#    This fixes the earlier issue where several nodes did not
-#    call Node.__init__ and therefore had no source position.
-#
-# 2. Program, Function, Parameter, VarDeclaration,
-#    ArrayDeclaration, ArrayDeclarationEmpty, and Literal now
-#    all carry line/column.
-#
-# 3. VarDeclaration now correctly stores its declared type.
-#    The earlier version accepted a type but did not store it.
-#
-# 4. Literal now carries line/column so diagnostics can point
-#    to the exact literal location.
-#
-# 5. Parameter uses "param_type" instead of "type" to avoid
-#    shadowing Python's built-in name "type".
-#
-# 6. Function uses "body" instead of "statement" because
-#    "body" is clearer and more conventional.
-# ============================================================
-
-
-# ------------------------------------------------------------
-# Base node classes
-# ------------------------------------------------------------
-
-class Node:
-    """
-    Base AST node.
-
-    Every node carries line/column so the type checker can
-    report precise diagnostics.
-    """
-    def __init__(self, line: int, column: int):
-        self.line = line
-        self.column = column
-
-
-class Statement(Node):
-    """Base class for all statement nodes."""
-    pass
-
-
-class Expression(Node):
-    """Base class for all expression nodes."""
-    pass
-
-
-# ------------------------------------------------------------
-# Program / function-level nodes
-# ------------------------------------------------------------
-
-class Program(Node):
-    """
-    Top-level program node.
-
-    CHANGE APPLIED:
-    The program is now function-centered. A program contains
-    functions, because your language design now treats functions
-    as the top-level units.
-    """
-    def __init__(self, functions: list["Function"], line: int = 1, column: int = 1):
-        super().__init__(line, column)
-        self.functions = functions
-
-
-class Function(Node):
-    """
-    Function declaration.
-
-    CHANGE APPLIED:
-    - now calls super().__init__(line, column)
-    - uses 'body' instead of 'statement'
-    """
-    def __init__(
-        self,
-        return_type: str,
-        name: str,
-        parameters: list["Parameter"],
-        body: Statement,
-        line: int,
-        column: int,
-    ):
-        super().__init__(line, column)
-        self.return_type = return_type
-        self.name = name
-        self.parameters = parameters
-        self.body = body
-
-
-class Parameter(Node):
-    """
-    Function parameter.
-
-    CHANGE APPLIED:
-    - now calls super().__init__(line, column)
-    - field renamed from 'type' to 'param_type'
-    """
-    def __init__(self, param_type: str, name: str, line: int, column: int):
-        super().__init__(line, column)
-        self.param_type = param_type
-        self.name = name
-
-
-# ------------------------------------------------------------
-# Statement nodes
-# ------------------------------------------------------------
-
-class BlockStatement(Statement):
-    def __init__(self, statements: list[Statement], line: int, column: int):
-        super().__init__(line, column)
-        self.statements = statements
-
-
-class VarDeclaration(Statement):
-    """
-    Variable declaration.
-
-    CHANGE APPLIED:
-    The earlier version accepted a declared type but did not
-    store it. This version stores it correctly in self.var_type.
-    """
-    def __init__(self, var_type: str, name: str, value: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.var_type = var_type
-        self.name = name
-        self.value = value
-
-
-class AssignStatement(Statement):
-    def __init__(self, name: str, value: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.name = name
-        self.value = value
-
-
-class IfStatement(Statement):
-    def __init__(
-        self,
-        condition: Expression,
-        then_branch: Statement,
-        else_branch: Statement | None,
-        line: int,
-        column: int,
-    ):
-        super().__init__(line, column)
-        self.condition = condition
-        self.then_branch = then_branch
-        self.else_branch = else_branch
-
-
-class WhileStatement(Statement):
-    def __init__(self, condition: Expression, body: Statement, line: int, column: int):
-        super().__init__(line, column)
-        self.condition = condition
-        self.body = body
-
-
-class ReturnStatement(Statement):
-    def __init__(self, value: Expression | None, line: int, column: int):
-        super().__init__(line, column)
-        self.value = value
-
-
-class BreakStatement(Statement):
-    def __init__(self, line: int, column: int):
-        super().__init__(line, column)
-
-
-class ExpressionStatement(Statement):
-    def __init__(self, expression: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.expression = expression
-
-
-class ArrayDeclaration(Statement):
-    """
-    Array declaration with explicit elements.
-
-    Example:
-        integer[] arr = [1, 2, 3];
-
-    CHANGE APPLIED:
-    - stores line/column
-    - stores declared element type as array_type
-    """
-    def __init__(self, array_type: str, name: str, elements: list[Expression], line: int, column: int):
-        super().__init__(line, column)
-        self.array_type = array_type
-        self.name = name
-        self.elements = elements
-
-
-class ArrayDeclarationEmpty(Statement):
-    """
-    Empty-sized array declaration.
-
-    Example:
-        integer[] arr[3];
-
-    CHANGE APPLIED:
-    - stores line/column
-    """
-    def __init__(self, array_type: str, name: str, size: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.array_type = array_type
-        self.name = name
-        self.size = size
-
-
-# ------------------------------------------------------------
-# Expression nodes
-# ------------------------------------------------------------
-
-class Literal(Expression):
-    """
-    Literal value.
-
-    CHANGE APPLIED:
-    Literal now carries line/column, so errors involving a
-    literal can point to the exact source position.
-    """
-    def __init__(self, value: object, line: int, column: int):
-        super().__init__(line, column)
-        self.value = value
-
-    def get_value(self):
-        return self.value
-
-
-class Variable(Expression):
-    def __init__(self, name: str, line: int, column: int):
-        super().__init__(line, column)
-        self.name = name
-
-
-class Unary(Expression):
-    def __init__(self, operator: str, right: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.operator = operator
-        self.right = right
-
-
-class Binary(Expression):
-    def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.left = left
-        self.operator = operator
-        self.right = right
-
-
-class Grouping(Expression):
-    def __init__(self, expression: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.expression = expression
-
-
-# ============================================================
-# TYPE OBJECTS
-# ============================================================
 
 class Type:
     pass
@@ -384,7 +140,6 @@ class TypeCheckError(Exception):
         self.message = message
         self.line = line
         self.column = column
-
 
 def format_type_error(error: TypeCheckError, source_lines: list[str]) -> str:
     """
@@ -541,20 +296,6 @@ def parse_declared_type(declared_type: str) -> Type:
     raise TypeCheckError(f"Unknown declared type '{declared_type}'.", 0, 0)
 
 
-# ============================================================
-# TYPE CHECKER
-# ============================================================
-# This checker is rewritten around the corrected AST.
-#
-# MAJOR DESIGN CHANGE APPLIED:
-# The top-level driver no longer iterates through program
-# statements. It now:
-#   1. collects function signatures
-#   2. checks each function body
-#
-# This matches your updated language design much better.
-# ============================================================
-
 class TypeChecker:
     def __init__(self, source_code: str):
         self.source_code = source_code
@@ -626,7 +367,7 @@ class TypeChecker:
 
             parameter_types: list[Type] = []
             for parameter in function.parameters:
-                param_type = self.parse_type_node(parameter.param_type, parameter)
+                param_type = self.parse_type_node(parameter.type, parameter)
                 parameter_types.append(param_type)
 
             self.function_env.define(
@@ -664,7 +405,7 @@ class TypeChecker:
 
         # Add parameters as local variables
         for parameter in function.parameters:
-            param_type = self.parse_type_node(parameter.param_type, parameter)
+            param_type = self.parse_type_node(parameter.type, parameter)
 
             if local_env.contains_in_current_scope(parameter.name):
                 self.report(parameter, f"Duplicate parameter '{parameter.name}' in function '{function.name}'.")
@@ -672,7 +413,7 @@ class TypeChecker:
 
             local_env.define(parameter.name, param_type)
 
-        flow = self.check_statement(function.body, local_env, inside_loop=False)
+        flow = self.check_statement(function.statement, local_env, inside_loop=False)
 
         # Enforce that the function returns on all paths.
         if self.expected_return_type != NULL and not flow.definitely_returns:
@@ -726,7 +467,7 @@ class TypeChecker:
         # VarDeclaration
         # ----------------------------------------------------
         if isinstance(stmt, VarDeclaration):
-            declared_type = self.parse_type_node(stmt.var_type, stmt)
+            declared_type = self.parse_type_node(stmt.type, stmt)
             value_type = self.check_expression(stmt.value, env)
 
             if env.contains_in_current_scope(stmt.name):
@@ -747,7 +488,7 @@ class TypeChecker:
         # ArrayDeclaration
         # ----------------------------------------------------
         if isinstance(stmt, ArrayDeclaration):
-            element_type = self.parse_type_node(stmt.array_type, stmt)
+            element_type = self.parse_type_node(stmt.array, stmt)
             array_type = ArrayType(element_type)
 
             if env.contains_in_current_scope(stmt.name):
@@ -770,7 +511,7 @@ class TypeChecker:
         # ArrayDeclarationEmpty
         # ----------------------------------------------------
         if isinstance(stmt, ArrayDeclarationEmpty):
-            element_type = self.parse_type_node(stmt.array_type, stmt)
+            element_type = self.parse_type_node(stmt.type, stmt)
             array_type = ArrayType(element_type)
 
             if env.contains_in_current_scope(stmt.name):
@@ -906,6 +647,41 @@ class TypeChecker:
     # --------------------------------------------------------
 
     def check_expression(self, expr: Expression, env: TypeEnvironment) -> Type:
+        if isinstance(expr, FunctionCall):
+            try:
+                function_type = self.function_env.get(expr.name)
+            except TypeCheckError:
+                self.report(expr, f"Undefined function '{expr.name}'.")
+                return ERROR
+
+            expected_count = len(function_type.parameter_types)
+            actual_count = len(expr.arguments)
+
+            if actual_count != expected_count:
+                self.report(
+                    expr,
+                    f"Function '{expr.name}' expects {expected_count} argument(s), "
+                    f"but got {actual_count}."
+                )
+                return ERROR
+
+            for i, (argument_expr, parameter_type) in enumerate(
+                zip(expr.arguments, function_type.parameter_types),
+                start=1,
+            ):
+                argument_type = self.check_expression(argument_expr, env)
+
+                if argument_type != ERROR and not can_assign(parameter_type, argument_type):
+                    self.report(
+                        argument_expr,
+                        f"Argument {i} of function '{expr.name}' has type "
+                        f"{type_name(argument_type)}, but expected {type_name(parameter_type)}."
+                    )
+
+            return function_type.return_type
+        
+        
+        
         if isinstance(expr, Literal):
             value = expr.value
 
@@ -1029,8 +805,6 @@ class TypeChecker:
         return ERROR
 
 
-
-
 # ============================================================
 # OPTIONAL CONVENIENCE RUNNER
 # ============================================================
@@ -1045,81 +819,6 @@ def run_typecheck(program: Program, source_code: str) -> None:
     checker.check(program)
 
     if checker.errors:
-        for err in checker.formatted_errors():
-            print(err)
-            print()
-    else:
-        print("Type check passed.")
-        
-# ============================================================
-# DEMO PROGRAM
-# ============================================================
-
-def build_error_program() -> Program:
-    """
-    Build this invalid program:
-
-        integer main() {
-            integer x = 10;
-            x = "hello";
-            return true;
-        }
-    """
-    main_function = Function(
-        return_type="integer",
-        name="main",
-        parameters=[],
-        body=BlockStatement(
-            statements=[
-                VarDeclaration(
-                    var_type="integer",
-                    name="x",
-                    value=Literal(10, line=2, column=17),
-                    line=2,
-                    column=5,
-                ),
-                AssignStatement(
-                    name="x",
-                    value=Literal("hello", line=3, column=9),
-                    line=3,
-                    column=5,
-                ),
-                ReturnStatement(
-                    value=Literal(True, line=4, column=12),
-                    line=4,
-                    column=5,
-                ),
-            ],
-            line=1,
-            column=16,
-        ),
-        line=1,
-        column=1,
-    )
-
-    return Program(
-        functions=[main_function],
-        line=1,
-        column=1,
-    )
-
-
-def error_source_code() -> str:
-    return """integer main() {
-    integer x = 10;
-    x = "hello";
-    return true;
-}"""
-
-if __name__ == "__main__":
-    source_code = error_source_code()
-    program = build_error_program()
-
-    checker = TypeChecker(source_code)
-    checker.check(program)
-
-    if checker.errors:
-        print("Type check failed:\n")
         for err in checker.formatted_errors():
             print(err)
             print()

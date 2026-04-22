@@ -74,6 +74,9 @@ class ReturnStatement(Statement):
         super().__init__(line, column)
         self.value = value
 
+class BreakStatement(Statement):
+    def __init__(self, line: int, column: int):
+        super().__init__(line, column)
 
 class ExpressionStatement(Statement):
     def __init__(self, expression: Expression, line: int, column: int):
