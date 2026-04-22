@@ -1,5 +1,3 @@
-funktionskald til expressions
-
 
 Prog            -> FuncDef                                   
 
