@@ -89,7 +89,7 @@ INT             -> NAT | -INT
 DOUBLE          -> INT.NAT                   
 BOOL            -> TRUE | FALSE              
 ASCII           -> Everything in ascii table 
-IDF             -> a | ... | z | IDFIDF | IDFNAT                                      ??
+IDF             -> a | ... | z | IDFIDF | IDFNAT                         
 AIDF            -> a | ... | z | IDFIDF | IDFNAT
 TYPE            -> integer | doubleFloatingPoint 
                    | string | boolean | void
