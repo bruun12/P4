@@ -3,99 +3,96 @@ Tomt array
 funktionskald til expressions
 
 
+Prog            -> FuncDef                                   
+
+FuncDef         -> TYPE IDF (Param,...,Param){Stm return e;} FuncDef 
+                   | \epsilon                                    
+Param           -> TYPE IDF 
 
 
-                                                                FÆLLES PRÆFIX(FP)
-                                                                VENSTRE REKURSIV(VR)
-Prog            -> FuncDef                                     OK                                          
-
-FuncDef         -> TYPE IDF (Param,...,Param){Stm return e;} FuncDef | \epsilon OK                                        
-Param           -> TYPE IDF                                     OK 
+FuncCall        -> TYPE IDF(ExpList)                        
+ExpList         -> ExpListElem | \epsilon                   
+ExpListElem     -> ExpA |Exp, ExpListElem                        
+ExpA            -> Exp                                      
 
 
-FuncCall        -> TYPE IDF(ExpList)                            OK
-ExpList         -> ExpListElem | \epsilon                       OK
-ExpListElem     -> ExpA |Exp, ExpListElem                       OK     
-ExpA            -> Exp                                          OK
+FuncCall        -> t x(ExpList);                            
+ExpList         -> ExpElemA |\epsilon                       
+ExpElemA        -> Exp | ExpElemB, ExpElemA                 
+ExpElemB        -> Exp                                       
 
-
-FuncCall        -> t x(ExpList);                                OK
-ExpList         -> ExpElemA |\epsilon                           OK
-ExpElemA        -> Exp | ExpElemB, ExpElemA                     OK
-ExpElemB        -> Exp                                          OK 
-
-Stm             -> StmBStm |StmA                                OK
-StmB            -> StmA |\epsilon                               OK
-StmA            -> TYPE Def                                     OK
-                    | IDF = Exp |AIDF = [Exp,...,Exp]                     OK
-                    | if(Exp){Stm}else{Stm}| while(Exp){Stm}    OK
-                    | skip
+Stm             -> StmBStm |StmA                             
+StmB            -> StmA |\epsilon                            
+StmA            -> TYPE Def                                  
+                   | IDF = Exp |AIDF = [Exp,...,Exp]        
+                   | if(Exp){Stm}else{Stm}| while(Exp){Stm} 
+                   | skip
 Def             -> IDF = Exp; | AIDF = [Exp,...,Exp]; 
 
-Exp -> ExpAnd
+Exp             -> ExpAnd
 
-ExpAnd      -> ExpAndA AND ExpAnd | ExpOr
-ExpAndA     -> ExpOr | \epsilon
+ExpAnd          -> ExpAndA AND ExpAnd | ExpOr
+ExpAndA         -> ExpOr | \epsilon
 
-ExpOr       -> ExpOrA OR ExpOr | ExpEqual
-ExpOrA      -> ExpEqual | \epsilon 
+ExpOr           -> ExpOrA OR ExpOr | ExpEqual
+ExpOrA          -> ExpEqual | \epsilon 
 
-ExpEqual    -> ExpEqualA == ExpEqual | ExpNotEq 
-ExpEqualA   -> ExpNotEq | \epsilon
+ExpEqual        -> ExpEqualA == ExpEqual | ExpNotEq 
+ExpEqualA       -> ExpNotEq | \epsilon
 
-ExpNotEq    -> ExpNotEqA != ExpNotEq | ExpGreatEq 
-ExpNotEqA   -> ExpGreatEq | \epsilon
+ExpNotEq        -> ExpNotEqA != ExpNotEq | ExpGreatEq 
+ExpNotEqA       -> ExpGreatEq | \epsilon
 
-ExpGreatEq  -> ExpGreatEqA >= ExpGreatEq | ExpGreat
-ExpGreatEqA -> ExpGreat | \epsilon
+ExpGreatEq      -> ExpGreatEqA >= ExpGreatEq | ExpGreat
+ExpGreatEqA     -> ExpGreat | \epsilon
 
-ExpGreat    -> ExpGreatA > ExpGreat | ExpLessEq
-ExpGreatA   -> ExpLessEq | \epsilon
+ExpGreat        -> ExpGreatA > ExpGreat | ExpLessEq
+ExpGreatA       -> ExpLessEq | \epsilon
 
-ExpLessEq   -> ExpLessEqA <= ExpLessEq | ExpLess
-ExpLessEqA  -> ExpLess | \epsilon
+ExpLessEq       -> ExpLessEqA <= ExpLessEq | ExpLess
+ExpLessEqA      -> ExpLess | \epsilon
 
-ExpLess     -> ExpLessA < ExpLess | ExpAdd
-ExpLessA    -> ExpAdd | \epsilon
+ExpLess         -> ExpLessA < ExpLess | ExpAdd
+ExpLessA        -> ExpAdd | \epsilon
 
-ExpAdd      -> ExpAddA + ExpAdd |ExpSub
-ExpAddA     -> ExpSub | \epsilon
+ExpAdd          -> ExpAddA + ExpAdd |ExpSub
+ExpAddA         -> ExpSub | \epsilon
 
-ExpSub      -> ExpSubA - ExpSub | ExpNeg
-ExpSubA     -> ExpNeg | \epsilon
+ExpSub          -> ExpSubA - ExpSub | ExpNeg
+ExpSubA         -> ExpNeg | \epsilon
 
-ExpNeg      -> - ExpNegA | ExpMult
-ExpNegA     -> ExpMult | \epsilon
+ExpNeg          -> - ExpNegA | ExpMult
+ExpNegA         -> ExpMult | \epsilon
 
-ExpMult     -> ExpMultA * ExpMult | ExpDiv 
-ExpMultA    -> ExpDiv | \epsilon
+ExpMult         -> ExpMultA * ExpMult | ExpDiv 
+ExpMultA        -> ExpDiv | \epsilon
 
-ExpDiv      -> ExpDivA/ExpDiv | ExpMod
-ExpDivA     -> ExpMod | \epsilon
+ExpDiv          -> ExpDivA/ExpDiv | ExpMod
+ExpDivA         -> ExpMod | \epsilon
 
-ExpMod      -> ExpModA MOD ExpMod | ExpNot
-ExpModA     -> ExpNot | \epsilon
+ExpMod          -> ExpModA MOD ExpMod | ExpNot
+ExpModA         -> ExpNot | \epsilon
 
-ExpNot -> !Term
+ExpNot          -> !Term
 
-Term ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]|(Exp)                                 
+Term            ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]|(Exp)                                 
 
-FormatString    -> FormatStringA + FormatString | "String"      OK
-FormatStringA   -> "String" | \epsilon                          OK
-String          -> StringA String | Symbol                      OK
-StringA         -> Symbol | \epsilon                            OK
-Symbol          -> ASCII | \epsilon                             OK
+FormatString    -> FormatStringA + FormatString | "String"
+FormatStringA   -> "String" | \epsilon             
+String          -> StringA String | Symbol         
+StringA         -> Symbol | \epsilon               
+Symbol          -> ASCII | \epsilon                
 
 
-NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9          VR & FP
-INT             -> NAT | -INT                               OK
-DOUBLE          -> INT.NAT                                  OK
-BOOL            -> TRUE | FALSE                             OK
-ASCII           -> Everything in ascii table                ??                                 OK
+NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9 
+INT             -> NAT | -INT                
+DOUBLE          -> INT.NAT                   
+BOOL            -> TRUE | FALSE              
+ASCII           -> Everything in ascii table 
 IDF             -> a | ... | z | IDFIDF | IDFNAT                                      ??
 AIDF            -> a | ... | z | IDFIDF | IDFNAT
 TYPE            -> integer | doubleFloatingPoint 
-                    | string | boolean | void                        OK
+                   | string | boolean | void
 
 
 
