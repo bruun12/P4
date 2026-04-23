@@ -206,7 +206,7 @@ class FunctionEnvironment:
     def define(self, name: str, typ: FunctionType) -> None:
         self.values[name] = typ
 
-    def contains(self, name: str) -> bool:
+    def contains_in_current_scope(self, name: str) -> bool:
         return name in self.values
 
     def get(self, name: str) -> FunctionType:

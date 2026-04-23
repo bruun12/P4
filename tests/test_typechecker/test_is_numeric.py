@@ -1,7 +1,7 @@
-from TypeCheckerExample.TypeChecker2 import is_numeric, INTEGER, FLOAT, STRING, BOOLEAN, NULL
+from type_checker.TypeChecker import is_numeric, INTEGER, FLOAT, STRING, BOOLEAN, NULL
 import unittest
 
-class TestIsNumeric(unittest.TestCase):
+class test_is_numeric(unittest.TestCase):
 
     def test_valid_numbers(self):
         self.assertTrue(is_numeric(INTEGER))
