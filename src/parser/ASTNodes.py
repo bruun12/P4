@@ -10,6 +10,9 @@ class Node:
     
     def to_dict(self):
         return {"type": self.__class__.__name__}
+    
+    def to_c(self):
+        raise NotImplementedError(f"to_c is not implemented for {__class__.__name__}")
 
 class Statement(Node):
     def __init__(self, line: int, column: int):
@@ -214,6 +217,19 @@ class Literal(Expression):
         else:
             return {"type": "literal", "value": self.value}
 
+    def to_c(self):
+        value_type = type(self.value).__name__
+        if value_type == "int":
+            return f"{self.value}"
+        if value_type == "float":
+            return f"{self.value}"
+        if value_type == "bool":
+            return f"{self.value}"
+        if value_type == "str":
+            return f"{self.value}"
+        else:
+            raise TypeError
+
 class Variable(Expression):
     def __init__(self, name: str, line: int, column: int):
         super().__init__(line, column)
@@ -224,6 +240,9 @@ class Variable(Expression):
             "type": "variable",
             "name": self.name
         }
+    
+    def to_c(self):
+        return f"{self.name}"
 
 class FunctionCall(Expression):
     def __init__(self, name: str, arguments: list, line: int, column: int):
@@ -238,6 +257,14 @@ class FunctionCall(Expression):
             "arguments": [arg.to_dict() for arg in self.arguments]
         }
 
+    def to_c(self):
+        argString = ""
+        for arg in self.arguments:
+            argString += arg.to_c() + ","
+
+        #argString[:-1] removes the last comma
+        return f"{self.name}({argString[:-1]})"
+
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -250,6 +277,9 @@ class Unary(Expression):
             "op": self.operator,
             "right": self.right.to_dict()
         }
+    
+    def to_c(self):
+        return f"{self.operator} {self.right.to_c}" 
 
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
@@ -272,14 +302,8 @@ class Binary(Expression):
             "right": self.right.to_dict()
         }
 
-class Grouping(Expression):
-    def __init__(self, expression: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.expression = expression
-    
-    def to_dict(self):
-        return self.expression.to_dict()  # Grouping just returns the inner expression
-
+    def to_c(self):
+        return f"({self.left.to_c()} {self.operator} {self.right.to_c()})"
 
 #Error class
 class ParserError(Exception):
