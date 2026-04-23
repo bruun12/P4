@@ -101,7 +101,7 @@ def test_statements_array_assignment_constant():
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.name == "arr"
-    assert node.offset == 1
+    assert node.offset.value == 1
     assert node.value.value == 2
 
 def test_statements_array_assignment_expression():
