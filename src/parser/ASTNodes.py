@@ -372,7 +372,12 @@ class Binary(Expression):
         }
 
     def to_c(self):
-        return f"({self.left.to_c()} {self.operator} {self.right.to_c()})"
+        op_map = {
+            '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
+            '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
+            'AND': '&&', 'OR': '||'
+        }
+        return f"{self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()}"
 
 #Error class
 class ParserError(Exception):
