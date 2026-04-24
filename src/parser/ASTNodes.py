@@ -247,10 +247,13 @@ class ArrayDeclaration(Statement):
         }
     
     def to_c(self):
+        type_map = {
+            'integer': 'int',
+        }
         arrElements = ""
         for elements in self.elements:
             arrElements += elements.to_c() + ","
-        return f"{self.type} {self.name}[] = {{{arrElements}}};"
+        return f"{type_map[self.type]} {self.name}[] = {{{arrElements[:-1]}}};"
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -268,7 +271,10 @@ class ArrayDeclarationEmpty(Statement):
         }
         
     def to_c(self):
-        return f"{self.type} {self.name} [{self.size.to_c()}];"
+        type_map = {
+            'integer': 'int',
+        }
+        return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
 class Literal(Expression):

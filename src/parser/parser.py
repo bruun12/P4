@@ -130,30 +130,32 @@ class Parser:
         type = self.previous()
         name = self.advance()
         
-        if self.match(TokenType.LBRACE): # Integer arr[3]
-            size = self.parse_expression()
-            self.consume(TokenType.RBRACE)
-            self.consume(TokenType.SEMICOLON)
-            return ArrayDeclarationEmpty(type.value, name.value, size.value, name.line, name.column)
+        if self.match(TokenType.LBRACE): 
+            if self.match(TokenType.RBRACE): #integer a[] = {1,2,3,4}
+                self.consume(TokenType.ASSIGN) 
+                if self.check(TokenType.LCBRACE):
+                    elements = self.parse_array_literal()
+                    self.consume(TokenType.SEMICOLON)
+                    return ArrayDeclaration(type.value, name.value, elements, name.line, name.column)
+            else: # Integer arr[3]
+                size = self.parse_expression()
+                self.consume(TokenType.RBRACE)
+                self.consume(TokenType.SEMICOLON)
+                return ArrayDeclarationEmpty(type.value, name.value, size, name.line, name.column)
         
-        self.consume(TokenType.ASSIGN)
-        if self.check(TokenType.LBRACE):
-            elements = self.parse_array_literal()
-            self.consume(TokenType.SEMICOLON)
-            return ArrayDeclaration(type.value, name.value, elements, name.line, name.column)
         
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
         return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
     def parse_array_literal(self) -> list:
-        self.advance()  # spiser [
+        self.consume(TokenType.LCBRACE)  # spiser {
         elements = []
-        if not self.check(TokenType.RBRACE):
+        if not self.check(TokenType.RCBRACE):
             elements.append(self.parse_expression())
         while self.match(TokenType.COMMA):
             elements.append(self.parse_expression())
-        self.consume(TokenType.RBRACE)  # spiser ]
+        self.consume(TokenType.RCBRACE)  # spiser ]
         return elements
     
     def block_statement(self) -> BlockStatement:
