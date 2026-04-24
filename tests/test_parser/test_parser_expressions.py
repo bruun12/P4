@@ -210,6 +210,13 @@ def test_expression_identifier():
     assert isinstance(node.value, Variable)
     assert node.value.name == "x"
 
+def test_expression_None():
+    lex = Lexer("return;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert node.value is None
+
 # Unary
 ###################################################################################################
 

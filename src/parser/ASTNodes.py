@@ -141,7 +141,7 @@ class WhileStatement(Statement):
         }
 
 class ReturnStatement(Statement):
-    def __init__(self, value: Expression, line: int, column: int):
+    def __init__(self, value: Expression | None, line: int, column: int):
         super().__init__(line, column)
         self.value = value
     
