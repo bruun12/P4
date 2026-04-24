@@ -224,6 +224,17 @@ def test_expression_unary_not():
     assert isinstance(node.value.right, Literal)
     assert node.value.right.value
 
+def test_expression_unary_minus():
+    lex = Lexer("return -5;")
+    lex.lexer()
+    node = Parser(lex.tokens).statement()
+
+    assert isinstance(node, ReturnStatement)
+    assert isinstance(node.value, Unary)
+    assert node.value.operator == "-"
+    assert isinstance(node.value.right, Literal)
+    assert node.value.right.value
+
 
 #Multiplicative
 ######################################################################################################

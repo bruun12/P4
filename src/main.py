@@ -6,7 +6,8 @@ integer main(){
     integer a = 1 + 2 * 5;
     string b = "Peter kan godt lide tis";
     double c = 9.9;
-    if (a < 500){
+    double d = -5;
+    if (d < 500){
         a = 1; b = "øv";
     } else {
         a = 999;

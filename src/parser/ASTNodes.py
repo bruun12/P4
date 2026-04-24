@@ -296,7 +296,7 @@ class Literal(Expression):
         if value_type == "float":
             return f"{self.value}"
         if value_type == "bool":
-            return f"{self.value}"
+            return f"{self.value}".lower()
         if value_type == "str":
             return f'"{self.value}"'
         else:
@@ -351,7 +351,7 @@ class Unary(Expression):
         }
     
     def to_c(self):
-        return f"{self.operator} {self.right.to_c}" 
+        return f"{self.operator}{self.right.to_c()}" 
 
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
