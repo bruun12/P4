@@ -360,7 +360,7 @@ class TypeChecker:
 
     def collect_function_signatures(self, program: Program) -> None:
         for function in program.functions:
-            if self.function_env.contains(function.name):
+            if self.function_env.contains_in_current_scope(function.name):
                 self.report(function, f"Function '{function.name}' is already declared.")
                 continue
 

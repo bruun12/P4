@@ -6,21 +6,15 @@ class test_contains_in_current_scope_typeenv(unittest.TestCase):
         obj_type = TypeEnvironment()
         obj_type.define("hej med dig din seje reje", STRING)
 
-        result = obj_type.contains_in_current_scope("hej med dig din seje reje")
-
-        self.assertTrue(result)
+        self.assertTrue(obj_type.contains_in_current_scope("hej med dig din seje reje"))
 
     def test_does_not_contain(self):
         obj_type = TypeEnvironment()
         obj_type.define("hej med dig din seje reje", STRING)
 
-        result = obj_type.contains_in_current_scope("hej")
-
-        self.assertFalse(result)
+        self.assertFalse(obj_type.contains_in_current_scope("hej"))
 
     def test_contains_empty(self):
         obj_type = TypeEnvironment()
 
-        result = obj_type.contains_in_current_scope("")
-
-        self.assertFalse(result)
+        self.assertFalse(obj_type.contains_in_current_scope(""))
