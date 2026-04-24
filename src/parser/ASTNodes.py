@@ -36,6 +36,17 @@ class Program(Node):
             "functions": [func.to_dict() for func in self.functions]
         }
 
+    def to_c(self):
+        functionList = ""
+        for func in self.functions:
+            functionList += func.to_c() + "\n"
+
+        return f"""
+                    #include <stdio.h>
+                    #include <stdbool.h>
+                    {functionList}
+                """
+
 class Function(Node):
     def __init__(self, return_type: str, name: str, parameters: list, statement: Statement, line: int, column: int):
         super().__init__(line, column)
@@ -52,6 +63,12 @@ class Function(Node):
             "parameters": [param.to_dict() for param in self.parameters],
             "body": self.statement.to_dict()
         }
+    
+    def to_c(self):
+        paraList = ""
+        for param in self.parameters:
+            paraList += param.to_c() + ","
+        return f"{self.return_type} {self.name}({paraList[:-1]})"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
@@ -65,6 +82,9 @@ class Parameter(Node):
             "param_type": self.type,
             "name": self.name
         }
+    
+    def to_c(self):
+        return f"{self.type} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -76,6 +96,12 @@ class BlockStatement(Statement):
             "type": "Block",
             "body": [stmt.to_dict() for stmt in self.statements]
         }
+
+    def to_c(self):
+        stmtList = ""
+        for stmt in self.statements:
+            stmtList += stmt.to_c() + "\n"
+        return f"{{{stmtList}}}"
 
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
@@ -91,6 +117,9 @@ class VarDeclaration(Statement):
             "name": self.name,
             "value": self.value.to_dict() if self.value else None
         }
+    
+    def to_c(self):
+        return f"{self.type} {self.name} = {self.value.to_c()};"  
 
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
@@ -113,6 +142,12 @@ class AssignStatement(Statement):
                 "value": self.value.to_dict()
             }
 
+    def to_c(self):
+        if self.offset is None:
+            return f"{self.name} = {self.value.to_c()};"
+        else:
+            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
+
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
         super().__init__(line, column)
@@ -129,6 +164,20 @@ class IfStatement(Statement):
         if self.else_branch:
             result["else"] = self.else_branch.to_dict() if isinstance(self.else_branch, BlockStatement) else [self.else_branch.to_dict()]
         return result
+    
+    def to_c(self):
+        if self.else_branch is None:
+            return f"""
+                    if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    """
+        else:
+            return f"""
+                    if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    else 
+                        {self.else_branch.to_c()}
+                    """
 
 class WhileStatement(Statement):
     def __init__(self, condition: Expression, body: Statement, line: int, column: int):
@@ -143,8 +192,14 @@ class WhileStatement(Statement):
             "body": self.body.to_dict() if isinstance(self.body, BlockStatement) else [self.body.to_dict()]
         }
 
+    def to_c(self):
+        return f"""
+            while ({self.condition.to_c()})
+                {self.body.to_c()}
+                """
+
 class ReturnStatement(Statement):
-    def __init__(self, value: Expression, line: int, column: int):
+    def __init__(self, value: Expression | None, line: int, column: int):
         super().__init__(line, column)
         self.value = value
     
@@ -153,6 +208,12 @@ class ReturnStatement(Statement):
         if self.value:
             result["value"] = self.value.to_dict()
         return result
+    
+    def to_c(self):
+        if self.value is not None:
+            return f"return {self.value.to_c()};"
+        else:
+            return "return;"
 
 class ExpressionStatement(Statement):
     def __init__(self, expression: Expression, line: int, column: int):
@@ -164,6 +225,9 @@ class ExpressionStatement(Statement):
             "type": "Expression",
             "value": self.expression.to_dict()
         }
+    
+    def to_c(self):
+        return f"{self.expression.to_c()};"
 
 class ArrayDeclaration(Statement):
     def __init__(self, type: str, name: str, elements: list, line: int, column: int):
@@ -181,6 +245,12 @@ class ArrayDeclaration(Statement):
             "elements": [elem.to_dict() for elem in self.elements],
             "size": self.size
         }
+    
+    def to_c(self):
+        arrElements = ""
+        for elements in self.elements:
+            arrElements += elements.to_c() + ","
+        return f"{self.type} {self.name}[] = {{{arrElements}}};"
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -197,6 +267,8 @@ class ArrayDeclarationEmpty(Statement):
             "size": self.size.to_dict()
         }
         
+    def to_c(self):
+        return f"{self.type} {self.name} [{self.size.to_c()}];"
 
 #Expression nodes
 class Literal(Expression):
@@ -226,7 +298,7 @@ class Literal(Expression):
         if value_type == "bool":
             return f"{self.value}"
         if value_type == "str":
-            return f"{self.value}"
+            return f'"{self.value}"'
         else:
             raise TypeError
 
