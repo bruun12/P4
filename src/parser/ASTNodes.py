@@ -36,6 +36,13 @@ class Program(Node):
             "functions": [func.to_dict() for func in self.functions]
         }
 
+    def to_c(self):
+        return """
+                #include <stdio.h>
+                #include <stdbool.h>
+                #include <stdlib.h>
+               """
+
 class Function(Node):
     def __init__(self, return_type: str, name: str, parameters: list, statement: Statement, line: int, column: int):
         super().__init__(line, column)
