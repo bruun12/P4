@@ -93,6 +93,29 @@ def test_statements_array_declaration_single_element():
     assert node.name == "arr"
     assert node.size == 1
 
+def test_statements_array_assignment_constant():
+    lex = Lexer("""
+                arr[1] = 2;
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    node = parser.statement()
+    assert node.name == "arr"
+    assert node.offset == 1
+    assert node.value.value == 2
+
+def test_statements_array_assignment_expression():
+    lex = Lexer("""
+                arr[1+2] = 2;
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    node = parser.statement()
+    assert node.name == "arr"
+    assert node.offset.left.value == 1
+    assert node.offset.right.value == 2
+    assert node.value.value == 2
+
 # Errors for statements
 def parse_stmt(source: str):
     lex = Lexer(source)

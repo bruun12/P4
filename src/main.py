@@ -1,12 +1,27 @@
 from lexer.lexer import Lexer
+from parser.parser import Parser
 
-
-string = "int x = 20 /* initializing */ x\ny = x * 5"
+string = """
+integer main(){
+    integer a = 1 + 2 * 5;
+    string b = "Peter kan godt lide tis";
+    double c = 9.9;
+    if (a < 500){
+        a = 1; b = "øv";
+    } else {
+        a = 999;
+        b = a;
+    }
+    return 0;
+}
+"""
 lex = Lexer(string)
 
-# 1. Run the lexing process
-lex.lexer() 
+lex.lexer()
 
-# 2. Print each token object in the list
-for token in lex.tokens:
-    print(token)
+p = Parser(lex.tokens)
+
+# Print AST tree
+print("\nAST Tree:")
+print(p.parse())
+
