@@ -293,11 +293,9 @@ class Literal(Expression):
         if value_type == "float":
             return f"{self.value}"
         if value_type == "bool":
-            return f"{self.value}"
+            return f"{self.value}".lower()
         if value_type == "str":
             return f'"{self.value}"'
-        elif value_type == "bool":
-            return f"{self.value}".lower()
         else:
             return f"{self.value}"
 
@@ -379,7 +377,7 @@ class Binary(Expression):
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
             'AND': '&&', 'OR': '||'
         }
-        return f"{self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()}"
+        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
 
 #Error class
 class ParserError(Exception):
