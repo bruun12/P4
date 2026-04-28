@@ -7,4 +7,5 @@ def test_if_statement():
     correctLines = lineTrim("if(true){}")
 
     assert correctLines[0] == "if (true)"
-    assert correctLines[1] == "{}"
+    assert correctLines[1] == "{"
+    assert correctLines[2] == "}"
