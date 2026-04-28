@@ -68,7 +68,7 @@ class Function(Node):
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{self.return_type} {self.name}({paraList[:-1]})"
+        return f"{self.return_type} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
