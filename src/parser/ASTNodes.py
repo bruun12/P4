@@ -167,13 +167,11 @@ class IfStatement(Statement):
     
     def to_c(self):
         if self.else_branch is None:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     """
         else:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     else 
                         {self.else_branch.to_c()}
