@@ -293,11 +293,13 @@ class Literal(Expression):
         if value_type == "float":
             return f"{self.value}"
         if value_type == "bool":
-            return f"{self.value}".lower()
+            return f"{self.value}"
         if value_type == "str":
             return f'"{self.value}"'
+        elif value_type == "bool":
+            return f"{self.value}".lower()
         else:
-            raise TypeError
+            return f"{self.value}"
 
 class Variable(Expression):
     def __init__(self, name: str, line: int, column: int):
