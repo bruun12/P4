@@ -36,7 +36,7 @@ def test_while_statement2():
     assert correctLines[10] == "x = 4;"
     assert correctLines[11] == "}"
 
-def test_if_statement3():
+def test_while_statement3():
     correctLines = lineTrim("""
                 while(true
                 
