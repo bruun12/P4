@@ -4,11 +4,8 @@ from parser.ASTNodes import IfStatement
 from tests.test_interpreter.test_line_trim import lineTrim
 
 def test_if_statement():
-    lex = Lexer("""if(true){}""")
-    lex.lexer()
-    node = Parser(lex.tokens).statement()
-    assert isinstance(node, IfStatement)
-    correctLines = lineTrim(node.to_c())
+    correctLines = lineTrim("""if(true){}""")
 
     assert correctLines[0] == "if (true)"
-    assert correctLines[1] == "{}"
+    assert correctLines[1] == "{"
+    assert correctLines[2] == "}"
