@@ -269,6 +269,9 @@ class Parser:
         if self.match(TokenType.NOT):
             op = self.previous()
             return Unary(op.value, self.parse_unary(), op.line, op.column)
+        elif self.match(TokenType.MINUS):
+            op = self.previous()
+            return Unary(op.value, self.parse_unary(),op.line, op.column)
         return self.parse_primary()
     
     def arguments(self) -> list:

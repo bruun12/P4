@@ -1,10 +1,29 @@
 from parser.parser import Parser
 from lexer.lexer import Lexer
 from parser.ASTNodes import IfStatement
-from test_line_trim import lineTrim
+from tests.test_interpreter.test_line_trim import lineTrim
 
 def test_if_statement():
-    correctLines = lineTrim("if(true){}")
+    correctLines = lineTrim("""if(true){}""")
 
     assert correctLines[0] == "if (true)"
-    assert correctLines[1] == "{}"
+    assert correctLines[1] == "{"
+    assert correctLines[2] == "}"
+
+def test_if_statement2():
+    correctLines = lineTrim("""if(a<b){x=5;
+                            while(false){
+                            a = a+b;
+                            }
+                            7+5;
+                            }""")
+
+    assert correctLines[0] == "if ((a < b))"
+    assert correctLines[1] == "{"
+    assert correctLines[2] == "x = 5;"
+    assert correctLines[3] == "while (false)"
+    assert correctLines[4] == "{"
+    assert correctLines[5] == "a = (a + b);"
+    assert correctLines[6] == "}"
+    assert correctLines[7] == "(7 + 5);"
+    assert correctLines[8] == "}"
