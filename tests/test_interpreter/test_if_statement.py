@@ -7,6 +7,7 @@ def test_if_statement():
     lex = Lexer("""if(true){}""")
     lex.lexer()
     node = Parser(lex.tokens).statement()
+    assert isinstance(node, IfStatement)
     correctLines = lineTrim(node.to_c())
 
     assert correctLines[0] == "if (true)"

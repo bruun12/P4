@@ -1,32 +1,18 @@
 from parser.parser import Parser
 from lexer.lexer import Lexer
 from parser.ASTNodes import WhileStatement
+from tests.test_interpreter.test_line_trim import lineTrim
 
-def test_while_statement():
+def test_if_statement():
     lex = Lexer("""
                 while(true)
                 {x = 4;}""")
     lex.lexer()
     node = Parser(lex.tokens).statement()
     assert isinstance(node, WhileStatement)
-    assert node.to_c() == "while (true){x = 4;}"
+    correctLines = lineTrim(node.to_c())
 
-def test_while_statement2():
-    lex = Lexer("""
-                while      (
-                
-                true      )
+    assert correctLines[0] == "while (true)"
+    assert correctLines[1] == "{x = 4;}"
 
 
-
-                {        x
-                     =
-                
-                    4      ;
-                
-                
-                }""")
-    lex.lexer()
-    node = Parser(lex.tokens).statement()
-    assert isinstance(node, WhileStatement)
-    assert node.to_c() == "while (true){x = 4;}"

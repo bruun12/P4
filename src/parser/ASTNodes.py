@@ -193,7 +193,8 @@ class WhileStatement(Statement):
         }
 
     def to_c(self):
-        return f"""while ({self.condition.to_c()}){self.body.to_c()}"""
+        return f"""while ({self.condition.to_c()})
+        {self.body.to_c()}"""
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
