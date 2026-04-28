@@ -144,6 +144,7 @@ class Parser:
                 return ArrayDeclarationEmpty(type.value, name.value, size, name.line, name.column)
         
         
+        self.consume(TokenType.ASSIGN)
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
         return VarDeclaration(type.value, name.value, value, name.line, name.column)

@@ -119,7 +119,10 @@ class VarDeclaration(Statement):
         }
     
     def to_c(self):
-        return f"{self.type} {self.name} = {self.value.to_c()};"  
+        type_map = {
+            'integer': 'int',
+        }
+        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
 
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
