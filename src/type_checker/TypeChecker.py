@@ -58,11 +58,6 @@ class VoidType(Type):
 
 
 @dataclass(frozen=True)
-class NullType(Type):
-    pass
-
-
-@dataclass(frozen=True)
 class ErrorType(Type):
     pass
 
@@ -96,7 +91,6 @@ FLOAT = FloatType()
 BOOLEAN = BooleanType()
 STRING = StringType()
 VOID = VoidType()
-NULL = NullType()
 ERROR = ErrorType()
 
 
@@ -627,9 +621,6 @@ class TypeChecker:
         
         if isinstance(expr, Literal):
             value = expr.value
-
-            if value is None:
-                return NULL
 
             # bool before int because Python bool is a subclass of int
             if isinstance(value, bool):
