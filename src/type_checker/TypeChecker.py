@@ -152,7 +152,7 @@ class FunctionEnvironment:
     def define(self, name: str, typ: FunctionType) -> None:
         self.values[name] = typ
 
-    def contains(self, name: str) -> bool:
+    def contains_in_current_scope(self, name: str) -> bool:
         return name in self.values
 
     def get(self, name: str) -> FunctionType:
@@ -288,7 +288,7 @@ class TypeChecker:
 
     def collect_function_signatures(self, program: Program) -> None:
         for function in program.functions:
-            if self.function_env.contains(function.name):
+            if self.function_env.contains_in_current_scope(function.name):
                 self.report(function, f"Function '{function.name}' is already declared.")
                 continue
 
