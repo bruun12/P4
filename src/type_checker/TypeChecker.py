@@ -14,7 +14,6 @@ from parser.ASTNodes import (
     Node,
     Program,
     ReturnStatement,
-    BreakStatement,
     Statement,
     Unary,
     Variable,
@@ -27,6 +26,7 @@ from parser.ASTNodes import (
     FunctionCall,
     Grouping
 )
+from error_handling import TypeCheckError, format_type_error
 
 
 class Type:
@@ -50,6 +50,10 @@ class BooleanType(Type):
 
 @dataclass(frozen=True)
 class StringType(Type):
+    pass
+
+@dataclass(frozen=True)
+class VoidType(Type):
     pass
 
 
@@ -91,6 +95,7 @@ INTEGER = IntegerType()
 FLOAT = FloatType()
 BOOLEAN = BooleanType()
 STRING = StringType()
+VOID = VoidType()
 NULL = NullType()
 ERROR = ErrorType()
 
@@ -102,67 +107,15 @@ ERROR = ErrorType()
 @dataclass(frozen=True)
 class FlowResult:
     definitely_returns: bool
-    breaks_loop: bool
-    unreachable: bool
 
 
 NO_FLOW = FlowResult(
-    definitely_returns=False,
-    breaks_loop=False,
-    unreachable=False,
+    definitely_returns=False
 )
 
 RETURNS = FlowResult(
-    definitely_returns=True,
-    breaks_loop=False,
-    unreachable=False,
+    definitely_returns=True
 )
-
-BREAKS = FlowResult(
-    definitely_returns=False,
-    breaks_loop=True,
-    unreachable=False,
-)
-
-UNREACHABLE = FlowResult(
-    definitely_returns=False,
-    breaks_loop=False,
-    unreachable=True,
-)
-
-
-# ============================================================
-# TYPE ERROR + FORMATTING
-# ============================================================
-
-class TypeCheckError(Exception):
-    def __init__(self, message: str, line: int, column: int):
-        super().__init__(message)
-        self.message = message
-        self.line = line
-        self.column = column
-
-def format_type_error(error: TypeCheckError, source_lines: list[str]) -> str:
-    """
-    Pretty-print a type error with source context.
-    """
-    line = error.line
-    column = error.column
-
-    if line < 1 or line > len(source_lines):
-        return f"Type error: {error.message} [line {line}, col {column}]"
-
-    code_line = source_lines[line - 1]
-    caret_line = " " * max(column - 1, 0) + "^"
-
-    return (
-        f"Type error: {error.message}\n"
-        f" --> line {line}, col {column}\n"
-        f"  |\n"
-        f"{line} | {code_line}\n"
-        f"  | {caret_line}"
-    )
-
 
 # ============================================================
 # ENVIRONMENTS
@@ -193,13 +146,6 @@ class TypeEnvironment:
 
 
 class FunctionEnvironment:
-    """
-    Global function environment.
-
-    CHANGE APPLIED:
-    Functions are now top-level program nodes, so they get their
-    own environment separate from variable scopes.
-    """
     def __init__(self):
         self.values: dict[str, FunctionType] = {}
 
@@ -218,7 +164,8 @@ class FunctionEnvironment:
 # ============================================================
 # HELPERS
 # ============================================================
-
+# Returns matching string of type object.
+# Mainly used for printing.
 def type_name(t: Type) -> str:
     if t == INTEGER:
         return "integer"
@@ -228,8 +175,8 @@ def type_name(t: Type) -> str:
         return "boolean"
     if t == STRING:
         return "string"
-    if t == NULL:
-        return "null"
+    if t == VOID:
+        return "void"
     if t == ERROR:
         return "<error>"
     if isinstance(t, ArrayType):
@@ -253,14 +200,7 @@ def is_numeric(t: Type) -> bool:
 
 
 def can_assign(target: Type, value: Type) -> bool:
-    """
-    Assignment compatibility.
 
-    Rules:
-    - exact same type is allowed
-    - integer can be assigned to float
-    - arrays must have matching element type
-    """
     if target == value:
         return True
 
@@ -280,9 +220,7 @@ def numeric_result_type(left: Type, right: Type) -> Type:
 
 
 def parse_declared_type(declared_type: str) -> Type:
-    """
-    Parse a declared primitive type string.
-    """
+
     if declared_type == "integer":
         return INTEGER
     if declared_type == "float":
@@ -291,8 +229,8 @@ def parse_declared_type(declared_type: str) -> Type:
         return BOOLEAN
     if declared_type == "string":
         return STRING
-    if declared_type == "null":
-        return NULL
+    if declared_type == "void":
+        return VOID
 
     raise TypeCheckError(f"Unknown declared type '{declared_type}'.", 0, 0)
 
@@ -318,7 +256,12 @@ class TypeChecker:
         self.errors.append(TypeCheckError(message, node.line, node.column))
 
     def formatted_errors(self) -> list[str]:
-        return [format_type_error(err, self.source_lines) for err in self.errors]
+        
+        error_list = []
+
+        for err in self.errors:
+            error_list.append(format_type_error(err, self.source_lines))           
+        return error_list
 
     def has_errors(self) -> bool:
         return len(self.errors) > 0
@@ -337,26 +280,11 @@ class TypeChecker:
         except TypeCheckError as err:
             self.errors.append(TypeCheckError(err.message, node.line, node.column))
             return ERROR
-    # --------------------------------------------------------
-    # Public entry point
-    # --------------------------------------------------------
 
     def check(self, program: Program) -> None:
-        """
-        Type-check a complete program.
 
-        CHANGE APPLIED:
-        Program is function-centered, so checking now happens in
-        two passes:
-          pass 1: collect all function signatures
-          pass 2: check each function body
-        """
         self.collect_function_signatures(program)
         self.check_all_functions(program)
-
-    # --------------------------------------------------------
-    # Pass 1: collect function signatures
-    # --------------------------------------------------------
 
     def collect_function_signatures(self, program: Program) -> None:
         for function in program.functions:
@@ -388,14 +316,8 @@ class TypeChecker:
             self.check_function(function)
 
     def check_function(self, function: Function) -> None:
-        """
-        Type-check one function.
-
-        CHANGE APPLIED:
-        Parameters are introduced into a fresh function-local
-        environment, and the function's body is checked with its
-        declared expected return type.
-        """
+        # Every time a new function is checked, the current function name and 
+        # expected return type is set on the TypeChecker object
         previous_function_name = self.current_function_name
         previous_expected_return_type = self.expected_return_type
 
@@ -407,17 +329,23 @@ class TypeChecker:
         # Add parameters as local variables
         for parameter in function.parameters:
             param_type = self.parse_type_node(parameter.type, parameter)
-
+            
+            if param_type == VOID:
+                self.report(
+                    parameter,
+                    f"Parameter '{parameter.name}' cannot have type void."
+                )
+                
             if local_env.contains_in_current_scope(parameter.name):
                 self.report(parameter, f"Duplicate parameter '{parameter.name}' in function '{function.name}'.")
                 continue
 
             local_env.define(parameter.name, param_type)
 
-        flow = self.check_statement(function.statement, local_env, inside_loop=False)
+        flow = self.check_statement(function.statement, local_env)
 
         # Enforce that the function returns on all paths.
-        if self.expected_return_type != NULL and not flow.definitely_returns:
+        if self.expected_return_type not in (VOID, ERROR) and not flow.definitely_returns:
             self.report(
                 function,
                 f"Function '{function.name}' may not return a value on all paths."
@@ -434,46 +362,50 @@ class TypeChecker:
         self,
         stmt: Statement,
         env: TypeEnvironment,
-        inside_loop: bool,
     ) -> FlowResult:
 
         # ----------------------------------------------------
         # BlockStatement
         # ----------------------------------------------------
         if isinstance(stmt, BlockStatement):
+            
             block_env = TypeEnvironment(parent=env)
             saw_terminal_flow = False
 
             for inner_stmt in stmt.statements:
+                #If previous statement definitely returns, then all following statements are unreachable
                 if saw_terminal_flow:
                     self.report(inner_stmt, "Unreachable statement.")
                     continue
-
-                flow = self.check_statement(inner_stmt, block_env, inside_loop)
-
-                if flow.unreachable:
-                    self.report(inner_stmt, "Unreachable statement.")
+                #Will return a FlowResult object
+                flow = self.check_statement(inner_stmt, block_env)
 
                 if flow.definitely_returns:
                     saw_terminal_flow = True
-                    return RETURNS
 
-                if flow.breaks_loop:
-                    saw_terminal_flow = True
-                    return BREAKS
-
+            if saw_terminal_flow:
+                return RETURNS
+            
             return NO_FLOW
 
         # ----------------------------------------------------
         # VarDeclaration
         # ----------------------------------------------------
         if isinstance(stmt, VarDeclaration):
+            #Returns a Type object that matches the type declared in the statement
+            #parse_type_node will raise an TypeCheckError and append it self.errors if type is unknown
             declared_type = self.parse_type_node(stmt.type, stmt)
+            
+            #Void is not allowed as a declared type
+            if declared_type == VOID:
+                self.report(stmt, f"Variable '{stmt.name}' cannot have type void.")
             value_type = self.check_expression(stmt.value, env)
-
+            
+            #Check if a variable name already is in the environment
             if env.contains_in_current_scope(stmt.name):
                 self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
-
+            
+            #If declared type and value type cannot be assigned
             if declared_type != ERROR and value_type != ERROR:
                 if not can_assign(declared_type, value_type):
                     self.report(
@@ -481,7 +413,7 @@ class TypeChecker:
                         f"Cannot initialize variable '{stmt.name}' of type "
                         f"{type_name(declared_type)} with value of type {type_name(value_type)}."
                     )
-
+            #Variable is defined in current environment
             env.define(stmt.name, declared_type)
             return NO_FLOW
 
@@ -489,9 +421,12 @@ class TypeChecker:
         # ArrayDeclaration
         # ----------------------------------------------------
         if isinstance(stmt, ArrayDeclaration):
-            element_type = self.parse_type_node(stmt.array, stmt)
+            element_type = self.parse_type_node(stmt.type, stmt)
+            if element_type == VOID:
+                self.report(stmt, f"Array '{stmt.name}' cannot have element type void.")
+            #Create ArrayType object
             array_type = ArrayType(element_type)
-
+        
             if env.contains_in_current_scope(stmt.name):
                 self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
 
@@ -513,6 +448,8 @@ class TypeChecker:
         # ----------------------------------------------------
         if isinstance(stmt, ArrayDeclarationEmpty):
             element_type = self.parse_type_node(stmt.type, stmt)
+            if element_type == VOID:
+                self.report(stmt, f"Array '{stmt.name}' cannot have element type void.")
             array_type = ArrayType(element_type)
 
             if env.contains_in_current_scope(stmt.name):
@@ -563,22 +500,18 @@ class TypeChecker:
                 )
 
             then_env = TypeEnvironment(parent=env)
-            then_flow = self.check_statement(stmt.then_branch, then_env, inside_loop)
+            then_flow = self.check_statement(stmt.then_branch, then_env)
 
             if stmt.else_branch is None:
                 return NO_FLOW
 
             else_env = TypeEnvironment(parent=env)
-            else_flow = self.check_statement(stmt.else_branch, else_env, inside_loop)
-
+            else_flow = self.check_statement(stmt.else_branch, else_env)
+            # Return flow result based on if then and else block definitely return,
             return FlowResult(
                 definitely_returns=(
                     then_flow.definitely_returns and else_flow.definitely_returns
-                ),
-                breaks_loop=(
-                    then_flow.breaks_loop and else_flow.breaks_loop
-                ),
-                unreachable=False,
+                )
             )
 
         # ----------------------------------------------------
@@ -594,12 +527,9 @@ class TypeChecker:
                 )
 
             body_env = TypeEnvironment(parent=env)
-            self.check_statement(stmt.body, body_env, inside_loop=True)
+            self.check_statement(stmt.body, body_env)
 
-            # Conservative choice:
-            # we do not claim that a while-loop definitely returns
-            # because it may execute zero times, many times, or end
-            # via break.
+
             return NO_FLOW
 
         # ----------------------------------------------------
@@ -611,9 +541,26 @@ class TypeChecker:
                 return RETURNS
 
             if stmt.value is None:
-                self.report(stmt, "Return statement must include a value.")
+                if self.expected_return_type == VOID:
+                    return RETURNS
+                
+                self.report(
+                    stmt,
+                    f"Return statement must include a value of type "
+                    f"{type_name(self.expected_return_type)}."
+                )
                 return RETURNS
-
+            
+            if self.expected_return_type == VOID:
+                
+                self.check_expression(stmt.value, env)
+                self.report(
+                    stmt.value,
+                    "Void function must not return a value."
+                )
+                # still check the expression so errors inside it are found
+                return RETURNS
+            
             value_type = self.check_expression(stmt.value, env)
 
             if value_type != ERROR and not can_assign(self.expected_return_type, value_type):
@@ -626,20 +573,13 @@ class TypeChecker:
             return RETURNS
 
         # ----------------------------------------------------
-        # BreakStatement
-        # ----------------------------------------------------
-        if isinstance(stmt, BreakStatement):
-            if not inside_loop:
-                self.report(stmt, "'break' used outside of a loop.")
-            return BREAKS
-
-        # ----------------------------------------------------
         # ExpressionStatement
         # ----------------------------------------------------
         if isinstance(stmt, ExpressionStatement):
             self.check_expression(stmt.expression, env)
             return NO_FLOW
-
+        # !r uses repr() for a detailed, quoted debug view
+        # repr() used to clarify type and content
         self.report(stmt, f"Unknown statement node: {stmt!r}")
         return NO_FLOW
 
@@ -649,7 +589,9 @@ class TypeChecker:
 
     def check_expression(self, expr: Expression, env: TypeEnvironment) -> Type:
         if isinstance(expr, FunctionCall):
-            try:
+            #Check if the function name exists in the function environment 
+            #Return function object if it exist, else return type check error
+            try:    
                 function_type = self.function_env.get(expr.name)
             except TypeCheckError:
                 self.report(expr, f"Undefined function '{expr.name}'.")
@@ -657,7 +599,7 @@ class TypeChecker:
 
             expected_count = len(function_type.parameter_types)
             actual_count = len(expr.arguments)
-
+            # Compare expected parameter count to the argument count from the function call
             if actual_count != expected_count:
                 self.report(
                     expr,
@@ -665,17 +607,17 @@ class TypeChecker:
                     f"but got {actual_count}."
                 )
                 return ERROR
-
-            for i, (argument_expr, parameter_type) in enumerate(
-                zip(expr.arguments, function_type.parameter_types),
-                start=1,
-            ):
+            #Check all argument types against the expected parameter types
+            for i in range(actual_count):
+                argument_expr = expr.arguments[i]
+                parameter_type = function_type.parameter_types[i]
+        
                 argument_type = self.check_expression(argument_expr, env)
 
                 if argument_type != ERROR and not can_assign(parameter_type, argument_type):
                     self.report(
                         argument_expr,
-                        f"Argument {i} of function '{expr.name}' has type "
+                        f"Argument {i + 1} of function '{expr.name}' has type "
                         f"{type_name(argument_type)}, but expected {type_name(parameter_type)}."
                     )
 
@@ -738,7 +680,7 @@ class TypeChecker:
                     )
                     return ERROR
                 return BOOLEAN
-
+            #This should never run if parser works correctly
             self.report(expr, f"Unknown unary operator '{expr.operator}'.")
             return ERROR
 
@@ -808,11 +750,6 @@ class TypeChecker:
 
 # ============================================================
 # OPTIONAL CONVENIENCE RUNNER
-# ============================================================
-# The earlier extra helper functions are no longer central to
-# the design, because the important notion of "functions" is
-# now represented in the AST itself. A small runner like this is
-# enough for most use cases.
 # ============================================================
 
 def run_typecheck(program: Program, source_code: str) -> None:

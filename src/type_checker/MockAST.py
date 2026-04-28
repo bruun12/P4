@@ -13,7 +13,6 @@ from parser.ASTNodes import (
     ParserError,
     Program,
     ReturnStatement,
-    BreakStatement,
     Statement,
     Unary,
     Variable,
@@ -26,7 +25,7 @@ from parser.ASTNodes import (
     FunctionCall,
     Grouping
 )
-from TypeChecker.TypeChecker2 import TypeChecker
+from type_checker.TypeChecker import TypeChecker
     
 # DEMO PROGRAM
 
@@ -59,7 +58,6 @@ def build_functioncall_demo_program() -> Program:
             } else {
                 x = add(x, 0);
             }
-
             add(1);               // wrong number of arguments
             average("hi", 2);     // wrong argument type
             mystery(1, 2);        // undefined function
@@ -427,7 +425,7 @@ integer main() {
 
 if __name__ == "__main__":
     source_code = functioncall_demo_source()
-    program = build_functioncall_demo_program()
+    program  = build_functioncall_demo_program()
 
     checker = TypeChecker(source_code)
     checker.check(program)

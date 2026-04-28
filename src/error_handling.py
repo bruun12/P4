@@ -58,6 +58,38 @@ class ParserError(Exception):
 ## cannot assign value of type ?? to variable ?? of type ?? (line 783)
 ## array mistakes (line 724-765)
 
+
+class TypeCheckError(Exception):
+    def __init__(self, message: str, line: int, column: int):
+        super().__init__(message)
+        self.message = message
+        self.line = line
+        self.column = column
+
+def format_type_error(error: TypeCheckError, source_lines: list[str]) -> str:
+    """
+    Pretty-print a type error with source context.
+    """
+    line = error.line
+    column = error.column
+
+    if line < 1 or line > len(source_lines):
+        return f"Type error: {error.message} [line {line}, col {column}]"
+
+    code_line = source_lines[line - 1]
+    caret_line = " " * max(column - 1, 0) + "^"
+
+    return (
+        f"Type error: {error.message}\n"
+        f" --> line {line}, col {column}\n"
+        f"  |\n"
+        f"{line} | {code_line}\n"
+        f"  | {caret_line}"
+    )
+
+
+
+"""
 class TypeCheckerError(Exception):
     def __init__(self, error_code: ErrorCode, message, line, column, name, type_name, value_type, target_type, stmt):
         if error_code == ErrorCode.SCOPE_ERROR:
@@ -80,4 +112,4 @@ class TypeCheckerError(Exception):
     def __str__(self):
         return f"{self.message} (Error code: {self.error_code} at line {self.line}, column {self.column})"
     
-
+"""
