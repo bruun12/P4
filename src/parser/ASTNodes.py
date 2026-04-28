@@ -177,13 +177,11 @@ class IfStatement(Statement):
     
     def to_c(self):
         if self.else_branch is None:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     """
         else:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     else 
                         {self.else_branch.to_c()}
@@ -203,10 +201,8 @@ class WhileStatement(Statement):
         }
 
     def to_c(self):
-        return f"""
-            while ({self.condition.to_c()})
-                {self.body.to_c()}
-                """
+        return f"""while ({self.condition.to_c()})
+        {self.body.to_c()}"""
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
@@ -307,11 +303,14 @@ class Literal(Expression):
 
     def to_c(self):
         value_type = type(self.value).__name__
-
+        if value_type == "int":
+            return f"{self.value}"
+        if value_type == "float":
+            return f"{self.value}"
+        if value_type == "bool":
+            return f"{self.value}".lower()
         if value_type == "str":
             return f'"{self.value}"'
-        elif value_type == "bool":
-            return f"{self.value}".lower()
         else:
             return f"{self.value}"
 
@@ -364,7 +363,7 @@ class Unary(Expression):
         }
     
     def to_c(self):
-        return f"{self.operator} {self.right.to_c}" 
+        return f"{self.operator}{self.right.to_c()}" 
 
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
@@ -388,7 +387,12 @@ class Binary(Expression):
         }
 
     def to_c(self):
-        return f"({self.left.to_c()} {self.operator} {self.right.to_c()})"
+        op_map = {
+            '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
+            '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
+            'AND': '&&', 'OR': '||'
+        }
+        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
 
 #Error class
 class ParserError(Exception):
