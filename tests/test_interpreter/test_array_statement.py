@@ -16,4 +16,4 @@ def test_arrayDeclaration():
     assert isinstance(node, ArrayDeclaration)
     assert node.to_c() == f"""int arr[] = {{{18}}};"""
 
-    # Block, Parameter, Function
+    # Parameter, Function

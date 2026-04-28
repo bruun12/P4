@@ -121,6 +121,7 @@ class VarDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'float',
         }
         return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
 
