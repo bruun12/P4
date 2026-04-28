@@ -53,6 +53,7 @@ class Interpreter:
          
     def exefunc(self):
         while not self.is_at_end():
+            pass
             
 
 
@@ -62,4 +63,4 @@ class Interpreter:
 #nteger foo(integer y) {
 #    integer z = 10;   // ligger i local_env
 #    return x + y + z; // kan se ALLE tre variable
-#}
+#
