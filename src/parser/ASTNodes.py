@@ -84,7 +84,11 @@ class Parameter(Node):
         }
     
     def to_c(self):
-        return f"{self.type} {self.name}"
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+        }
+        return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -100,8 +104,10 @@ class BlockStatement(Statement):
     def to_c(self):
         stmtList = ""
         for stmt in self.statements:
-            stmtList += stmt.to_c() #+ "\n"
-        return f"{{{stmtList}}}"
+            stmtList += stmt.to_c() + "\n"
+        return f"""{{
+        {stmtList}
+        }}"""
 
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
