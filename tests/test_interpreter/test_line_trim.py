@@ -1,6 +1,5 @@
 from lexer.lexer import Lexer
 from parser.parser import Parser
-from parser.ASTNodes import IfStatement
 
 def lineTrim(lexerString:str):
     lex = Lexer(lexerString)

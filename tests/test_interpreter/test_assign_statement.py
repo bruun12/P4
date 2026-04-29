@@ -1,6 +1,3 @@
-from parser.parser import Parser
-from lexer.lexer import Lexer
-from parser.ASTNodes import AssignStatement
 from tests.test_interpreter.test_line_trim import lineTrim
 
 def test_assign_var_simple():
