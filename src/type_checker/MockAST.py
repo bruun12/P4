@@ -230,6 +230,7 @@ def build_functioncall_demo_program() -> Program:
                 # x = add(x, 1);
                 AssignStatement(
                     name="x",
+                    offset=None,
                     value=FunctionCall(
                         name="add",
                         arguments=[
@@ -246,6 +247,7 @@ def build_functioncall_demo_program() -> Program:
                 # y = average(add(1, 2), 8);
                 AssignStatement(
                     name="y",
+                    offset=None,
                     value=FunctionCall(
                         name="average",
                         arguments=[
@@ -281,6 +283,7 @@ def build_functioncall_demo_program() -> Program:
                         statements=[
                             AssignStatement(
                                 name="x",
+                                offset=None,
                                 value=FunctionCall(
                                     name="add",
                                     arguments=[
@@ -301,6 +304,7 @@ def build_functioncall_demo_program() -> Program:
                         statements=[
                             AssignStatement(
                                 name="x",
+                                offset=None,
                                 value=FunctionCall(
                                     name="add",
                                     arguments=[

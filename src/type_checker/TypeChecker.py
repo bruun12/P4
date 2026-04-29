@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 
 from parser.ASTNodes import (
@@ -26,7 +25,7 @@ from parser.ASTNodes import (
     FunctionCall,
     Grouping
 )
-from error_handling import TypeCheckError, format_type_error
+from error_handling import ErrorCode, TypeCheckError, format_compiler_error
 
 
 class Type:
@@ -136,7 +135,7 @@ class TypeEnvironment:
         if self.parent is not None:
             return self.parent.get(name)
 
-        raise TypeCheckError(f"Undefined variable '{name}'.", 0, 0)
+        raise TypeCheckError(f"Undefined variable '{name}'.", ErrorCode.UNDEFINED_VARIABLE_ERROR, 0, 0)
 
 
 class FunctionEnvironment:
@@ -152,7 +151,7 @@ class FunctionEnvironment:
     def get(self, name: str) -> FunctionType:
         if name in self.values:
             return self.values[name]
-        raise TypeCheckError(f"Undefined function '{name}'.", 0, 0)
+        raise TypeCheckError(f"Undefined function '{name}'.", ErrorCode.UNDEFINED_FUNCTION_ERROR, 0, 0)
 
 
 # ============================================================
@@ -226,7 +225,7 @@ def parse_declared_type(declared_type: str) -> Type:
     if declared_type == "void":
         return VOID
 
-    raise TypeCheckError(f"Unknown declared type '{declared_type}'.", 0, 0)
+    raise TypeCheckError(f"Unknown declared type '{declared_type}'.", ErrorCode.UNKNOWN_DECLARED_TYPE, 0, 0)
 
 
 class TypeChecker:
@@ -246,15 +245,15 @@ class TypeChecker:
     # Error helpers
     # --------------------------------------------------------
 
-    def report(self, node: Node, message: str) -> None:
-        self.errors.append(TypeCheckError(message, node.line, node.column))
+    def report(self, node: Node, error_code: ErrorCode, message: str) -> None:
+        self.errors.append(TypeCheckError(message, error_code, node.line, node.column))
 
     def formatted_errors(self) -> list[str]:
         
         error_list = []
 
         for err in self.errors:
-            error_list.append(format_type_error(err, self.source_lines))           
+            error_list.append(format_compiler_error(err, self.source_lines))           
         return error_list
 
     def has_errors(self) -> bool:
@@ -272,7 +271,7 @@ class TypeChecker:
         try:
             return parse_declared_type(declared_type)
         except TypeCheckError as err:
-            self.errors.append(TypeCheckError(err.message, node.line, node.column))
+            self.report(node, err.error_code, err.message)
             return ERROR
 
     def check(self, program: Program) -> None:
@@ -283,7 +282,7 @@ class TypeChecker:
     def collect_function_signatures(self, program: Program) -> None:
         for function in program.functions:
             if self.function_env.contains_in_current_scope(function.name):
-                self.report(function, f"Function '{function.name}' is already declared.")
+                self.report(function, ErrorCode.ALREADY_DECLARED_ERROR, f"Function '{function.name}' is already declared.")
                 continue
 
             return_type = self.parse_type_node(function.return_type, function)
@@ -327,11 +326,16 @@ class TypeChecker:
             if param_type == VOID:
                 self.report(
                     parameter,
+                    ErrorCode.INVALID_PARAMETER_TYPE,
                     f"Parameter '{parameter.name}' cannot have type void."
                 )
                 
             if local_env.contains_in_current_scope(parameter.name):
-                self.report(parameter, f"Duplicate parameter '{parameter.name}' in function '{function.name}'.")
+                self.report(
+                    parameter, 
+                    ErrorCode.ALREADY_DECLARED_ERROR,
+                    f"Duplicate parameter '{parameter.name}' in function '{function.name}'."
+                    )
                 continue
 
             local_env.define(parameter.name, param_type)
@@ -342,6 +346,7 @@ class TypeChecker:
         if self.expected_return_type not in (VOID, ERROR) and not flow.definitely_returns:
             self.report(
                 function,
+                ErrorCode.MISSING_RETURN_ERROR,
                 f"Function '{function.name}' may not return a value on all paths."
             )
 
@@ -369,7 +374,11 @@ class TypeChecker:
             for inner_stmt in stmt.statements:
                 #If previous statement definitely returns, then all following statements are unreachable
                 if saw_terminal_flow:
-                    self.report(inner_stmt, "Unreachable statement.")
+                    self.report(
+                        inner_stmt,
+                        ErrorCode.UNREACHABLE_ERROR, 
+                        "Unreachable statement."
+                        )
                     continue
                 #Will return a FlowResult object
                 flow = self.check_statement(inner_stmt, block_env)
@@ -392,18 +401,26 @@ class TypeChecker:
             
             #Void is not allowed as a declared type
             if declared_type == VOID:
-                self.report(stmt, f"Variable '{stmt.name}' cannot have type void.")
+                self.report(
+                    stmt, 
+                    ErrorCode.INVALID_DECLARED_TYPE,
+                    f"Variable '{stmt.name}' cannot have type void."
+                    )
             value_type = self.check_expression(stmt.value, env)
             
             #Check if a variable name already is in the environment
             if env.contains_in_current_scope(stmt.name):
-                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
-            
+                self.report(
+                    stmt, 
+                    ErrorCode.ALREADY_DECLARED_ERROR,
+                    f"Variable '{stmt.name}' is already declared in this scope."
+                    )
             #If declared type and value type cannot be assigned
             if declared_type != ERROR and value_type != ERROR:
                 if not can_assign(declared_type, value_type):
                     self.report(
                         stmt.value,
+                        ErrorCode.CANNOT_ASSIGN,
                         f"Cannot initialize variable '{stmt.name}' of type "
                         f"{type_name(declared_type)} with value of type {type_name(value_type)}."
                     )
@@ -417,12 +434,20 @@ class TypeChecker:
         if isinstance(stmt, ArrayDeclaration):
             element_type = self.parse_type_node(stmt.type, stmt)
             if element_type == VOID:
-                self.report(stmt, f"Array '{stmt.name}' cannot have element type void.")
+                self.report(
+                    stmt, 
+                    ErrorCode.INVALID_DECLARED_TYPE,
+                    f"Array '{stmt.name}' cannot have element type void."
+                    )
             #Create ArrayType object
             array_type = ArrayType(element_type)
         
             if env.contains_in_current_scope(stmt.name):
-                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
+                self.report(
+                    stmt, 
+                    ErrorCode.ALREADY_DECLARED_ERROR,
+                    f"Variable '{stmt.name}' is already declared in this scope."
+                    )
 
             for element in stmt.elements:
                 element_expr_type = self.check_expression(element, env)
@@ -430,6 +455,7 @@ class TypeChecker:
                     if not can_assign(element_type, element_expr_type):
                         self.report(
                             element,
+                            ErrorCode.CANNOT_ASSIGN,
                             f"Cannot place element of type {type_name(element_expr_type)} "
                             f"into array '{stmt.name}' of element type {type_name(element_type)}."
                         )
@@ -443,16 +469,25 @@ class TypeChecker:
         if isinstance(stmt, ArrayDeclarationEmpty):
             element_type = self.parse_type_node(stmt.type, stmt)
             if element_type == VOID:
-                self.report(stmt, f"Array '{stmt.name}' cannot have element type void.")
+                self.report(
+                    stmt, 
+                    ErrorCode.INVALID_DECLARED_TYPE,
+                    f"Array '{stmt.name}' cannot have element type void."
+                    )
             array_type = ArrayType(element_type)
 
             if env.contains_in_current_scope(stmt.name):
-                self.report(stmt, f"Variable '{stmt.name}' is already declared in this scope.")
+                self.report(
+                    stmt, 
+                    ErrorCode.ALREADY_DECLARED_ERROR,
+                    f"Variable '{stmt.name}' is already declared in this scope."
+                    )
 
             size_type = self.check_expression(stmt.size, env)
             if size_type != ERROR and size_type != INTEGER:
                 self.report(
                     stmt.size,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Array size must be integer, got {type_name(size_type)}."
                 )
 
@@ -466,7 +501,7 @@ class TypeChecker:
             try:
                 target_type = env.get(stmt.name)
             except TypeCheckError:
-                self.report(stmt, f"Undefined variable '{stmt.name}'.")
+                self.report(stmt, ErrorCode.UNDEFINED_VARIABLE_ERROR, f"Undefined variable '{stmt.name}'.")
                 target_type = ERROR
 
             value_type = self.check_expression(stmt.value, env)
@@ -475,6 +510,7 @@ class TypeChecker:
                 if not can_assign(target_type, value_type):
                     self.report(
                         stmt.value,
+                        ErrorCode.CANNOT_ASSIGN,
                         f"Cannot assign value of type {type_name(value_type)} "
                         f"to variable '{stmt.name}' of type {type_name(target_type)}."
                     )
@@ -490,6 +526,7 @@ class TypeChecker:
             if condition_type != ERROR and condition_type != BOOLEAN:
                 self.report(
                     stmt.condition,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
                     f"If condition must be boolean, got {type_name(condition_type)}."
                 )
 
@@ -517,6 +554,7 @@ class TypeChecker:
             if condition_type != ERROR and condition_type != BOOLEAN:
                 self.report(
                     stmt.condition,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
                     f"While condition must be boolean, got {type_name(condition_type)}."
                 )
 
@@ -531,7 +569,11 @@ class TypeChecker:
         # ----------------------------------------------------
         if isinstance(stmt, ReturnStatement):
             if self.expected_return_type is None:
-                self.report(stmt, "Return statement is not allowed here.")
+                self.report(
+                    stmt, 
+                    ErrorCode.INVALID_RETURN_ERROR,
+                    "Return statement is not allowed here."
+                    )
                 return RETURNS
 
             if stmt.value is None:
@@ -540,6 +582,7 @@ class TypeChecker:
                 
                 self.report(
                     stmt,
+                    ErrorCode.INVALID_RETURN_ERROR,
                     f"Return statement must include a value of type "
                     f"{type_name(self.expected_return_type)}."
                 )
@@ -550,6 +593,7 @@ class TypeChecker:
                 self.check_expression(stmt.value, env)
                 self.report(
                     stmt.value,
+                    ErrorCode.INVALID_RETURN_ERROR,
                     "Void function must not return a value."
                 )
                 # still check the expression so errors inside it are found
@@ -560,6 +604,7 @@ class TypeChecker:
             if value_type != ERROR and not can_assign(self.expected_return_type, value_type):
                 self.report(
                     stmt.value,
+                    ErrorCode.INVALID_RETURN_ERROR,
                     f"Return type mismatch in function '{self.current_function_name}': "
                     f"expected {type_name(self.expected_return_type)}, got {type_name(value_type)}."
                 )
@@ -574,7 +619,11 @@ class TypeChecker:
             return NO_FLOW
         # !r uses repr() for a detailed, quoted debug view
         # repr() used to clarify type and content
-        self.report(stmt, f"Unknown statement node: {stmt!r}")
+        self.report(
+            stmt,
+            ErrorCode.UNKNOWN_AST_NODE_ERROR,
+            f"Unknown statement node: {stmt!r}"
+            )
         return NO_FLOW
 
     # --------------------------------------------------------
@@ -588,7 +637,7 @@ class TypeChecker:
             try:    
                 function_type = self.function_env.get(expr.name)
             except TypeCheckError:
-                self.report(expr, f"Undefined function '{expr.name}'.")
+                self.report(expr, ErrorCode.UNDEFINED_FUNCTION_ERROR, f"Undefined function '{expr.name}'.")
                 return ERROR
 
             expected_count = len(function_type.parameter_types)
@@ -597,6 +646,7 @@ class TypeChecker:
             if actual_count != expected_count:
                 self.report(
                     expr,
+                    ErrorCode.INVALID_ARGUMENT_COUNT,
                     f"Function '{expr.name}' expects {expected_count} argument(s), "
                     f"but got {actual_count}."
                 )
@@ -611,6 +661,7 @@ class TypeChecker:
                 if argument_type != ERROR and not can_assign(parameter_type, argument_type):
                     self.report(
                         argument_expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Argument {i + 1} of function '{expr.name}' has type "
                         f"{type_name(argument_type)}, but expected {type_name(parameter_type)}."
                     )
@@ -635,14 +686,22 @@ class TypeChecker:
             if isinstance(value, str):
                 return STRING
 
-            self.report(expr, f"Unsupported literal value {value!r}.")
+            self.report(
+                expr, 
+                ErrorCode.TYPE_MISMATCH_ERROR,
+                f"Unsupported literal value {value!r}."
+                )
             return ERROR
 
         if isinstance(expr, Variable):
             try:
                 return env.get(expr.name)
             except TypeCheckError:
-                self.report(expr, f"Undefined variable '{expr.name}'.")
+                self.report(
+                    expr, 
+                    ErrorCode.UNDEFINED_VARIABLE_ERROR, 
+                    f"Undefined variable '{expr.name}'."
+                    )
                 return ERROR
 
         if isinstance(expr, Grouping):
@@ -658,6 +717,7 @@ class TypeChecker:
                 if not is_numeric(right_type):
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Unary '-' requires integer or float, got {type_name(right_type)}."
                     )
                     return ERROR
@@ -667,6 +727,7 @@ class TypeChecker:
                 if right_type != BOOLEAN:
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Unary '!' requires boolean, got {type_name(right_type)}."
                     )
                     return ERROR
@@ -691,6 +752,7 @@ class TypeChecker:
                 if not is_numeric(left_type) or not is_numeric(right_type):
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Operator '{op}' requires numeric operands "
                         f"(or string + string for '+'), got "
                         f"{type_name(left_type)} and {type_name(right_type)}."
@@ -704,6 +766,7 @@ class TypeChecker:
                 if not is_numeric(left_type) or not is_numeric(right_type):
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Operator '{op}' requires numeric operands, got "
                         f"{type_name(left_type)} and {type_name(right_type)}."
                     )
@@ -715,27 +778,37 @@ class TypeChecker:
                 if left_type != right_type:
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Operator '{op}' requires both sides to have the same type, got "
                         f"{type_name(left_type)} and {type_name(right_type)}."
                     )
                     return ERROR
                 return BOOLEAN
 
-            # Logical
+            # Logical 
             if op in {"&&", "||"}:
                 if left_type != BOOLEAN or right_type != BOOLEAN:
                     self.report(
                         expr,
+                        ErrorCode.TYPE_MISMATCH_ERROR,
                         f"Operator '{op}' requires boolean operands, got "
                         f"{type_name(left_type)} and {type_name(right_type)}."
                     )
                     return ERROR
                 return BOOLEAN
 
-            self.report(expr, f"Unknown binary operator '{op}'.")
+            self.report(
+                expr,
+                ErrorCode.UNKNOWN_AST_NODE_ERROR,
+                f"Unknown binary operator '{op}'."
+                )
             return ERROR
 
-        self.report(expr, f"Unknown expression node: {expr!r}")
+        self.report(
+            expr, 
+            ErrorCode.UNKNOWN_AST_NODE_ERROR,
+            f"Unknown expression node: {expr!r}"
+            )
         return ERROR
 
 
