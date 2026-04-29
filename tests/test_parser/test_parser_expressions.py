@@ -17,6 +17,7 @@ from parser.ASTNodes import (
     Variable,
     WhileStatement,
     VarDeclaration,
+    ArrayAccess,
 )
 from parser.parser import Parser
 from error_handling import ParserError
@@ -426,3 +427,44 @@ def test_expression_precedence_min_over_add():
 
     assert node.value.operator == "+"
     assert node.value.left.operator == "-"
+
+
+#ArrayAccess
+###########################################################################################################
+
+def test_array_access_integer_index():
+    node = parse_expr("a[3]")
+
+    assert isinstance(node, ArrayAccess)
+    assert node.name == "a"
+    assert isinstance(node.offset, Literal)
+    assert node.offset.value == 3
+
+def test_array_access_variable_index():
+    node = parse_expr("a[i]")
+
+    assert isinstance(node, ArrayAccess)
+    assert node.name == "a"
+    assert isinstance(node.offset, Variable)
+    assert node.offset.name == "i"
+
+def test_array_access_expression_index():
+    node = parse_expr("a[i + 1]")
+
+    assert isinstance(node, ArrayAccess)
+    assert isinstance(node.offset, Binary)
+    assert node.offset.operator == "+"
+
+def test_array_access_to_c():
+    node = parse_expr("a[3]")
+
+    assert node.to_c() == "a[3]"
+
+# Errors
+def test_array_access_missing_index_raises():
+    with pytest.raises(ParserError):
+        parse_expr("a[]")
+
+def test_array_access_missing_rbrace_raises():
+    with pytest.raises(ParserError):
+        parse_expr("a[3")
