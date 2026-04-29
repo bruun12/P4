@@ -94,8 +94,13 @@ class Parameter(Node):
             'integer': 'int',
             'double': 'float',
             'string': 'char*',
+            'boolean': 'bool',
+            'void': 'void'
         }
-        return f"{type_map[self.type]} {self.name}"
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[]"
+        else:
+            return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -136,9 +141,15 @@ class VarDeclaration(Statement):
             'integer': 'int',
             'double': 'float',
             'string': 'char*',
+            'boolean': 'bool',
+            'void': 'void'
         }
-        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
-    
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
+        else:
+            return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
+         
+
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -355,6 +366,8 @@ class FunctionCall(Expression):
         argString = ""
         for arg in self.arguments:
             argString += arg.to_c() + ","
+        if(self.name == "print"):
+            self.name = "printf"
 
         #argString[:-1] removes the last comma
         return f"{self.name}({argString[:-1]})"
