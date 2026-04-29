@@ -101,7 +101,9 @@ class BlockStatement(Statement):
         stmtList = ""
         for stmt in self.statements:
             stmtList += stmt.to_c() + "\n"
-        return f"{{{stmtList}}}"
+        return f"""{{
+            {stmtList}
+            }}"""
 
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):

@@ -1,15 +1,8 @@
 from parser.parser import Parser
 from lexer.lexer import Lexer
 from parser.ASTNodes import IfStatement
-from test_line_trim import lineTrim
+from tests.test_interpreter.test_line_trim import lineTrim
 
-<<<<<<< Updated upstream
-def test_if_statement():
-    correctLines = lineTrim("if(true){}")
-
-    assert correctLines[0] == "if (true)"
-    assert correctLines[1] == "{}"
-=======
 def test_if_statement_simple():
     correctLines = lineTrim("""if(true){}""")
 
@@ -70,4 +63,3 @@ def test_if_statement_space():
     assert correctLines[5] == "{"  
     assert correctLines[6] == "a = 5;"  
     assert correctLines[7] == "}" 
->>>>>>> Stashed changes
