@@ -130,7 +130,7 @@ class VarDeclaration(Statement):
             'double': 'float',
         }
         return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
-
+    
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -393,6 +393,22 @@ class Binary(Expression):
             'AND': '&&', 'OR': '||'
         }
         return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
+    
+class ArrayAccess(Expression):
+    def __init__(self, name: str, offset: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.name = name
+        self.offset = offset
+
+    def to_dict(self):
+        return {
+            "type": "ArrayAccess",
+            "name": self.name, 
+            "offset": self.offset.to_dict()
+        }
+    
+    def to_c(self):
+        return f"{self.name}[{self.offset.to_c()}]"
 
 #Error class
 class ParserError(Exception):
