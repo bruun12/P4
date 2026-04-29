@@ -18,7 +18,8 @@ from parser.ASTNodes import (
     Parameter,
     ArrayDeclaration,
     ArrayDeclarationEmpty,
-    FunctionCall
+    FunctionCall,
+    ArrayAccess,
 )
 
 class Parser:
@@ -131,7 +132,7 @@ class Parser:
 
     def var_declaration(self) -> VarDeclaration | ArrayDeclaration | ArrayDeclarationEmpty:
         type = self.previous()
-        name = self.advance()
+        name = self.advance() #integer b = a[3]
         
         if self.match(TokenType.LBRACE): 
             if self.match(TokenType.RBRACE): #integer a[] = {1,2,3,4}
@@ -304,6 +305,16 @@ class Parser:
         
         if self.match(TokenType.STRING):
             return Literal(tok.value, tok.line, tok.column)
+        
+        # Array access: a[3]
+        if (self.current().type == TokenType.IDENTIFIER 
+                and self.peek() is not None 
+                and self.peek().type == TokenType.LBRACE):
+            name = self.consume(TokenType.IDENTIFIER)
+            self.consume(TokenType.LBRACE)
+            index = self.parse_expression()
+            self.consume(TokenType.RBRACE)
+            return ArrayAccess(name.value, index, name.line, name.column)
         
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
             name = self.consume(TokenType.IDENTIFIER)
