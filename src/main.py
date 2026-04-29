@@ -9,7 +9,7 @@ def compile_source(source: str) -> str:
     ast = p.parse()
     return ast.to_c()
 
-
+# For at køre skal du være i src mappen (cd src), herefter "python main.py program.mit output.c"
 def main():
     print("Program starter...")
     if len(sys.argv) >= 2: #sys.argv = ["main.py", "program.mit", "output.c"]
