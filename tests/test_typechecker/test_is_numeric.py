@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import is_numeric, INTEGER, FLOAT, STRING, BOOLEAN, NULL
+from type_checker.TypeChecker import is_numeric, INTEGER, FLOAT, STRING, BOOLEAN, VOID
 import unittest
 
 class test_is_numeric(unittest.TestCase):
@@ -14,4 +14,4 @@ class test_is_numeric(unittest.TestCase):
         self.assertFalse(is_numeric(BOOLEAN))
 
     def test_empty(self):
-        self.assertFalse(is_numeric(NULL))
+        self.assertFalse(is_numeric(VOID))
