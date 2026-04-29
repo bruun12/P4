@@ -74,7 +74,7 @@ class Parser:
             return None
         return self.tokens[self.position+1]
 
-    #Return parser error with costum message
+    #Return parser error with custom message
     def error(self, error_code: ErrorCode) -> ParserError:
         return ParserError(error_code, self.current(), self.previous())
 

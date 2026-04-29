@@ -617,7 +617,7 @@ class TypeChecker:
 
             return function_type.return_type
         
-        
+        if isinstance(expr, ArrayAccess)
         
         if isinstance(expr, Literal):
             value = expr.value

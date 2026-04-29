@@ -109,6 +109,7 @@ class BlockStatement(Statement):
         {stmtList}
         }}"""
 
+
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -123,13 +124,6 @@ class VarDeclaration(Statement):
             "name": self.name,
             "value": self.value.to_dict() if self.value else None
         }
-    
-    def to_c(self):
-        type_map = {
-            'integer': 'int',
-            'double': 'float',
-        }
-        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
 
 
 class AssignStatement(Statement):
@@ -159,6 +153,7 @@ class AssignStatement(Statement):
         else:
             return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
 
+
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
         super().__init__(line, column)
@@ -175,18 +170,6 @@ class IfStatement(Statement):
         if self.else_branch:
             result["else"] = self.else_branch.to_dict() if isinstance(self.else_branch, BlockStatement) else [self.else_branch.to_dict()]
         return result
-    
-    def to_c(self):
-        if self.else_branch is None:
-            return f"""if ({self.condition.to_c()})
-                        {self.then_branch.to_c()}
-                    """
-        else:
-            return f"""if ({self.condition.to_c()})
-                        {self.then_branch.to_c()}
-                    else 
-                        {self.else_branch.to_c()}
-                    """
 
 
 class WhileStatement(Statement):
@@ -205,6 +188,7 @@ class WhileStatement(Statement):
     def to_c(self):
         return f"""while ({self.condition.to_c()})
         {self.body.to_c()}"""
+
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
@@ -363,9 +347,6 @@ class Unary(Expression):
             "op": self.operator,
             "right": self.right.to_dict()
         }
-    
-    def to_c(self):
-        return f"{self.operator}{self.right.to_c()}" 
 
 
 class Binary(Expression):
@@ -397,6 +378,13 @@ class Binary(Expression):
         }
         return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
 
+class Grouping(Expression):
+    def __init__(self, expression: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.expression = expression
+    
+    def to_dict(self):
+        return self.expression.to_dict()  # Grouping just returns the inner expression
 # ============================================================
 # Error class
 # ============================================================
