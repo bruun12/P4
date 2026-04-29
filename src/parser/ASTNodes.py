@@ -65,10 +65,16 @@ class Function(Node):
         }
     
     def to_c(self):
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+            'string': 'char*',
+            'void': 'void'
+        }
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{self.return_type} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
+        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
@@ -87,7 +93,7 @@ class Parameter(Node):
         type_map = {
             'integer': 'int',
             'double': 'float',
-            'string': 'char',
+            'string': 'char*',
             'boolean': 'bool',
             'void': 'void'
         }
@@ -268,6 +274,8 @@ class ArrayDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'float',
+            'string': 'char*',
         }
         arrElements = ""
         for elements in self.elements:

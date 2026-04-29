@@ -8,7 +8,6 @@ integer main(){
         a = 1; b = "øv";
     } else {
         a = 999;
-        b = a;
     }
     return 0;
 }

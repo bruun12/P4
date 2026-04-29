@@ -32,20 +32,20 @@ def main():
         }
         """
 
-        c_code = compile_source(source)
+    c_code = compile_source(source)
 
         # Print AST tree
         #print("\nAST Tree:")
         #print(p.parse())
-        if len(sys.argv) >= 3:
+    if len(sys.argv) >= 3:
             with open(sys.argv[2], "w", encoding="utf-8") as file:
                 file.write(c_code)
             print (f"Compiled -> {sys.argv[2]}")
             print(f"C kode:\n{c_code}")
-        else: 
+    else: 
             print(c_code)
 
-        if __name__ == "__main__":
+if __name__ == "__main__":
             main()
 
     
