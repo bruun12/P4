@@ -136,8 +136,7 @@ class VarDeclaration(Statement):
             'integer': 'int',
             'double': 'float',
             'string': 'char',
-            'boolean': 'bool',
-            'void': 'void'
+            'boolean': 'bool'
         }
         if(self.type == 'string'):
             return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
