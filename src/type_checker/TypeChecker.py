@@ -23,7 +23,7 @@ from parser.ASTNodes import (
     ArrayDeclaration,
     ArrayDeclarationEmpty,
     FunctionCall,
-    Grouping
+    ArrayAccess
 )
 from error_handling import ErrorCode, TypeCheckError, format_compiler_error
 
@@ -163,7 +163,7 @@ def type_name(t: Type) -> str:
     if t == INTEGER:
         return "integer"
     if t == FLOAT:
-        return "float"
+        return "double"
     if t == BOOLEAN:
         return "boolean"
     if t == STRING:
@@ -216,7 +216,7 @@ def parse_declared_type(declared_type: str) -> Type:
 
     if declared_type == "integer":
         return INTEGER
-    if declared_type == "float":
+    if declared_type == "double":
         return FLOAT
     if declared_type == "boolean":
         return BOOLEAN
@@ -501,18 +501,65 @@ class TypeChecker:
             try:
                 target_type = env.get(stmt.name)
             except TypeCheckError:
-                self.report(stmt, ErrorCode.UNDEFINED_VARIABLE_ERROR, f"Undefined variable '{stmt.name}'.")
+                self.report(
+                    stmt,
+                    ErrorCode.UNDEFINED_VARIABLE_ERROR,
+                    f"Undefined variable '{stmt.name}'."
+                )
                 target_type = ERROR
+            
+            # Normal assignment: x = value;
+            if stmt.offset is None:
+                value_type = self.check_expression(stmt.value, env)
 
+                if target_type != ERROR and value_type != ERROR:
+                    if not can_assign(target_type, value_type):
+                        self.report(
+                            stmt.value,
+                            ErrorCode.CANNOT_ASSIGN,
+                            f"Cannot assign value of type {type_name(value_type)} "
+                            f"to variable '{stmt.name}' of type {type_name(target_type)}."
+                        )
+
+                return NO_FLOW
+
+            # Array assignment: arr[index] = value;
+            if target_type != ERROR and not isinstance(target_type, ArrayType):
+                self.report(
+                    stmt,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Variable '{stmt.name}' is not an array, so it cannot be indexed."
+                )
+                # Still check subexpressions so their own errors are not hidden
+                self.check_expression(stmt.offset, env)
+                self.check_expression(stmt.value, env)
+                return NO_FLOW
+
+            offset_type = self.check_expression(stmt.offset, env)
             value_type = self.check_expression(stmt.value, env)
 
-            if target_type != ERROR and value_type != ERROR:
-                if not can_assign(target_type, value_type):
+            if offset_type != ERROR and offset_type != INTEGER:
+                self.report(
+                    stmt.offset,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Array index must be integer, got {type_name(offset_type)}."
+                )
+            if stmt.offset < 0:
+                self.report(
+                    stmt.offset,
+                    ErrorCode.INVALID_ARGUMENT_COUNT,
+                    f"Array index must be positive, got {stmt.offset}."
+                )
+
+            if isinstance(target_type, ArrayType) and value_type != ERROR:
+                element_type = target_type.element_type
+
+                if not can_assign(element_type, value_type):
                     self.report(
                         stmt.value,
                         ErrorCode.CANNOT_ASSIGN,
                         f"Cannot assign value of type {type_name(value_type)} "
-                        f"to variable '{stmt.name}' of type {type_name(target_type)}."
+                        f"to array '{stmt.name}' element of type {type_name(element_type)}."
                     )
 
             return NO_FLOW
@@ -668,7 +715,43 @@ class TypeChecker:
 
             return function_type.return_type
         
-        if isinstance(expr, ArrayAccess)
+        if isinstance(expr, ArrayAccess):
+            try:
+                array_type = env.get(expr.name)
+            except TypeCheckError:
+                self.report(
+                    expr,
+                    ErrorCode.UNDEFINED_VARIABLE_ERROR,
+                    f"Undefined variable '{expr.name}'."
+                )
+                return ERROR
+        
+            if not isinstance(array_type, ArrayType):
+                self.report(
+                    expr,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Variable '{expr.name}' is not an array, so it cannot be indexed."
+                )
+                # Still check the offset so errors inside it are not hidden
+                self.check_expression(expr.offset, env)
+                return ERROR
+        
+            offset_type = self.check_expression(expr.offset, env)
+        
+            if offset_type != ERROR and offset_type != INTEGER:
+                self.report(
+                    expr.offset,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Array index must be integer, got {type_name(offset_type)}."
+                )
+                return ERROR
+            if expr.offset < 0:
+                self.report(
+                    expr.offset,
+                    ErrorCode.INVALID_ARGUMENT_COUNT,
+                    f"Array index must be positive, got {expr.offset}."
+                )
+            return array_type.element_type
         
         if isinstance(expr, Literal):
             value = expr.value
@@ -703,9 +786,6 @@ class TypeChecker:
                     f"Undefined variable '{expr.name}'."
                     )
                 return ERROR
-
-        if isinstance(expr, Grouping):
-            return self.check_expression(expr.expression, env)
 
         if isinstance(expr, Unary):
             right_type = self.check_expression(expr.right, env)

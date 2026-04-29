@@ -1,35 +1,29 @@
-from dataclasses import dataclass
-
 from parser.ASTNodes import (
     AssignStatement,
-    Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    Grouping,
-    IfStatement,
-    Literal,
-    Node,
-    ParserError,
-    Program,
-    ReturnStatement,
-    Statement,
-    Unary,
-    Variable,
-    WhileStatement,
-    VarDeclaration,
-    Function,
-    Parameter,
+    ArrayAccess,
     ArrayDeclaration,
     ArrayDeclarationEmpty,
+    Binary,
+    BlockStatement,
+    ExpressionStatement,
+    Function,
     FunctionCall,
-    Grouping
+    IfStatement,
+    Literal,
+    Parameter,
+    Program,
+    ReturnStatement,
+    VarDeclaration,
+    Variable,
 )
 from type_checker.TypeChecker import TypeChecker
-    
-# DEMO PROGRAM
 
-def build_functioncall_demo_program() -> Program:
+
+# ============================================================
+# DEMO PROGRAM
+# ============================================================
+
+def build_demo_program() -> Program:
     """
     Build a hand-written AST for this mock program:
 
@@ -50,6 +44,11 @@ def build_functioncall_demo_program() -> Program:
             float y = average(x, 10);
             boolean ok = is_positive(x);
 
+            integer nums = [1, 2, 3];
+            integer more[5];
+            nums[1] = add(x, 1);
+            more[0] = nums[1];
+
             x = add(x, 1);
             y = average(add(1, 2), 8);
 
@@ -58,11 +57,14 @@ def build_functioncall_demo_program() -> Program:
             } else {
                 x = add(x, 0);
             }
+
             add(1);               // wrong number of arguments
             average("hi", 2);     // wrong argument type
             mystery(1, 2);        // undefined function
+            nums["bad"] = 3;      // bad array index
+            x[0] = 1;             // indexing non-array
 
-            return x;
+            return nums[1];
         }
     """
 
@@ -111,16 +113,12 @@ def build_functioncall_demo_program() -> Program:
             statements=[
                 ReturnStatement(
                     value=Binary(
-                        left=Grouping(
-                            expression=Binary(
-                                left=Variable("a", line=6, column=13),
-                                operator="+",
-                                right=Variable("b", line=6, column=17),
-                                line=6,
-                                column=15,
-                            ),
+                        left=Binary(
+                            left=Variable("a", line=6, column=13),
+                            operator="+",
+                            right=Variable("b", line=6, column=17),
                             line=6,
-                            column=12,
+                            column=15,
                         ),
                         operator="/",
                         right=Literal(2.0, line=6, column=23),
@@ -227,6 +225,59 @@ def build_functioncall_demo_program() -> Program:
                     column=5,
                 ),
 
+                # integer nums = [1, 2, 3];
+                ArrayDeclaration(
+                    type="integer",
+                    name="nums",
+                    elements=[
+                        Literal(1, line=18, column=21),
+                        Literal(2, line=18, column=24),
+                        Literal(3, line=18, column=27),
+                    ],
+                    line=18,
+                    column=5,
+                ),
+
+                # integer more[5];
+                ArrayDeclarationEmpty(
+                    type="integer",
+                    name="more",
+                    size=Literal(5, line=19, column=18),
+                    line=19,
+                    column=5,
+                ),
+
+                # nums[1] = add(x, 1);
+                AssignStatement(
+                    name="nums",
+                    offset=Literal(1, line=20, column=10),
+                    value=FunctionCall(
+                        name="add",
+                        arguments=[
+                            Variable("x", line=20, column=19),
+                            Literal(1, line=20, column=22),
+                        ],
+                        line=20,
+                        column=15,
+                    ),
+                    line=20,
+                    column=5,
+                ),
+
+                # more[0] = nums[1];
+                AssignStatement(
+                    name="more",
+                    offset=Literal(0, line=21, column=10),
+                    value=ArrayAccess(
+                        name="nums",
+                        offset=Literal(1, line=21, column=20),
+                        line=21,
+                        column=16,
+                    ),
+                    line=21,
+                    column=5,
+                ),
+
                 # x = add(x, 1);
                 AssignStatement(
                     name="x",
@@ -234,13 +285,13 @@ def build_functioncall_demo_program() -> Program:
                     value=FunctionCall(
                         name="add",
                         arguments=[
-                            Variable("x", line=18, column=13),
-                            Literal(1, line=18, column=16),
+                            Variable("x", line=23, column=13),
+                            Literal(1, line=23, column=16),
                         ],
-                        line=18,
+                        line=23,
                         column=9,
                     ),
-                    line=18,
+                    line=23,
                     column=5,
                 ),
 
@@ -254,18 +305,18 @@ def build_functioncall_demo_program() -> Program:
                             FunctionCall(
                                 name="add",
                                 arguments=[
-                                    Literal(1, line=19, column=21),
-                                    Literal(2, line=19, column=24),
+                                    Literal(1, line=24, column=21),
+                                    Literal(2, line=24, column=24),
                                 ],
-                                line=19,
+                                line=24,
                                 column=17,
                             ),
-                            Literal(8, line=19, column=29),
+                            Literal(8, line=24, column=29),
                         ],
-                        line=19,
+                        line=24,
                         column=9,
                     ),
-                    line=19,
+                    line=24,
                     column=5,
                 ),
 
@@ -274,9 +325,9 @@ def build_functioncall_demo_program() -> Program:
                     condition=FunctionCall(
                         name="is_positive",
                         arguments=[
-                            Variable("x", line=21, column=21),
+                            Variable("x", line=26, column=21),
                         ],
-                        line=21,
+                        line=26,
                         column=9,
                     ),
                     then_branch=BlockStatement(
@@ -287,17 +338,17 @@ def build_functioncall_demo_program() -> Program:
                                 value=FunctionCall(
                                     name="add",
                                     arguments=[
-                                        Variable("x", line=22, column=17),
-                                        Literal(100, line=22, column=20),
+                                        Variable("x", line=27, column=17),
+                                        Literal(100, line=27, column=20),
                                     ],
-                                    line=22,
+                                    line=27,
                                     column=13,
                                 ),
-                                line=22,
+                                line=27,
                                 column=9,
                             )
                         ],
-                        line=21,
+                        line=26,
                         column=25,
                     ),
                     else_branch=BlockStatement(
@@ -308,20 +359,20 @@ def build_functioncall_demo_program() -> Program:
                                 value=FunctionCall(
                                     name="add",
                                     arguments=[
-                                        Variable("x", line=24, column=17),
-                                        Literal(0, line=24, column=20),
+                                        Variable("x", line=29, column=17),
+                                        Literal(0, line=29, column=20),
                                     ],
-                                    line=24,
+                                    line=29,
                                     column=13,
                                 ),
-                                line=24,
+                                line=29,
                                 column=9,
                             )
                         ],
-                        line=23,
+                        line=28,
                         column=12,
                     ),
-                    line=21,
+                    line=26,
                     column=5,
                 ),
 
@@ -330,12 +381,12 @@ def build_functioncall_demo_program() -> Program:
                     expression=FunctionCall(
                         name="add",
                         arguments=[
-                            Literal(1, line=27, column=9),
+                            Literal(1, line=32, column=9),
                         ],
-                        line=27,
+                        line=32,
                         column=5,
                     ),
-                    line=27,
+                    line=32,
                     column=5,
                 ),
 
@@ -344,13 +395,13 @@ def build_functioncall_demo_program() -> Program:
                     expression=FunctionCall(
                         name="average",
                         arguments=[
-                            Literal("hi", line=28, column=13),
-                            Literal(2, line=28, column=19),
+                            Literal("hi", line=33, column=13),
+                            Literal(2, line=33, column=19),
                         ],
-                        line=28,
+                        line=33,
                         column=5,
                     ),
-                    line=28,
+                    line=33,
                     column=5,
                 ),
 
@@ -359,20 +410,43 @@ def build_functioncall_demo_program() -> Program:
                     expression=FunctionCall(
                         name="mystery",
                         arguments=[
-                            Literal(1, line=29, column=13),
-                            Literal(2, line=29, column=16),
+                            Literal(1, line=34, column=13),
+                            Literal(2, line=34, column=16),
                         ],
-                        line=29,
+                        line=34,
                         column=5,
                     ),
-                    line=29,
+                    line=34,
                     column=5,
                 ),
 
-                # return x;
+                # nums["bad"] = 3;   -> bad array index
+                AssignStatement(
+                    name="nums",
+                    offset=Literal("bad", line=35, column=10),
+                    value=Literal(3, line=35, column=19),
+                    line=35,
+                    column=5,
+                ),
+
+                # x[0] = 1;   -> indexing non-array
+                AssignStatement(
+                    name="x",
+                    offset=Literal(0, line=36, column=7),
+                    value=Literal(1, line=36, column=12),
+                    line=36,
+                    column=5,
+                ),
+
+                # return nums[1];
                 ReturnStatement(
-                    value=Variable("x", line=31, column=12),
-                    line=31,
+                    value=ArrayAccess(
+                        name="nums",
+                        offset=Literal(1, line=38, column=17),
+                        line=38,
+                        column=12,
+                    ),
+                    line=38,
                     column=5,
                 ),
             ],
@@ -393,7 +467,9 @@ def build_functioncall_demo_program() -> Program:
         line=1,
         column=1,
     )
-def functioncall_demo_source() -> str:
+
+
+def demo_source() -> str:
     return """integer add(integer a, integer b) {
     return a + b;
 }
@@ -411,6 +487,11 @@ integer main() {
     float y = average(x, 10);
     boolean ok = is_positive(x);
 
+    integer nums = [1, 2, 3];
+    integer more[5];
+    nums[1] = add(x, 1);
+    more[0] = nums[1];
+
     x = add(x, 1);
     y = average(add(1, 2), 8);
 
@@ -423,13 +504,16 @@ integer main() {
     add(1);
     average("hi", 2);
     mystery(1, 2);
+    nums["bad"] = 3;
+    x[0] = 1;
 
-    return x;
+    return nums[1];
 }"""
 
+
 if __name__ == "__main__":
-    source_code = functioncall_demo_source()
-    program  = build_functioncall_demo_program()
+    source_code = demo_source()
+    program = build_demo_program()
 
     checker = TypeChecker(source_code)
     checker.check(program)
@@ -441,4 +525,3 @@ if __name__ == "__main__":
             print()
     else:
         print("Type check passed.")
-
