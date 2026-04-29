@@ -68,7 +68,7 @@ class Function(Node):
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{self.return_type} {self.name}({paraList[:-1]})"
+        return f"{self.return_type} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
@@ -84,7 +84,17 @@ class Parameter(Node):
         }
     
     def to_c(self):
-        return f"{self.type} {self.name}"
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+            'string': 'char',
+            'boolean': 'bool',
+            'void': 'void'
+        }
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[]"
+        else:
+            return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -105,6 +115,7 @@ class BlockStatement(Statement):
             {stmtList}
             }}"""
 
+
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -121,7 +132,18 @@ class VarDeclaration(Statement):
         }
     
     def to_c(self):
-        return f"{self.type} {self.name} = {self.value.to_c()};"  
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+            'string': 'char',
+            'boolean': 'bool',
+            'void': 'void'
+        }
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
+        else:
+            return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
+         
 
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
@@ -169,13 +191,11 @@ class IfStatement(Statement):
     
     def to_c(self):
         if self.else_branch is None:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     """
         else:
-            return f"""
-                    if ({self.condition.to_c()})
+            return f"""if ({self.condition.to_c()})
                         {self.then_branch.to_c()}
                     else 
                         {self.else_branch.to_c()}
@@ -195,10 +215,8 @@ class WhileStatement(Statement):
         }
 
     def to_c(self):
-        return f"""
-            while ({self.condition.to_c()})
-                {self.body.to_c()}
-                """
+        return f"""while ({self.condition.to_c()})
+        {self.body.to_c()}"""
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
@@ -249,10 +267,13 @@ class ArrayDeclaration(Statement):
         }
     
     def to_c(self):
+        type_map = {
+            'integer': 'int',
+        }
         arrElements = ""
         for elements in self.elements:
             arrElements += elements.to_c() + ","
-        return f"{self.type} {self.name}[] = {{{arrElements}}};"
+        return f"{type_map[self.type]} {self.name}[] = {{{arrElements[:-1]}}};"
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -270,7 +291,10 @@ class ArrayDeclarationEmpty(Statement):
         }
         
     def to_c(self):
-        return f"{self.type} {self.name} [{self.size.to_c()}];"
+        type_map = {
+            'integer': 'int',
+        }
+        return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
 class Literal(Expression):
@@ -293,11 +317,14 @@ class Literal(Expression):
 
     def to_c(self):
         value_type = type(self.value).__name__
-
+        if value_type == "int":
+            return f"{self.value}"
+        if value_type == "float":
+            return f"{self.value}"
+        if value_type == "bool":
+            return f"{self.value}".lower()
         if value_type == "str":
             return f'"{self.value}"'
-        elif value_type == "bool":
-            return f"{self.value}".lower()
         else:
             return f"{self.value}"
 
@@ -332,6 +359,8 @@ class FunctionCall(Expression):
         argString = ""
         for arg in self.arguments:
             argString += arg.to_c() + ","
+        if(self.name == "print"):
+            self.name = "printf"
 
         #argString[:-1] removes the last comma
         return f"{self.name}({argString[:-1]})"
@@ -350,7 +379,7 @@ class Unary(Expression):
         }
     
     def to_c(self):
-        return f"{self.operator} {self.right.to_c}" 
+        return f"{self.operator}{self.right.to_c()}" 
 
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
@@ -374,7 +403,28 @@ class Binary(Expression):
         }
 
     def to_c(self):
-        return f"({self.left.to_c()} {self.operator} {self.right.to_c()})"
+        op_map = {
+            '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
+            '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
+            'AND': '&&', 'OR': '||'
+        }
+        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
+    
+class ArrayAccess(Expression):
+    def __init__(self, name: str, offset: Expression, line: int, column: int):
+        super().__init__(line, column)
+        self.name = name
+        self.offset = offset
+
+    def to_dict(self):
+        return {
+            "type": "ArrayAccess",
+            "name": self.name, 
+            "offset": self.offset.to_dict()
+        }
+    
+    def to_c(self):
+        return f"{self.name}[{self.offset.to_c()}]"
 
 #Error class
 class ParserError(Exception):

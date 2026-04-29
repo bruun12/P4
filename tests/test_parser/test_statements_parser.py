@@ -7,7 +7,10 @@ def test_statements_if_and_blockStatement_match():
     lex = Lexer(""" 
                 {
                 if (true)
-                {x = 4;} else {
+                {
+                x = 4;
+                y = 2;
+                } else {
                 x = 3;}
                 }""")
     lex.lexer()
@@ -61,13 +64,13 @@ def test_statements_expression():
 # Array declaration
 def test_statements_array_declaration_with_values():
     lex = Lexer("""
-                integer arr = [1,2,3];
+                integer abe[] = {1,2,3};
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.type == "integer"
-    assert node.name == "arr"
+    assert node.name == "abe"
     assert node.size == 3
 
 def test_statements_array_declaration_empty():
@@ -79,12 +82,12 @@ def test_statements_array_declaration_empty():
     node = parser.statement()
     assert node.type == "double"
     assert node.name == "arr"
-    assert node.size == 3
+    assert node.size.value == 3
 
 
 def test_statements_array_declaration_single_element():
-    lex = Lexer("""
-                integer arr = [1];
+    lex = Lexer(f"""
+                integer arr[] = {{{1}}};
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
