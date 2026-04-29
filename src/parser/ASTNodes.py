@@ -367,10 +367,27 @@ class FunctionCall(Expression):
         for arg in self.arguments:
             argString += arg.to_c() + ","
         if(self.name == "print"):
-            self.name = "printf"
+            argString = self.to_print()
 
         #argString[:-1] removes the last comma
         return f"{self.name}({argString[:-1]})"
+    
+    def to_print(self):
+        self.name = "printf"
+        s = ""
+        for arg in self.arguments:
+            if type(arg.value).__name__ == "str":
+                s = s + arg.to_c() + ","
+            if type(arg.value).__name__ == "int":
+                s = s + "%d,"
+            if type(arg.value).__name__ == "float":
+                s = s + "%f,"
+            if type(arg.value).__name__ == "bool":
+                s = s + "%b,"
+        return s
+
+
+
 
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
