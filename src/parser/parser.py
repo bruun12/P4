@@ -147,7 +147,7 @@ class Parser:
         return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
     def parse_array_literal(self) -> list:
-        self.advance()  # spiser [
+        self.consume(TokenType.LBRACE)  # spiser [
         elements = []
         if not self.check(TokenType.RBRACE):
             elements.append(self.parse_expression())

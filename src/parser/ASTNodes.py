@@ -148,7 +148,7 @@ class AssignStatement(Statement):
         if self.offset is None:
             return f"{self.name} = {self.value.to_c()};"
         else:
-            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
+            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()};"
 
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
