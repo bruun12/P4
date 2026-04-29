@@ -15,7 +15,7 @@ def lineTrimFunction(lexerString: str):
 
 def test_function_to_c():
     result = lineTrimFunction("integer foobar(integer x, integer y) { return x; }")
-    assert result == ["integer foobar(int x,int y) {", "return x;", "}"]
+    assert result == ["int foobar(int x,int y) {", "return x;", "}"]
 
 def test_two_functions_to_c():
     result = lineTrimFunction(
@@ -23,10 +23,10 @@ def test_two_functions_to_c():
         "integer piphans(integer y) { return y; }"
     )
     assert result == [
-        "integer foobar(int x) {",
+        "int foobar(int x) {",
         "return x;",
         "}",
-        "integer piphans(int y) {",
+        "int piphans(int y) {",
         "return y;",
         "}"
     ]
@@ -38,13 +38,13 @@ def test_three_functions_to_c():
         "integer wallah(integer z) { return z; }"
     )
     assert result == [
-        "integer foobar(int x) {",
+        "int foobar(int x) {",
         "return x;",
         "}",
-        "integer piphans(int y) {",
+        "int piphans(int y) {",
         "return y;",
         "}",
-        "integer wallah(int z) {",
+        "int wallah(int z) {",
         "return z;",
         "}"
     ]

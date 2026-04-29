@@ -43,18 +43,19 @@ def test_big_program():
                                     return;
                                     }""")
     assert correctLines == [
-        "integer add (integer a, float b){",
+        "int add(int a,float b) {",
             "a = (a + 5);",
             "b = ((8.2 * 2) + b);",
-            "return (a + b);}",         
-            "void main(){",
-            """string = "This is a test";""",
-            "print(string)",
-            "integer a = 8;",
-            "while((5 < a)){",
+            "return (a + b);",
+            "}",         
+            "void main() {",
+            """char* text[] = "This is a test";""",
+            "printf(text);", 
+            "int a = 8;",
+            "while ((5 < a))",
+            "{",
             "add(5,a);",
             "}",
             "return;",
-            "}",
             "}"
     ]
