@@ -10,6 +10,9 @@ class Node:
     
     def to_dict(self):
         return {"type": self.__class__.__name__}
+    
+    def to_c(self):
+        raise NotImplementedError(f"to_c is not implemented for {__class__.__name__}")
 
 class Statement(Node):
     def __init__(self, line: int, column: int):
@@ -33,6 +36,17 @@ class Program(Node):
             "functions": [func.to_dict() for func in self.functions]
         }
 
+    def to_c(self):
+        functionList = ""
+        for func in self.functions:
+            functionList += func.to_c() + "\n"
+
+        return f"""
+                    #include <stdio.h>
+                    #include <stdbool.h>
+                    {functionList}
+                """
+
 class Function(Node):
     def __init__(self, return_type: str, name: str, parameters: list, statement: Statement, line: int, column: int):
         super().__init__(line, column)
@@ -49,6 +63,12 @@ class Function(Node):
             "parameters": [param.to_dict() for param in self.parameters],
             "body": self.statement.to_dict()
         }
+    
+    def to_c(self):
+        paraList = ""
+        for param in self.parameters:
+            paraList += param.to_c() + ","
+        return f"{self.return_type} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
@@ -62,6 +82,13 @@ class Parameter(Node):
             "param_type": self.type,
             "name": self.name
         }
+    
+    def to_c(self):
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+        }
+        return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -74,6 +101,13 @@ class BlockStatement(Statement):
             "body": [stmt.to_dict() for stmt in self.statements]
         }
 
+    def to_c(self):
+        stmtList = ""
+        for stmt in self.statements:
+            stmtList += stmt.to_c() + "\n"
+        return f"""{{
+        {stmtList}
+        }}"""
 
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
@@ -89,6 +123,13 @@ class VarDeclaration(Statement):
             "name": self.name,
             "value": self.value.to_dict() if self.value else None
         }
+    
+    def to_c(self):
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+        }
+        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
 
 
 class AssignStatement(Statement):
@@ -112,6 +153,11 @@ class AssignStatement(Statement):
                 "value": self.value.to_dict()
             }
 
+    def to_c(self):
+        if self.offset is None:
+            return f"{self.name} = {self.value.to_c()};"
+        else:
+            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
 
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
@@ -129,6 +175,18 @@ class IfStatement(Statement):
         if self.else_branch:
             result["else"] = self.else_branch.to_dict() if isinstance(self.else_branch, BlockStatement) else [self.else_branch.to_dict()]
         return result
+    
+    def to_c(self):
+        if self.else_branch is None:
+            return f"""if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    """
+        else:
+            return f"""if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    else 
+                        {self.else_branch.to_c()}
+                    """
 
 
 class WhileStatement(Statement):
@@ -144,6 +202,9 @@ class WhileStatement(Statement):
             "body": self.body.to_dict() if isinstance(self.body, BlockStatement) else [self.body.to_dict()]
         }
 
+    def to_c(self):
+        return f"""while ({self.condition.to_c()})
+        {self.body.to_c()}"""
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
@@ -155,6 +216,12 @@ class ReturnStatement(Statement):
         if self.value:
             result["value"] = self.value.to_dict()
         return result
+    
+    def to_c(self):
+        if self.value is not None:
+            return f"return {self.value.to_c()};"
+        else:
+            return "return;"
 
 class ExpressionStatement(Statement):
     def __init__(self, expression: Expression, line: int, column: int):
@@ -166,6 +233,9 @@ class ExpressionStatement(Statement):
             "type": "Expression",
             "value": self.expression.to_dict()
         }
+    
+    def to_c(self):
+        return f"{self.expression.to_c()};"
 
 class ArrayDeclaration(Statement):
     def __init__(self, type: str, name: str, elements: list, line: int, column: int):
@@ -183,6 +253,15 @@ class ArrayDeclaration(Statement):
             "elements": [elem.to_dict() for elem in self.elements],
             "size": self.size
         }
+    
+    def to_c(self):
+        type_map = {
+            'integer': 'int',
+        }
+        arrElements = ""
+        for elements in self.elements:
+            arrElements += elements.to_c() + ","
+        return f"{type_map[self.type]} {self.name}[] = {{{arrElements[:-1]}}};"
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -199,6 +278,11 @@ class ArrayDeclarationEmpty(Statement):
             "size": self.size.to_dict()
         }
         
+    def to_c(self):
+        type_map = {
+            'integer': 'int',
+        }
+        return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
 class Literal(Expression):
@@ -219,6 +303,19 @@ class Literal(Expression):
         else:
             return {"type": "literal", "value": self.value}
 
+    def to_c(self):
+        value_type = type(self.value).__name__
+        if value_type == "int":
+            return f"{self.value}"
+        if value_type == "float":
+            return f"{self.value}"
+        if value_type == "bool":
+            return f"{self.value}".lower()
+        if value_type == "str":
+            return f'"{self.value}"'
+        else:
+            return f"{self.value}"
+
 class Variable(Expression):
     def __init__(self, name: str, line: int, column: int):
         super().__init__(line, column)
@@ -229,6 +326,9 @@ class Variable(Expression):
             "type": "variable",
             "name": self.name
         }
+    
+    def to_c(self):
+        return f"{self.name}"
 
 class FunctionCall(Expression):
     def __init__(self, name: str, arguments: list, line: int, column: int):
@@ -243,6 +343,14 @@ class FunctionCall(Expression):
             "arguments": [arg.to_dict() for arg in self.arguments]
         }
 
+    def to_c(self):
+        argString = ""
+        for arg in self.arguments:
+            argString += arg.to_c() + ","
+
+        #argString[:-1] removes the last comma
+        return f"{self.name}({argString[:-1]})"
+
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -255,6 +363,9 @@ class Unary(Expression):
             "op": self.operator,
             "right": self.right.to_dict()
         }
+    
+    def to_c(self):
+        return f"{self.operator}{self.right.to_c()}" 
 
 
 class Binary(Expression):
@@ -278,15 +389,13 @@ class Binary(Expression):
             "right": self.right.to_dict()
         }
 
-
-class Grouping(Expression):
-    def __init__(self, expression: Expression, line: int, column: int):
-        super().__init__(line, column)
-        self.expression = expression
-    
-    def to_dict(self):
-        return self.expression.to_dict()  # Grouping just returns the inner expression
-
+    def to_c(self):
+        op_map = {
+            '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
+            '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
+            'AND': '&&', 'OR': '||'
+        }
+        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
 
 # ============================================================
 # Error class

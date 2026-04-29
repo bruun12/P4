@@ -33,6 +33,7 @@ class Interpreter:
     def __init__(self):
         self.functions = {}
         self.global_env = Environment()
+        self.position = 0
 
     def run(self, program):
         for func in program.functions:
@@ -46,6 +47,14 @@ class Interpreter:
         func = self.functions.get(name)
         if not func: 
             raise RuntimeError(f"Unknown function: '{name}'")
+        
+    def is_at_end(self) -> bool:
+        return len(self.functions) > self.position
+         
+    def exefunc(self):
+        while not self.is_at_end():
+            pass
+            
 
 
 # Eksempel på logikken bag local og global_env
@@ -54,4 +63,4 @@ class Interpreter:
 #nteger foo(integer y) {
 #    integer z = 10;   // ligger i local_env
 #    return x + y + z; // kan se ALLE tre variable
-#}
+#
