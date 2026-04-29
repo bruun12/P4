@@ -26,6 +26,8 @@ class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.position = 0
+        self.errors: list[ParserError] = []
+
 
     #Return current token
     def current(self) -> Token:
@@ -33,7 +35,7 @@ class Parser:
 
     #Return previous token
     def previous(self) -> Token:
-        if self.position-1 is None:
+        if self.position == 0:
             return None
         return self.tokens[self.position-1]
 
@@ -46,9 +48,14 @@ class Parser:
     #If token is of specific type; advance position and return previous token.
     #If not of specific type; raise error with argument message.
     def consume(self, token_type: TokenType) -> Token:
+        
+        
         if self.current().type == token_type:
             return self.advance()
-        raise self.error(ErrorCode.STRUCTURE_ERROR)
+        raise self.error(
+            f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value}'",
+            ErrorCode.STRUCTURE_ERROR
+        )
 
     #Return true if current token is of type "EOF"
     def is_at_end(self) -> bool:
@@ -76,17 +83,20 @@ class Parser:
         return self.tokens[self.position+1]
 
     #Return parser error with custom message
-    def error(self, error_code: ErrorCode) -> ParserError:
-        return ParserError(error_code, self.current(), self.previous())
-
+    def error(self, message: str, error_code: ErrorCode):
+        return ParserError(message, error_code, self.current().line, self.current().column)
 
     def parse(self) -> Program:
         functions = []
-        while not self.is_at_end():
-            functions.append(self.function())
-        return Program(functions, self.current().line, self.current().column)
-
+        try:
+            while not self.is_at_end():
+                functions.append(self.function())
+            return Program(functions, self.current().line, self.current().column)
+        except ParserError as err:
+            self.errors.append(err)
+            raise
     def function(self) -> Function:
+        
         type = self.consume(TokenType.TYPE)
         name = self.consume(TokenType.IDENTIFIER)
         parameters = self.parameters()
@@ -325,7 +335,13 @@ class Parser:
         if self.match(TokenType.LPAREN):
             expr = self.parse_expression()
             if not self.match(TokenType.RPAREN):
-                raise self.error(ErrorCode.STRUCTURE_ERROR) 
+                raise self.error(
+                    f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value}'",
+                    ErrorCode.STRUCTURE_ERROR
+                    ) 
             return expr
 
-        raise self.error(ErrorCode.UNEXPECTED_TOKEN_ERROR)
+        raise self.error(
+            f"Parser Error: Unexpected Token '{self.current().value}'",
+            ErrorCode.UNEXPECTED_TOKEN_ERROR
+            )

@@ -297,9 +297,9 @@ def parse_declared_type(declared_type: str) -> Type:
 
 
 class TypeChecker:
-    def __init__(self, source_code: str):
-        self.source_code = source_code
-        self.source_lines = source_code.splitlines()
+    def __init__(self):
+        #self.source_code = source_code
+        #self.source_lines = source_code.splitlines()
         self.errors: list[TypeCheckError] = []
 
         # Global function signatures live here.
@@ -814,13 +814,13 @@ class TypeChecker:
 # enough for most use cases.
 # ============================================================
 
-def run_typecheck(program: Program, source_code: str) -> None:
-    checker = TypeChecker(source_code)
-    checker.check(program)
-
-    if checker.errors:
-        for err in checker.formatted_errors():
-            print(err)
-            print()
-    else:
-        print("Type check passed.")
+#def run_typecheck(program: Program, source_code: str) -> None:
+#    checker = TypeChecker(source_code)
+#    checker.check(program)
+#
+#    if checker.errors:
+#        for err in checker.formatted_errors():
+#            print(err)
+#            print()
+#    else:
+#        print("Type check passed.")
