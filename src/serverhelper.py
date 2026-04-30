@@ -5,13 +5,13 @@ import tempfile
 import os
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.post("/api/compile")
 def compile_code(body: dict):
@@ -21,7 +21,7 @@ def compile_code(body: dict):
         return {"error": "Ingen kode modtaget"}
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".mit", delete=False, encoding="utf-8"
+        mode="w", suffix=".cimple", delete=False, encoding="utf-8"
     ) as f:
         f.write(kode)
         input_sti = f.name
