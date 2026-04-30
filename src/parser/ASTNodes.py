@@ -375,20 +375,25 @@ class FunctionCall(Expression):
             return f"{self.name}({argString[:-1]})"
     
     def to_print(self):
-        a = f"if(sizeof({self.arguments[0].to_c()})==8)"
-        b = """{printf("%f","""
-        c = f"{self.arguments[0].to_c()});"
-        d = "}else if(sizeof("
-        e = f"{self.arguments[0].to_c()})==4)"
-        f ="""{printf("%d","""
-        g = f"{self.arguments[0].to_c()});"
-        h = """}else{printf("%s","""
-        i = f"{self.arguments[0].to_c()});"
-        k = "}"
-        
-        s = a + b + c + d + e + f + g + h + i + k
-
-        return s
+        text = ""
+        for args in self.arguments:
+            a = f"if(sizeof({args.to_c()})==8)"
+            b = """{printf("%f","""
+            c = f"{args.to_c()});"
+            d = "}else if(sizeof("
+            e = f"{args.to_c()})==4)"
+            f ="""{printf("%d","""
+            g = f"{args.to_c()});"
+            h = "}else if(sizeof("
+            i = f"{args.to_c()})==1)"
+            j ="""{printf("%s","""
+            k = f"""{args.to_c()} ? "true" : "false");"""
+            l = """}else{printf("%s","""
+            m = f"{args.to_c()});"
+            n = "}"
+            s = a + b + c + d + e + f + g + h + i + j + k + l + m + n
+            text = text + s
+        return text
 
         #self.name = "printf"
         #s = ""
