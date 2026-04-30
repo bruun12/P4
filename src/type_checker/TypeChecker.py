@@ -86,7 +86,7 @@ class FunctionType(Type):
 
 
 INTEGER = IntegerType()
-DOUBLE = DOUBLEType()
+DOUBLE = DoubleType()
 BOOLEAN = BooleanType()
 STRING = StringType()
 VOID = VoidType()
