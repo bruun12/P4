@@ -67,7 +67,7 @@ class Function(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'void': 'void'
         }
@@ -92,15 +92,12 @@ class Parameter(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'boolean': 'bool',
             'void': 'void'
         }
-        if(self.type == 'string'):
-            return f"{type_map[self.type]} {self.name}[]"
-        else:
-            return f"{type_map[self.type]} {self.name}"
+        return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -139,15 +136,12 @@ class VarDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'boolean': 'bool',
             'void': 'void'
         }
-        if(self.type == 'string'):
-            return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
-        else:
-            return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
+        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
          
 
 class AssignStatement(Statement):
@@ -274,7 +268,7 @@ class ArrayDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
         }
         arrElements = ""

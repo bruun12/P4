@@ -12,7 +12,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.post("/api/compile")
 def compile_code(body: dict):
     code = body.get("code", "")
@@ -27,14 +26,42 @@ def compile_code(body: dict):
         input_path = f.name
 
     try:
+        cwd_path = os.path.join(os.path.dirname(__file__), "")
+
         # Kør: python main.py <input.mit> (ingen output-fil = printer til stdout)
-        result = subprocess.run(
-            ["python", "main.py", input_path, "output.c", "&&", "gcc", "output.c", "-o", "output", "&&", "./output"],
+        cimpleToC = subprocess.run(
+            ["python", "main.py", input_path, "output.c"],
             capture_output=True,
             text=True,
             timeout=5,
-            cwd=os.path.join(os.path.dirname(__file__), "")  # Kør fra /src mappen
+            cwd=cwd_path  # Kør fra /src mappen
         )
+
+        if cimpleToC.returncode != 0:
+            return cimpleToC
+
+        cToExecutable = subprocess.run(
+            ["gcc", "output.c", "-o", "output"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=cwd_path  # Kør fra /src mappen
+        )
+
+        if cToExecutable.returncode != 0:
+            return cToExecutable
+        
+        executeC = subprocess.run(
+            ["./output"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=cwd_path  # Kør fra /src mappen
+        )
+
+        if executeC.returncode != 0:
+            return executeC
+
 
         """
         if result.returncode != 0:
@@ -44,10 +71,10 @@ def compile_code(body: dict):
         # Vi fjerner den første linje så kun C-koden returneres
 
 
-        return {"output": result}
+        return executeC
 
     except subprocess.TimeoutExpired:
-        return {"error": "Timeout - koden tog for lang tid"}
+        return {"error": "Timeout"}
     except Exception as e:
         return {"error": str(e)}
     finally:
