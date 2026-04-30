@@ -363,28 +363,45 @@ class FunctionCall(Expression):
         }
 
     def to_c(self):
-        argString = ""
-        for arg in self.arguments:
-            argString += arg.to_c() + ","
         if(self.name == "print"):
-            argString = self.to_print()
+            return self.to_print()
+        else:
+            argString = ""
+            for arg in self.arguments:
+                argString += arg.to_c() + ","
+            
 
-        #argString[:-1] removes the last comma
-        return f"{self.name}({argString[:-1]})"
+            #argString[:-1] removes the last comma
+            return f"{self.name}({argString[:-1]})"
     
     def to_print(self):
-        self.name = "printf"
-        s = ""
-        for arg in self.arguments:
-            if type(arg.value).__name__ == "str":
-                s = s + arg.to_c() + ","
-            if type(arg.value).__name__ == "int":
-                s = s + "%d,"
-            if type(arg.value).__name__ == "float":
-                s = s + "%f,"
-            if type(arg.value).__name__ == "bool":
-                s = s + "%b,"
+        a = f"if(sizeof({self.arguments[0].to_c()})==8)"
+        b = """{printf("%f","""
+        c = f"{self.arguments[0].to_c()});"
+        d = "}else if(sizeof("
+        e = f"{self.arguments[0].to_c()})==4)"
+        f ="""{printf("%d","""
+        g = f"{self.arguments[0].to_c()});"
+        h = """}else{printf("%s","""
+        i = f"{self.arguments[0].to_c()});"
+        k = "}"
+        
+        s = a + b + c + d + e + f + g + h + i + k
+
         return s
+
+        #self.name = "printf"
+        #s = ""
+        #for arg in self.arguments:
+        #    if type(arg.value).__name__ == "str":
+        #        s = s + arg.to_c() + ","
+        #    if type(arg.value).__name__ == "int":
+        #        s = s + "%d,"
+        #    if type(arg.value).__name__ == "float":
+        #        s = s + "%f,"
+        #    if type(arg.value).__name__ == "bool":
+        #        s = s + "%b,"
+        #return s
 
 
 
