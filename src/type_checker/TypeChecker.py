@@ -38,7 +38,7 @@ class IntegerType(Type):
 
 
 @dataclass(frozen=True)
-class DOUBLEType(Type):
+class DoubleType(Type):
     pass
 
 
