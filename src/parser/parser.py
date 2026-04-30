@@ -132,6 +132,9 @@ class Parser:
         if self.match(TokenType.TYPE):
             return self.var_declaration()
         
+        if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
+            return self.expression_statement()
+        
         if self.match(TokenType.IDENTIFIER):
             return self.assign_statement()
 

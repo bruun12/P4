@@ -65,10 +65,16 @@ class Function(Node):
         }
     
     def to_c(self):
+        type_map = {
+            'integer': 'int',
+            'double': 'float',
+            'string': 'char*',
+            'void': 'void'
+        }
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{self.return_type} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
+        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
         
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
@@ -87,8 +93,14 @@ class Parameter(Node):
         type_map = {
             'integer': 'int',
             'double': 'float',
+            'string': 'char*',
+            'boolean': 'bool',
+            'void': 'void'
         }
-        return f"{type_map[self.type]} {self.name}"
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[]"
+        else:
+            return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -129,9 +141,16 @@ class VarDeclaration(Statement):
         type_map = {
             'integer': 'int',
             'double': 'float',
+            'string': 'char*',
+            'boolean': 'bool',
+            'void': 'void'
         }
-        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};"  
-    
+        if(self.type == 'string'):
+            return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
+        else:
+            return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
+         
+
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -247,6 +266,8 @@ class ArrayDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'float',
+            'string': 'char*',
         }
         arrElements = ""
         for elements in self.elements:
@@ -337,6 +358,8 @@ class FunctionCall(Expression):
         argString = ""
         for arg in self.arguments:
             argString += arg.to_c() + ","
+        if(self.name == "print"):
+            self.name = "printf"
 
         #argString[:-1] removes the last comma
         return f"{self.name}({argString[:-1]})"
