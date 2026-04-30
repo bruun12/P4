@@ -1,6 +1,12 @@
 from lexer.lexer import Lexer
 from parser.parser import Parser
 import sys
+import subprocess
+
+def run_c_code():
+    res = subprocess.run(["gcc", "output.c"], capture_output=True, text=True)
+    print("Output:", res.stdout)
+    print("Return Code:", res.returncode)
 
 def compile_source(source: str) -> str:
     lex = Lexer(source)
@@ -33,10 +39,9 @@ def main():
         """
 
     c_code = compile_source(source)
+    
 
-        # Print AST tree
-        #print("\nAST Tree:")
-        #print(p.parse())
+        
     if len(sys.argv) >= 3:
             with open(sys.argv[2], "w", encoding="utf-8") as file:
                 file.write(c_code)
