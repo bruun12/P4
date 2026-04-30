@@ -33,7 +33,7 @@ def compile_code(body: dict):
             capture_output=True,
             text=True,
             timeout=5,
-            cwd=os.path.join(os.path.dirname(__file__), "src")  # Kør fra /src mappen
+            cwd=os.path.join(os.path.dirname(__file__), "")  # Kør fra /src mappen
         )
 
         if resultat.returncode != 0:
