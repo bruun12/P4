@@ -544,11 +544,11 @@ class TypeChecker:
                     ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
-            if stmt.offset < 0:
+            if stmt.offset.value < 0:
                 self.report(
                     stmt.offset,
                     ErrorCode.INVALID_ARGUMENT_COUNT,
-                    f"Array index must be positive, got {stmt.offset}."
+                    f"Array index must be positive, got {stmt.offset.value}."
                 )
 
             if isinstance(target_type, ArrayType) and value_type != ERROR:
@@ -745,11 +745,11 @@ class TypeChecker:
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
                 return ERROR
-            if expr.offset < 0:
+            if expr.offset.value < 0:
                 self.report(
                     expr.offset,
                     ErrorCode.INVALID_ARGUMENT_COUNT,
-                    f"Array index must be positive, got {expr.offset}."
+                    f"Array index must be positive, got {expr.offset.value}."
                 )
             return array_type.element_type
         
