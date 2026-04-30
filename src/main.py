@@ -4,9 +4,10 @@ import sys
 import subprocess
 
 def run_c_code():
-    res = subprocess.run(["gcc", "output.c"], capture_output=True, text=True)
-    print("Output:", res.stdout)
-    print("Return Code:", res.returncode)
+    res = subprocess.run(["gcc", "output.c", "-o", "output", "&&", "./output"], capture_output=True, text=True)
+    print(res)
+
+
 
 def compile_source(source: str) -> str:
     lex = Lexer(source)
@@ -40,6 +41,7 @@ def main():
 
     c_code = compile_source(source)
     
+    output = run_c_code(c_code)    
 
         
     if len(sys.argv) >= 3:
