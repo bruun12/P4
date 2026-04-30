@@ -118,8 +118,9 @@ class BlockStatement(Statement):
         for stmt in self.statements:
             stmtList += stmt.to_c() + "\n"
         return f"""{{
-        {stmtList}
-        }}"""
+            {stmtList}
+            }}"""
+
 
 
 class VarDeclaration(Statement):
@@ -141,9 +142,8 @@ class VarDeclaration(Statement):
         type_map = {
             'integer': 'int',
             'double': 'float',
-            'string': 'char*',
-            'boolean': 'bool',
-            'void': 'void'
+            'string': 'char',
+            'boolean': 'bool'
         }
         if(self.type == 'string'):
             return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
@@ -176,7 +176,7 @@ class AssignStatement(Statement):
         if self.offset is None:
             return f"{self.name} = {self.value.to_c()};"
         else:
-            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
+            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()};"
 
 
 class IfStatement(Statement):
