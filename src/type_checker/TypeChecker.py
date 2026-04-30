@@ -38,7 +38,7 @@ class IntegerType(Type):
 
 
 @dataclass(frozen=True)
-class FloatType(Type):
+class DOUBLEType(Type):
     pass
 
 
@@ -86,7 +86,7 @@ class FunctionType(Type):
 
 
 INTEGER = IntegerType()
-FLOAT = FloatType()
+DOUBLE = DOUBLEType()
 BOOLEAN = BooleanType()
 STRING = StringType()
 VOID = VoidType()
@@ -162,7 +162,7 @@ class FunctionEnvironment:
 def type_name(t: Type) -> str:
     if t == INTEGER:
         return "integer"
-    if t == FLOAT:
+    if t == DOUBLE:
         return "double"
     if t == BOOLEAN:
         return "boolean"
@@ -189,7 +189,7 @@ def type_name(t: Type) -> str:
 
 
 def is_numeric(t: Type) -> bool:
-    return t == INTEGER or t == FLOAT
+    return t == INTEGER or t == DOUBLE
 
 
 def can_assign(target: Type, value: Type) -> bool:
@@ -197,7 +197,7 @@ def can_assign(target: Type, value: Type) -> bool:
     if target == value:
         return True
 
-    if target == FLOAT and value == INTEGER:
+    if target == DOUBLE and value == INTEGER:
         return True
 
     if isinstance(target, ArrayType) and isinstance(value, ArrayType):
@@ -207,8 +207,8 @@ def can_assign(target: Type, value: Type) -> bool:
 
 
 def numeric_result_type(left: Type, right: Type) -> Type:
-    if left == FLOAT or right == FLOAT:
-        return FLOAT
+    if left == DOUBLE or right == DOUBLE:
+        return DOUBLE
     return INTEGER
 
 
@@ -217,7 +217,7 @@ def parse_declared_type(declared_type: str) -> Type:
     if declared_type == "integer":
         return INTEGER
     if declared_type == "double":
-        return FLOAT
+        return DOUBLE
     if declared_type == "boolean":
         return BOOLEAN
     if declared_type == "string":
@@ -764,7 +764,7 @@ class TypeChecker:
                 return INTEGER
 
             if isinstance(value, float):
-                return FLOAT
+                return DOUBLE
 
             if isinstance(value, str):
                 return STRING
@@ -798,7 +798,7 @@ class TypeChecker:
                     self.report(
                         expr,
                         ErrorCode.TYPE_MISMATCH_ERROR,
-                        f"Unary '-' requires integer or float, got {type_name(right_type)}."
+                        f"Unary '-' requires integer or double, got {type_name(right_type)}."
                     )
                     return ERROR
                 return right_type

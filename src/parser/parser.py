@@ -307,7 +307,7 @@ class Parser:
         if self.match(TokenType.INTEGER):
             return Literal(tok.value, tok.line, tok.column)
         
-        if self.match(TokenType.FLOAT):
+        if self.match(TokenType.DOUBLE):
             return Literal(tok.value, tok.line, tok.column)
         
         if self.match(TokenType.TRUE):
