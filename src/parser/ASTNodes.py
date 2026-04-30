@@ -24,7 +24,7 @@ class Expression(Node):
         super().__init__(line, column)
 
 
-
+#Statement nodes:
 class Program(Node):
     def __init__(self, functions: list, line: int, column: int):
         super().__init__(line, column)
@@ -122,7 +122,6 @@ class BlockStatement(Statement):
             }}"""
 
 
-
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -178,7 +177,6 @@ class AssignStatement(Statement):
         else:
             return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()};"
 
-
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
         super().__init__(line, column)
@@ -195,7 +193,18 @@ class IfStatement(Statement):
         if self.else_branch:
             result["else"] = self.else_branch.to_dict() if isinstance(self.else_branch, BlockStatement) else [self.else_branch.to_dict()]
         return result
-
+    
+    def to_c(self):
+        if self.else_branch is None:
+            return f"""if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    """
+        else:
+            return f"""if ({self.condition.to_c()})
+                        {self.then_branch.to_c()}
+                    else 
+                        {self.else_branch.to_c()}
+                    """
 
 class WhileStatement(Statement):
     def __init__(self, condition: Expression, body: Statement, line: int, column: int):
@@ -213,7 +222,6 @@ class WhileStatement(Statement):
     def to_c(self):
         return f"""while ({self.condition.to_c()})
         {self.body.to_c()}"""
-
 
 class ReturnStatement(Statement):
     def __init__(self, value: Expression | None, line: int, column: int):
@@ -376,7 +384,9 @@ class Unary(Expression):
             "op": self.operator,
             "right": self.right.to_dict()
         }
-
+    
+    def to_c(self):
+        return f"{self.operator}{self.right.to_c()}" 
 
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
