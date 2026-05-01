@@ -67,7 +67,7 @@ class Function(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'void': 'void'
         }
@@ -92,7 +92,7 @@ class Parameter(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'boolean': 'bool',
             'void': 'void'
@@ -140,7 +140,7 @@ class VarDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char',
             'boolean': 'bool'
         }
@@ -255,12 +255,12 @@ class ExpressionStatement(Statement):
         return f"{self.expression.to_c()};"
 
 class ArrayDeclaration(Statement):
-    def __init__(self, type: str, name: str, elements: list, line: int, column: int):
+    def __init__(self, type: str, name: str, elements: list, size: Expression, line: int, column: int):
         super().__init__(line, column)
         self.type = type
         self.name = name 
         self.elements = elements
-        self.size = len(elements)
+        self.size = size
     
     def to_dict(self):
         return {
@@ -274,7 +274,7 @@ class ArrayDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
         }
         arrElements = ""
@@ -313,7 +313,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return {"type": "integer", "value": self.value}
-        elif value_type == "float":
+        elif value_type == "double":
             return {"type": "double", "value": self.value}
         elif value_type == "bool":
             return {"type": "boolean", "value": self.value}
@@ -326,7 +326,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return f"{self.value}"
-        if value_type == "float":
+        if value_type == "double":
             return f"{self.value}"
         if value_type == "bool":
             return f"{self.value}".lower()
