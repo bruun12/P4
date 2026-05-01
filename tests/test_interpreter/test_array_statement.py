@@ -10,7 +10,7 @@ def test_arrayDeclarationEmpty():
     assert node.to_c() ==  "int arr[3];"
 
 def test_arrayDeclaration():
-    lex = Lexer(f"""integer arr[] = {{{18}}};""")
+    lex = Lexer(f"""integer arr[1] = [{18}];""")
     lex.lexer()
     node = Parser(lex.tokens).statement()
     assert isinstance(node, ArrayDeclaration)

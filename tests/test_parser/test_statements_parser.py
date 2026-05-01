@@ -1,6 +1,7 @@
 from lexer.lexer import Lexer
 from error_handling import ParserError
 from parser.parser import Parser
+from parser.ASTNodes import ArrayDeclaration
 import pytest
 
 def test_statements_if_and_blockStatement_match():
@@ -80,14 +81,14 @@ def test_expression_statement_equal():
 # Array declaration
 def test_statements_array_declaration_with_values():
     lex = Lexer("""
-                integer abe[] = {1,2,3};
+                integer abe[3] = [1,2,3];
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.type == "integer"
     assert node.name == "abe"
-    assert node.size == 3
+    assert node.size.value == 3
 
 def test_statements_array_declaration_empty():
     lex = Lexer("""
@@ -103,14 +104,14 @@ def test_statements_array_declaration_empty():
 
 def test_statements_array_declaration_single_element():
     lex = Lexer(f"""
-                integer arr[] = {{{1}}};
+                integer arr[1] = [{1}];
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.type == "integer"
     assert node.name == "arr"
-    assert node.size == 1
+    assert node.size.value == 1
 
 def test_statements_array_assignment_constant():
     lex = Lexer("""

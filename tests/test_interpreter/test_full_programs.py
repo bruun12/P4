@@ -43,7 +43,7 @@ def test_big_program():
                                     return;
                                     }""")
     assert correctLines == [
-        "int add(int a,float b) {",
+        "int add(int a,double b) {",
             "a = (a + 5);",
             "b = ((8.2 * 2) + b);",
             "return (a + b);",
