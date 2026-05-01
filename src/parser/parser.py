@@ -236,7 +236,7 @@ class Parser:
     
     #Expressions
     def parse_expression(self):
-        print(self.current())
+#        print(self.current())
 
         return self.parse_or()
 
