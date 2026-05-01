@@ -147,16 +147,15 @@ class Parser:
         type = self.previous()
         name = self.advance() #integer b = a[3]
         
-        if self.match(TokenType.LBRACE): 
-            if self.match(TokenType.RBRACE): #integer a[] = {1,2,3,4}
-                self.consume(TokenType.ASSIGN) 
-                if self.check(TokenType.LCBRACE):
+        if self.match(TokenType.LBRACE):
+            size = self.parse_expression()
+            self.consume(TokenType.RBRACE)
+            if self.match(TokenType.ASSIGN): #integer a[] = {1,2,3,4}
+                if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)
-                    return ArrayDeclaration(type.value, name.value, elements, name.line, name.column)
+                    return ArrayDeclaration(type.value, name.value, elements, size, name.line, name.column)
             else: # Integer arr[3]
-                size = self.parse_expression()
-                self.consume(TokenType.RBRACE)
                 self.consume(TokenType.SEMICOLON)
                 return ArrayDeclarationEmpty(type.value, name.value, size, name.line, name.column)
         
@@ -167,13 +166,13 @@ class Parser:
         return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
     def parse_array_literal(self) -> list:
-        self.consume(TokenType.LCBRACE)  # spiser {
+        self.consume(TokenType.LBRACE)  # spiser {
         elements = []
-        if not self.check(TokenType.RCBRACE):
+        if not self.check(TokenType.RBRACE):
             elements.append(self.parse_expression())
         while self.match(TokenType.COMMA):
             elements.append(self.parse_expression())
-        self.consume(TokenType.RCBRACE)  # spiser ]
+        self.consume(TokenType.RBRACE)  # spiser ]
         return elements
     
     def block_statement(self) -> BlockStatement:

@@ -21,17 +21,17 @@ integer main() {
     double y = average(x, 10);
     boolean ok = is_positive(x);
 
-    integer nums[] = {1, 2, 3};
+    integer nums[3] = [1, 2, 3];
     integer more[5];
-    string words[] = {"a", "b", "c"};
+    string words[3] = ["a", "b", "c"];
 
     nums[1] = add(x, 1);
-    more[0] = nums[1];
+    more[6] = nums[1];
 
     x = nums[0];
     y = average(add(1, 2), 8);
 
-    if (is_positive(x)) {
+    if (is_positive(x)){
         x = 2;
     } else {
         x = 5;

@@ -70,6 +70,7 @@ class ArrayType(Type):
         ArrayType(INTEGER)
     """
     element_type: Type
+    size: int
 
 
 @dataclass(frozen=True)
@@ -122,8 +123,8 @@ class TypeEnvironment:
         self.parent = parent
         self.values: dict[str, Type] = {}
 
-    def define(self, name: str, typ: Type) -> None:
-        self.values[name] = typ
+    def define(self, name: str, type: Type) -> None:
+        self.values[name] = type
 
     def contains_in_current_scope(self, name: str) -> bool:
         return name in self.values
@@ -431,7 +432,7 @@ class TypeChecker:
                     f"Array '{stmt.name}' cannot have element type void."
                     )
             #Create ArrayType object
-            array_type = ArrayType(element_type)
+            array_type_size = ArrayType(element_type, stmt.size.value)
         
             if env.contains_in_current_scope(stmt.name):
                 self.report(
@@ -439,7 +440,14 @@ class TypeChecker:
                     ErrorCode.ALREADY_DECLARED_ERROR,
                     f"Variable '{stmt.name}' is already declared in this scope."
                     )
-
+            if stmt.size.value != len(stmt.elements):
+                self.report(
+                        stmt,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        f"Array size must match number or declared array elements"
+                        f" Expected {stmt.size.value} number of elements, but got {len(stmt.elements)}."
+                    )
+                
             for element in stmt.elements:
                 element_expr_type = self.check_expression(element, env)
                 if element_type != ERROR and element_expr_type != ERROR:
@@ -451,7 +459,7 @@ class TypeChecker:
                             f"into array '{stmt.name}' of element type {type_name(element_type)}."
                         )
 
-            env.define(stmt.name, array_type)
+            env.define(stmt.name, array_type_size)
             return 
 
         # ----------------------------------------------------
@@ -465,7 +473,7 @@ class TypeChecker:
                     ErrorCode.INVALID_DECLARED_TYPE,
                     f"Array '{stmt.name}' cannot have element type void."
                     )
-            array_type = ArrayType(element_type)
+            array_type_size = ArrayType(element_type, stmt.size.value)
 
             if env.contains_in_current_scope(stmt.name):
                 self.report(
@@ -482,7 +490,7 @@ class TypeChecker:
                     f"Array size must be integer, got {type_name(size_type)}."
                 )
 
-            env.define(stmt.name, array_type)
+            env.define(stmt.name, array_type_size)
             return
 
         # ----------------------------------------------------
@@ -542,7 +550,14 @@ class TypeChecker:
                         ErrorCode.INVALID_ARGUMENT_COUNT,
                         f"Array index must be positive, got {stmt.offset.value}."
                     )
-
+            if stmt.offset.value > target_type.size:
+                    self.report(
+                        stmt.offset,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        f"Element assigned to array index is out of range."
+                        f" Array maximum index: {target_type.size} but tries to assign to index: {stmt.offset.value}"
+                    )                
+                
             if isinstance(target_type, ArrayType) and value_type != ERROR:
                 element_type = target_type.element_type
 

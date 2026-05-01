@@ -255,12 +255,12 @@ class ExpressionStatement(Statement):
         return f"{self.expression.to_c()};"
 
 class ArrayDeclaration(Statement):
-    def __init__(self, type: str, name: str, elements: list, line: int, column: int):
+    def __init__(self, type: str, name: str, elements: list, size: Expression, line: int, column: int):
         super().__init__(line, column)
         self.type = type
         self.name = name 
         self.elements = elements
-        self.size = len(elements)
+        self.size = size
     
     def to_dict(self):
         return {
