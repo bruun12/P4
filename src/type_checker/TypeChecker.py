@@ -38,7 +38,7 @@ class IntegerType(Type):
 
 
 @dataclass(frozen=True)
-class FloatType(Type):
+class DoubleType(Type):
     pass
 
 
@@ -86,7 +86,7 @@ class FunctionType(Type):
 
 
 INTEGER = IntegerType()
-FLOAT = FloatType()
+DOUBLE = DoubleType()
 BOOLEAN = BooleanType()
 STRING = StringType()
 VOID = VoidType()
@@ -96,7 +96,7 @@ ERROR = ErrorType()
 # ============================================================
 # FLOW RESULT
 # ============================================================
-
+"""
 @dataclass(frozen=True)
 class FlowResult:
     definitely_returns: bool
@@ -109,7 +109,7 @@ NO_FLOW = FlowResult(
 RETURNS = FlowResult(
     definitely_returns=True
 )
-
+"""
 # ============================================================
 # ENVIRONMENTS
 # ============================================================
@@ -162,7 +162,7 @@ class FunctionEnvironment:
 def type_name(t: Type) -> str:
     if t == INTEGER:
         return "integer"
-    if t == FLOAT:
+    if t == DOUBLE:
         return "double"
     if t == BOOLEAN:
         return "boolean"
@@ -189,7 +189,7 @@ def type_name(t: Type) -> str:
 
 
 def is_numeric(t: Type) -> bool:
-    return t == INTEGER or t == FLOAT
+    return t == INTEGER or t == DOUBLE
 
 
 def can_assign(target: Type, value: Type) -> bool:
@@ -197,7 +197,7 @@ def can_assign(target: Type, value: Type) -> bool:
     if target == value:
         return True
 
-    if target == FLOAT and value == INTEGER:
+    if target == DOUBLE and value == INTEGER:
         return True
 
     if isinstance(target, ArrayType) and isinstance(value, ArrayType):
@@ -207,8 +207,8 @@ def can_assign(target: Type, value: Type) -> bool:
 
 
 def numeric_result_type(left: Type, right: Type) -> Type:
-    if left == FLOAT or right == FLOAT:
-        return FLOAT
+    if left == DOUBLE or right == DOUBLE:
+        return DOUBLE
     return INTEGER
 
 
@@ -217,7 +217,7 @@ def parse_declared_type(declared_type: str) -> Type:
     if declared_type == "integer":
         return INTEGER
     if declared_type == "double":
-        return FLOAT
+        return DOUBLE
     if declared_type == "boolean":
         return BOOLEAN
     if declared_type == "string":
@@ -240,6 +240,7 @@ class TypeChecker:
         # These are set while checking a function body.
         self.current_function_name: str | None = None
         self.expected_return_type: Type | None = None
+        self.does_return_correctly: bool 
 
     # --------------------------------------------------------
     # Error helpers
@@ -339,17 +340,18 @@ class TypeChecker:
                 continue
 
             local_env.define(parameter.name, param_type)
-
-        flow = self.check_statement(function.statement, local_env)
-
-        # Enforce that the function returns on all paths.
-        if self.expected_return_type not in (VOID, ERROR) and not flow.definitely_returns:
+        
+        self.does_return_correctly = False
+        self.check_statement(function.statement, local_env, True)
+        
+       
+        # Enforce that the function returns correctly.
+        if self.expected_return_type not in (VOID, ERROR) and not self.does_return_correctly:
             self.report(
                 function,
                 ErrorCode.MISSING_RETURN_ERROR,
-                f"Function '{function.name}' may not return a value on all paths."
+                f"Function '{function.name}' must include return statement at the end."
             )
-
         self.current_function_name = previous_function_name
         self.expected_return_type = previous_expected_return_type
 
@@ -361,35 +363,24 @@ class TypeChecker:
         self,
         stmt: Statement,
         env: TypeEnvironment,
-    ) -> FlowResult:
+        within_function: bool
+         ) -> None:
 
         # ----------------------------------------------------
         # BlockStatement
         # ----------------------------------------------------
+
         if isinstance(stmt, BlockStatement):
-            
             block_env = TypeEnvironment(parent=env)
-            saw_terminal_flow = False
 
-            for inner_stmt in stmt.statements:
-                #If previous statement definitely returns, then all following statements are unreachable
-                if saw_terminal_flow:
-                    self.report(
-                        inner_stmt,
-                        ErrorCode.UNREACHABLE_ERROR, 
-                        "Unreachable statement."
-                        )
-                    continue
-                #Will return a FlowResult object
-                flow = self.check_statement(inner_stmt, block_env)
+            for i, inner_stmt in enumerate(stmt.statements):
+                is_last_statement = i == len(stmt.statements) - 1
 
-                if flow.definitely_returns:
-                    saw_terminal_flow = True
+                inner_within_function = within_function and is_last_statement
 
-            if saw_terminal_flow:
-                return RETURNS
-            
-            return NO_FLOW
+                self.check_statement(inner_stmt, block_env, inner_within_function)
+
+            return
 
         # ----------------------------------------------------
         # VarDeclaration
@@ -426,7 +417,7 @@ class TypeChecker:
                     )
             #Variable is defined in current environment
             env.define(stmt.name, declared_type)
-            return NO_FLOW
+            return
 
         # ----------------------------------------------------
         # ArrayDeclaration
@@ -461,7 +452,7 @@ class TypeChecker:
                         )
 
             env.define(stmt.name, array_type)
-            return NO_FLOW
+            return 
 
         # ----------------------------------------------------
         # ArrayDeclarationEmpty
@@ -492,7 +483,7 @@ class TypeChecker:
                 )
 
             env.define(stmt.name, array_type)
-            return NO_FLOW
+            return
 
         # ----------------------------------------------------
         # AssignStatement
@@ -521,7 +512,7 @@ class TypeChecker:
                             f"to variable '{stmt.name}' of type {type_name(target_type)}."
                         )
 
-                return NO_FLOW
+                return
 
             # Array assignment: arr[index] = value;
             if target_type != ERROR and not isinstance(target_type, ArrayType):
@@ -533,7 +524,7 @@ class TypeChecker:
                 # Still check subexpressions so their own errors are not hidden
                 self.check_expression(stmt.offset, env)
                 self.check_expression(stmt.value, env)
-                return NO_FLOW
+                return 
 
             offset_type = self.check_expression(stmt.offset, env)
             value_type = self.check_expression(stmt.value, env)
@@ -544,12 +535,13 @@ class TypeChecker:
                     ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
-            if stmt.offset.value < 0:
-                self.report(
-                    stmt.offset,
-                    ErrorCode.INVALID_ARGUMENT_COUNT,
-                    f"Array index must be positive, got {stmt.offset.value}."
-                )
+            if isinstance(stmt.offset, Literal) and isinstance(stmt.offset.value, int):    
+                if stmt.offset.value < 0:
+                    self.report(
+                        stmt.offset,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        f"Array index must be positive, got {stmt.offset.value}."
+                    )
 
             if isinstance(target_type, ArrayType) and value_type != ERROR:
                 element_type = target_type.element_type
@@ -562,7 +554,7 @@ class TypeChecker:
                         f"to array '{stmt.name}' element of type {type_name(element_type)}."
                     )
 
-            return NO_FLOW
+            return 
 
         # ----------------------------------------------------
         # IfStatement
@@ -578,20 +570,16 @@ class TypeChecker:
                 )
 
             then_env = TypeEnvironment(parent=env)
-            then_flow = self.check_statement(stmt.then_branch, then_env)
+            self.check_statement(stmt.then_branch, then_env, False)
 
             if stmt.else_branch is None:
-                return NO_FLOW
+                return
 
             else_env = TypeEnvironment(parent=env)
-            else_flow = self.check_statement(stmt.else_branch, else_env)
+            self.check_statement(stmt.else_branch, else_env, False)
             # Return flow result based on if then and else block definitely return,
-            return FlowResult(
-                definitely_returns=(
-                    then_flow.definitely_returns and else_flow.definitely_returns
-                )
-            )
-
+            return 
+    
         # ----------------------------------------------------
         # WhileStatement
         # ----------------------------------------------------
@@ -606,26 +594,34 @@ class TypeChecker:
                 )
 
             body_env = TypeEnvironment(parent=env)
-            self.check_statement(stmt.body, body_env)
+            self.check_statement(stmt.body, body_env, False)
 
-
-            return NO_FLOW
+            return
 
         # ----------------------------------------------------
         # ReturnStatement
         # ----------------------------------------------------
         if isinstance(stmt, ReturnStatement):
+            if not within_function:
+                self.report(
+                    stmt,
+                    ErrorCode.INVALID_RETURN_ERROR,
+                    "Return statement is only allowed as the final statement of a function."
+                    )  
+                return
+                 
             if self.expected_return_type is None:
                 self.report(
                     stmt, 
                     ErrorCode.INVALID_RETURN_ERROR,
                     "Return statement is not allowed here."
                     )
-                return RETURNS
+                return
 
             if stmt.value is None:
                 if self.expected_return_type == VOID:
-                    return RETURNS
+                    self.does_return_correctly = True
+                    return 
                 
                 self.report(
                     stmt,
@@ -633,18 +629,20 @@ class TypeChecker:
                     f"Return statement must include a value of type "
                     f"{type_name(self.expected_return_type)}."
                 )
-                return RETURNS
-            
+                self.does_return_correctly = False
+                return 
+           
             if self.expected_return_type == VOID:
-                
+               
                 self.check_expression(stmt.value, env)
                 self.report(
                     stmt.value,
                     ErrorCode.INVALID_RETURN_ERROR,
                     "Void function must not return a value."
                 )
-                # still check the expression so errors inside it are found
-                return RETURNS
+                self.does_return_correctly = False
+               # still check the expression so errors inside it are found
+                return
             
             value_type = self.check_expression(stmt.value, env)
 
@@ -655,15 +653,15 @@ class TypeChecker:
                     f"Return type mismatch in function '{self.current_function_name}': "
                     f"expected {type_name(self.expected_return_type)}, got {type_name(value_type)}."
                 )
-
-            return RETURNS
+            self.does_return_correctly = True
+            return 
 
         # ----------------------------------------------------
         # ExpressionStatement
         # ----------------------------------------------------
         if isinstance(stmt, ExpressionStatement):
             self.check_expression(stmt.expression, env)
-            return NO_FLOW
+            return
         # !r uses repr() for a detailed, quoted debug view
         # repr() used to clarify type and content
         self.report(
@@ -671,7 +669,7 @@ class TypeChecker:
             ErrorCode.UNKNOWN_AST_NODE_ERROR,
             f"Unknown statement node: {stmt!r}"
             )
-        return NO_FLOW
+        return
 
     # --------------------------------------------------------
     # Expression checking
@@ -764,7 +762,7 @@ class TypeChecker:
                 return INTEGER
 
             if isinstance(value, float):
-                return FLOAT
+                return DOUBLE
 
             if isinstance(value, str):
                 return STRING
@@ -798,7 +796,7 @@ class TypeChecker:
                     self.report(
                         expr,
                         ErrorCode.TYPE_MISMATCH_ERROR,
-                        f"Unary '-' requires integer or float, got {type_name(right_type)}."
+                        f"Unary '-' requires integer or double, got {type_name(right_type)}."
                     )
                     return ERROR
                 return right_type

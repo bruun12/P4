@@ -67,7 +67,7 @@ class Function(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'void': 'void'
         }
@@ -92,7 +92,7 @@ class Parameter(Node):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
             'boolean': 'bool',
             'void': 'void'
@@ -140,7 +140,7 @@ class VarDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char',
             'boolean': 'bool'
         }
@@ -274,7 +274,7 @@ class ArrayDeclaration(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'float',
+            'double': 'double',
             'string': 'char*',
         }
         arrElements = ""
@@ -313,7 +313,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return {"type": "integer", "value": self.value}
-        elif value_type == "float":
+        elif value_type == "double":
             return {"type": "double", "value": self.value}
         elif value_type == "bool":
             return {"type": "boolean", "value": self.value}
@@ -326,7 +326,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return f"{self.value}"
-        if value_type == "float":
+        if value_type == "double":
             return f"{self.value}"
         if value_type == "bool":
             return f"{self.value}".lower()

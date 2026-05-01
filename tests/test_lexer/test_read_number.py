@@ -9,10 +9,10 @@ def test_read_number_with_int_input():
     assert token.type == TokenType.INTEGER
     assert token.value == 123
 
-def test_read_number_with_float_input():
+def test_read_number_with_double_input():
     lex = Lexer("0.987")
     token = lex.read_number()
-    assert token.type == TokenType.FLOAT
+    assert token.type == TokenType.DOUBLE
     assert token.value == 0.987
 
 def test_read_number_with_two_dots():

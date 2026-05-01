@@ -16,19 +16,6 @@ boolean is_positive(integer x) {
     return x > 0;
 }
 
-integer bump(integer x) {
-    if (x > 10) {
-        return x + 1;
-    } else {
-        return x + 2;
-    }
-}
-
-void do_nothing(integer x) {
-    x = x + 1;
-    return;
-}
-
 integer main() {
     integer x = add(3, 4);
     double y = average(x, 10);
@@ -45,16 +32,14 @@ integer main() {
     y = average(add(1, 2), 8);
 
     if (is_positive(x)) {
-        x = bump(x);
+        x = 2;
     } else {
-        x = add(x, 0);
+        x = 5;
     }
 
     while (x < 20) {
         x = add(x, 1);
     }
-
-    do_nothing(x);
 
     words[1] = "updated";
     ok = is_positive(nums[1]);

@@ -8,7 +8,7 @@ def test_varDeclaration_integer():
 def test_varDeclaration_double():
     correctLines = lineTrim("double b=5.4;")
 
-    assert correctLines[0] == "float b = 5.4;"
+    assert correctLines[0] == "double b = 5.4;"
 
 def test_varDeclaration_string():
     correctLines = lineTrim('string greating = "Hello my friend";')

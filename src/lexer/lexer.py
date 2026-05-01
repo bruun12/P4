@@ -81,7 +81,7 @@ class Lexer:
             raise LexerError("A error on line: " + str(startLine) + " Invalid number: a number can only have one punctuation", 12, startLine, startColumn)
 
         if '.' in number_str:
-            return Token(TokenType.FLOAT, float(number_str), startLine, startColumn)
+            return Token(TokenType.DOUBLE, float(number_str), startLine, startColumn)
         else:
             return Token(TokenType.INTEGER, int(number_str), startLine, startColumn)
         

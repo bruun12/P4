@@ -124,7 +124,7 @@ def test_lexer_while_statement():
         (TokenType.TYPE, "double"),
         (TokenType.IDENTIFIER, "f"),
         (TokenType.ASSIGN, "="),
-        (TokenType.FLOAT, 2.0),
+        (TokenType.DOUBLE, 2.0),
         (TokenType.SEMICOLON, ";"),
         (TokenType.WHILE, "while"),
         (TokenType.LPAREN, "("),
