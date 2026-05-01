@@ -1,17 +1,14 @@
-from type_checker.TypeChecker import is_numeric, INTEGER, FLOAT, STRING, BOOLEAN, VOID
-import unittest
+from type_checker.TypeChecker import is_numeric, INTEGER, DOUBLE, STRING, BOOLEAN, VOID
 
-class test_is_numeric(unittest.TestCase):
+def test_valid_numbers():
+    assert is_numeric(INTEGER)
+    assert is_numeric(DOUBLE)
 
-    def test_valid_numbers(self):
-        self.assertTrue(is_numeric(INTEGER))
-        self.assertTrue(is_numeric(FLOAT))
+def test_invalid_values():
+    assert not is_numeric(STRING)
 
-    def test_invalid_values(self):
-        self.assertFalse(is_numeric(STRING))
+def test_boolean():
+    assert not is_numeric(BOOLEAN)
 
-    def test_boolean(self):
-        self.assertFalse(is_numeric(BOOLEAN))
-
-    def test_empty(self):
-        self.assertFalse(is_numeric(VOID))
+def test_empty():
+    assert not is_numeric(VOID)
