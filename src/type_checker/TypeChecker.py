@@ -67,7 +67,7 @@ class ArrayType(Type):
     Array type with an element type.
 
     Example:
-        ArrayType(INTEGER)
+        ArrayType(INTEGER, 1)
     """
     element_type: Type
     size: int
@@ -93,24 +93,6 @@ STRING = StringType()
 VOID = VoidType()
 ERROR = ErrorType()
 
-
-# ============================================================
-# FLOW RESULT
-# ============================================================
-"""
-@dataclass(frozen=True)
-class FlowResult:
-    definitely_returns: bool
-
-
-NO_FLOW = FlowResult(
-    definitely_returns=False
-)
-
-RETURNS = FlowResult(
-    definitely_returns=True
-)
-"""
 # ============================================================
 # ENVIRONMENTS
 # ============================================================
