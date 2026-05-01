@@ -1,28 +1,29 @@
-from type_checker.TypeChecker import can_assign, INTEGER, FLOAT, STRING, BOOLEAN, ArrayType
-import unittest
+from type_checker.TypeChecker import can_assign, INTEGER, DOUBLE, STRING, BOOLEAN, ArrayType
 
-class test_can_assign(unittest.TestCase):
 
-    def test_same_type(self):
-        self.assertTrue(can_assign(INTEGER, INTEGER))
-        self.assertTrue(can_assign(FLOAT, FLOAT))
-        self.assertTrue(can_assign(BOOLEAN, BOOLEAN))
-        self.assertTrue(can_assign(STRING, STRING))
+def test_same_type():
+    assert can_assign(INTEGER, INTEGER)
+    assert can_assign(DOUBLE, DOUBLE)
+    assert can_assign(BOOLEAN, BOOLEAN)
+    assert can_assign(STRING, STRING)
 
-    def test_int_to_float(self):
-        self.assertTrue(can_assign(FLOAT, INTEGER))
-        self.assertFalse(can_assign(FLOAT, STRING))
-        self.assertFalse(can_assign(FLOAT, BOOLEAN))
+def test_int_to_double():
+    assert can_assign(DOUBLE, INTEGER)
+
+def test_double_to_int():
+    assert not can_assign(INTEGER, DOUBLE)
+
+def test_wrong_assign_type():
+    assert not can_assign(DOUBLE, BOOLEAN)
+    assert not can_assign(STRING, DOUBLE)
+    assert not can_assign(DOUBLE, STRING)
     
-    def test_float_to_int(self):
-        self.assertFalse(can_assign(INTEGER, FLOAT))
+def test_same_array_type():
+    assert can_assign(ArrayType(INTEGER), ArrayType(INTEGER))
+    assert can_assign(ArrayType(DOUBLE), ArrayType(DOUBLE))
+    assert can_assign(ArrayType(STRING), ArrayType(STRING))
 
-    def test_same_array_type(self):
-        self.assertTrue(can_assign(ArrayType(INTEGER), ArrayType(INTEGER)))
-        self.assertTrue(can_assign(ArrayType(FLOAT), ArrayType(FLOAT)))
-        self.assertTrue(can_assign(ArrayType(STRING), ArrayType(STRING)))
-
-    def test_different_array_type(self):
-        self.assertFalse(can_assign(ArrayType(INTEGER), ArrayType(FLOAT)))
-        self.assertFalse(can_assign(ArrayType(FLOAT), ArrayType(STRING)))
-        self.assertFalse(can_assign(ArrayType(STRING), ArrayType(INTEGER)))
+def test_different_array_type():
+    assert not can_assign(ArrayType(INTEGER), ArrayType(DOUBLE))
+    assert not can_assign(ArrayType(DOUBLE), ArrayType(STRING))
+    assert not can_assign(ArrayType(STRING), ArrayType(INTEGER))
