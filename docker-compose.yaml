@@ -49,6 +49,6 @@ services:
       environment:
         - PYTHONPATH=/app/src
       working_dir: /app/
-      command: uvicorn serverhelper:app --host 0.0.0.0 --port 8000
+      command: uvicorn server:app --host 0.0.0.0 --port 8000
       stdin_open: true
       tty: true

@@ -1,16 +1,28 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 import subprocess
 import tempfile
 import os
 
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+
+@app.get("/")
+async def root():
+    return FileResponse("webapp/index.html")
+
+@app.get("/index.html")
+async def index():
+    return FileResponse("webapp/index.html")
+
+@app.get("/style")
+async def style():
+    return FileResponse("webapp/style.css")
+
+@app.get("/script")
+async def script():
+    return FileResponse("webapp/src/app.js")
+
 
 @app.post("/api/compile")
 def compile_code(body: dict):
