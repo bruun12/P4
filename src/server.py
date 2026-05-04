@@ -23,6 +23,13 @@ async def style():
 async def script():
     return FileResponse("webapp/src/app.js")
 
+@app.get("/documentation")
+async def documentation():
+    return FileResponse("webapp/cimple-documentation-english.pdf")
+
+@app.get("/dokumentation")
+async def dokumentation():
+    return FileResponse("webapp/cimple-dokumentation-dansk.pdf")
 
 @app.post("/api/compile")
 def compile_code(body: dict):
