@@ -42,8 +42,10 @@ class Program(Node):
             functionList += func.to_c() + "\n"
 
         return f"""
-                    #include <stdio.h>
-                    #include <stdbool.h>
+                #include <stdlib.h>
+                #include <stdio.h>
+                #include <stdbool.h>
+                #define sametypeof(A,B) _Generic(A, typeof(B): true, default: false)
                     {functionList}
                 """
 
@@ -371,40 +373,20 @@ class FunctionCall(Expression):
     
     def to_print(self):
         text = ""
-        for args in self.arguments:
-            a = f"if(sizeof({args.to_c()})==8)"
-            b = """{printf("%f","""
-            c = f"{args.to_c()});"
-            d = "}else if(sizeof("
-            e = f"{args.to_c()})==4)"
-            f ="""{printf("%d","""
-            g = f"{args.to_c()});"
-            h = "}else if(sizeof("
-            i = f"{args.to_c()})==1)"
-            j ="""{printf("%s","""
-            k = f"""{args.to_c()} ? "true" : "false");"""
-            l = """}else{printf("%s","""
-            m = f"{args.to_c()});"
-            n = "}"
-            s = a + b + c + d + e + f + g + h + i + j + k + l + m + n
+        for arg in self.arguments:
+            s = f"""
+                if (sametypeof(1.2,{arg.to_c()})){{
+                    printf("%f",{arg.to_c()});
+                }} else if (sametypeof(1, {arg.to_c()})){{
+                    printf("%d", {arg.to_c()});
+                }} else if (sametypeof("string",{arg.to_c()})){{
+                    printf("%s",{arg.to_c()});
+                }} else {{
+                    printf("%s", {arg.to_c()} ? "true" : "false");
+                }}
+                """
             text = text + s
         return text
-
-        #self.name = "printf"
-        #s = ""
-        #for arg in self.arguments:
-        #    if type(arg.value).__name__ == "str":
-        #        s = s + arg.to_c() + ","
-        #    if type(arg.value).__name__ == "int":
-        #        s = s + "%d,"
-        #    if type(arg.value).__name__ == "float":
-        #        s = s + "%f,"
-        #    if type(arg.value).__name__ == "bool":
-        #        s = s + "%b,"
-        #return s
-
-
-
 
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
