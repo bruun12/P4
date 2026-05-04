@@ -26,7 +26,8 @@ integer main() {
     string words[3] = ["a", "b", "c"];
 
     nums[1] = add(x, 1);
-    more[6] = nums[1];
+    more[4] = nums[1];
+    print("x = : ", x);
 
     x = nums[0];
     y = average(add(1, 2), 8);
