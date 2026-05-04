@@ -363,14 +363,53 @@ class FunctionCall(Expression):
         }
 
     def to_c(self):
-        argString = ""
-        for arg in self.arguments:
-            argString += arg.to_c() + ","
         if(self.name == "print"):
-            self.name = "printf"
+            return self.to_print()
+        else:
+            argString = ""
+            for arg in self.arguments:
+                argString += arg.to_c() + ","
+            
 
-        #argString[:-1] removes the last comma
-        return f"{self.name}({argString[:-1]})"
+            #argString[:-1] removes the last comma
+            return f"{self.name}({argString[:-1]})"
+    
+    def to_print(self):
+        text = ""
+        for args in self.arguments:
+            a = f"if(sizeof({args.to_c()})==8)"
+            b = """{printf("%f","""
+            c = f"{args.to_c()});"
+            d = "}else if(sizeof("
+            e = f"{args.to_c()})==4)"
+            f ="""{printf("%d","""
+            g = f"{args.to_c()});"
+            h = "}else if(sizeof("
+            i = f"{args.to_c()})==1)"
+            j ="""{printf("%s","""
+            k = f"""{args.to_c()} ? "true" : "false");"""
+            l = """}else{printf("%s","""
+            m = f"{args.to_c()});"
+            n = "}"
+            s = a + b + c + d + e + f + g + h + i + j + k + l + m + n
+            text = text + s
+        return text
+
+        #self.name = "printf"
+        #s = ""
+        #for arg in self.arguments:
+        #    if type(arg.value).__name__ == "str":
+        #        s = s + arg.to_c() + ","
+        #    if type(arg.value).__name__ == "int":
+        #        s = s + "%d,"
+        #    if type(arg.value).__name__ == "float":
+        #        s = s + "%f,"
+        #    if type(arg.value).__name__ == "bool":
+        #        s = s + "%b,"
+        #return s
+
+
+
 
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):

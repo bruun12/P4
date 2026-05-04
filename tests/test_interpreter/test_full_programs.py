@@ -21,8 +21,8 @@ def test_medium_program():
                             } """)
     assert correctLines == [
         "void main() {",
-        """printf("Hello World!");""",
-        """printf("I am learning Cimple.");""",
+        """if(sizeof("Hello World!")==8){printf("%f","Hello World!");}else if(sizeof("Hello World!")==4){printf("%d","Hello World!");}else if(sizeof("Hello World!")==1){printf("%s","Hello World!" ? "true" : "false");}else{printf("%s","Hello World!");};""",
+        """if(sizeof("I am learning Cimple.")==8){printf("%f","I am learning Cimple.");}else if(sizeof("I am learning Cimple.")==4){printf("%d","I am learning Cimple.");}else if(sizeof("I am learning Cimple.")==1){printf("%s","I am learning Cimple." ? "true" : "false");}else{printf("%s","I am learning Cimple.");};""",
         "return;",
         "}"
     ]
@@ -49,8 +49,8 @@ def test_big_program():
             "return (a + b);",
             "}",         
             "void main() {",
-            """char* text[] = "This is a test";""",
-            "printf(text);", 
+            """char text[] = "This is a test";""",
+            """if(sizeof(text)==8){printf("%f",text);}else if(sizeof(text)==4){printf("%d",text);}else if(sizeof(text)==1){printf("%s",text ? "true" : "false");}else{printf("%s",text);};""",
             "int a = 8;",
             "while ((5 < a))",
             "{",
