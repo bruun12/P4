@@ -435,6 +435,14 @@ class TypeChecker:
                     ErrorCode.INVALID_DECLARED_TYPE,
                     f"Array '{stmt.name}' cannot have element type void."
                     )
+            
+            size_type = self.check_expression(stmt.size, env)
+            if size_type != ERROR and size_type != INTEGER:
+                self.report(
+                    stmt.size,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Array size must be integer, got {type_name(size_type)}."
+                )
             #Create ArrayType object
             array_type_size = ArrayType(element_type, stmt.size.value)
         
