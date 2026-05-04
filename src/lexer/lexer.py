@@ -1,6 +1,6 @@
 from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS
 
-from error_handling import LexerError
+from error_handling import LexerError, ErrorCode
 
 
 class Lexer:
@@ -47,7 +47,7 @@ class Lexer:
 
         while (self.current_char() != '*' or self.peek_next_char() != '/'):
             if self.position >= self.length:
-                raise LexerError("Comment is never ended, please put */", 420, startColumn, startLine)
+                raise LexerError("Comment is never ended, please put */", ErrorCode.UNTERMINATED_COMMENT, startColumn, startLine)
             self.advance()  
         self.advance()
         self.advance()
@@ -78,7 +78,7 @@ class Lexer:
         number_str = self.source[startPos:self.position]
 
         if number_str.count(".") > 1:
-            raise LexerError("A error on line: " + str(startLine) + " Invalid number: a number can only have one punctuation", 12, startLine, startColumn)
+            raise LexerError("A error on line: " + str(startLine) + " Invalid number: a number can only have one punctuation", ErrorCode.INVALID_NUMBER, startLine, startColumn)
 
         if '.' in number_str:
             return Token(TokenType.DOUBLE, float(number_str), startLine, startColumn)
@@ -114,7 +114,7 @@ class Lexer:
         startPos = self.position
         while (self.current_char() != '"'):
             if (self.position >= self.length):
-                raise LexerError("Missing closing quote", 6969, startLine, startColumn)
+                raise LexerError("Missing closing quote", ErrorCode.UNTERMINATED_STRING, startLine, startColumn)
             self.advance()
         value = self.source[startPos:self.position]
 
@@ -193,7 +193,7 @@ class Lexer:
                 self.advance()
 
             else:
-                raise LexerError("Invalid token", 1, self.line, self.column)
+                raise LexerError("Invalid token", ErrorCode.INVALID_CHARACTER, self.line, self.column)
             
             if token is not None:
                 self.add_token(token)

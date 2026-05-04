@@ -16,6 +16,10 @@ FROM base AS production
 
 CMD [ "python", "main.py" ]
 
-FROM base AS dev
+FROM base AS api
 
 CMD [ "tail -f", "/dev/null" ]
+
+FROM base AS server
+
+CMD ["uvicorn", "serverhelper:app", "--host", "0.0.0.0", "--port", "8000"]
