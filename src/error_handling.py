@@ -4,6 +4,8 @@ from enum import Enum
 class ErrorCode(Enum):
     INVALID_CHARACTER = 1
     UNTERMINATED_STRING = 2
+    UNTERMINATED_COMMENT = 3
+    INVALID_NUMBER = 4
 
     STRUCTURE_ERROR = 21
     SEMICOLON_ERROR = 22
