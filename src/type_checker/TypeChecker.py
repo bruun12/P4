@@ -82,7 +82,7 @@ class FunctionType(Type):
     Because programs are now function-centered, the checker
     stores function signatures separately from local variables.
     """
-    parameter_types: tuple[Type, ...]
+    parameter_types: tuple[Type, ...] 
     return_type: Type
 
 
@@ -275,6 +275,10 @@ class TypeChecker:
         except TypeCheckError as err:
             self.report(node, err.error_code, err.message)
             return ERROR
+    
+    def is_printable_type(self, t: Type) -> bool:
+        return t in {INTEGER, DOUBLE, BOOLEAN, STRING}
+
 
     def check(self, program: Program) -> None:
 
@@ -431,6 +435,14 @@ class TypeChecker:
                     ErrorCode.INVALID_DECLARED_TYPE,
                     f"Array '{stmt.name}' cannot have element type void."
                     )
+            
+            size_type = self.check_expression(stmt.size, env)
+            if size_type != ERROR and size_type != INTEGER:
+                self.report(
+                    stmt.size,
+                    ErrorCode.TYPE_MISMATCH_ERROR,
+                    f"Array size must be integer, got {type_name(size_type)}."
+                )
             #Create ArrayType object
             array_type_size = ArrayType(element_type, stmt.size.value)
         
@@ -692,6 +704,28 @@ class TypeChecker:
 
     def check_expression(self, expr: Expression, env: TypeEnvironment) -> Type:
         if isinstance(expr, FunctionCall):
+            
+            if expr.name == "print":
+                if len(expr.arguments) == 0:
+                    self.report(
+                        expr,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        "Function 'print' expects at least 1 argument."
+                    )
+                    return ERROR
+
+                for argument in expr.arguments:
+                    argument_type = self.check_expression(argument, env)
+
+                    if argument_type != ERROR and not self.is_printable_type(argument_type):
+                        self.report(
+                            argument,
+                            ErrorCode.TYPE_MISMATCH_ERROR,
+                            f"Function 'print' cannot print value of type {type_name(argument_type)}."
+                        )
+
+                return VOID
+
             #Check if the function name exists in the function environment 
             #Return function object if it exist, else return type check error
             try:    
