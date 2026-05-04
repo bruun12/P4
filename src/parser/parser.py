@@ -150,7 +150,7 @@ class Parser:
         if self.match(TokenType.LBRACE):
             size = self.parse_expression()
             self.consume(TokenType.RBRACE)
-            if self.match(TokenType.ASSIGN): #integer a[] = {1,2,3,4}
+            if self.match(TokenType.ASSIGN): #integer a[] = [1,2,3,4]
                 if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)

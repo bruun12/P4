@@ -68,10 +68,10 @@ tasks.count =
 /*-------------------------------------------------*/
 
 integer main(){
-    integer i = 1;
+    integer i = 0;
     while(i < 5){
         i = i + 1;
-        print("%d",i);
+        print(i, ",");
     }
     return 0;
 }`;
@@ -86,11 +86,10 @@ Make functions that can subtract, multiply and devide (remember to do a 0 check)
 integer main(){
     double d = 5.5;
     integer a = 0;
-    double result;
 
     if(true){
-        result = d / a;
-        print("%lf", result);
+        double result = d / a;
+        print(result);
     } else{
         print("The denominator is 0 making it an illegal operation");
     }
@@ -100,8 +99,7 @@ integer main(){
 tasks.sum = 
 `/*---------------------Task 4---------------------*/
 /*Here is code that uses a function to get the sum of two numbers
-Make functions that subtract and devide
-Hint: use <, >, <=, >=, == inside "if()"*/
+Make functions that subtract multiply and devide
 /*Bonus: Can it all be written in one function?*/
 /*-------------------------------------------------*/
 
@@ -110,10 +108,9 @@ integer sum(integer a, integer b){
 }
 
 integer main(){
-    integer i = 1;
-    while(i < 5){
-        print("%d",i);
-    }
+    integer number = sum(1,2);
+
+    print(number);
     return 0;
 }`; 
 
@@ -136,6 +133,22 @@ integer main(){
         print("\\n");
         i = i + 1;
     }
+    return 0;
+}
+`
+
+tasks.array =
+`/*---------------------Task 6---------------------*/
+/*Here is an array can that prints index 0
+can you print the whole array using a while loop?*/
+/*Bonus: can you sort the array*/
+/*-------------------------------------------------*/
+
+integer main(){
+    integer array[6] = [6,2,5,1,3,4];
+    integer index = 0;
+    
+    print(array[index]);
     return 0;
 }
 `
