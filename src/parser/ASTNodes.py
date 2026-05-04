@@ -45,8 +45,8 @@ class Program(Node):
                 #include <stdlib.h>
                 #include <stdio.h>
                 #include <stdbool.h>
-                #define sametypeof(A,B) _Generic(A, typeof(B): true, default: false)
-                    {functionList}
+                #define sametypeof(x, y) _Generic((x),typeof((y) + 0): 1, default: 0)
+                {functionList}
                 """
 
 class Function(Node):
@@ -377,13 +377,13 @@ class FunctionCall(Expression):
             s = f"""
                 if (sametypeof(1.2,{arg.to_c()})){{
                     printf("%f",{arg.to_c()});
+                }} else if (sizeof({arg.to_c()}) == 1) {{
+                    printf("%s", {arg.to_c()} ? "true" : "false");
                 }} else if (sametypeof(1, {arg.to_c()})){{
                     printf("%d", {arg.to_c()});
                 }} else if (sametypeof("string",{arg.to_c()})){{
                     printf("%s",{arg.to_c()});
-                }} else {{
-                    printf("%s", {arg.to_c()} ? "true" : "false");
-                }}
+                }} 
                 """
             text = text + s
         return text
