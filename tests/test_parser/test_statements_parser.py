@@ -60,7 +60,23 @@ def test_statements_expression():
     lex.lexer()
     parser = Parser(lex.tokens)
     parser.statement()
+    
+def test_expression_statement_add():
+    lex = Lexer("""
+                x + a; 
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    parser.expression_statement()
 
+def test_expression_statement_equal():
+    lex = Lexer("""
+                x == a; 
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    parser.expression_statement()
+ 
 # Array declaration
 def test_statements_array_declaration_with_values():
     lex = Lexer("""

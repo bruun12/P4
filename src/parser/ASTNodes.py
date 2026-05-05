@@ -42,9 +42,11 @@ class Program(Node):
             functionList += func.to_c() + "\n"
 
         return f"""
-                    #include <stdio.h>
-                    #include <stdbool.h>
-                    {functionList}
+                #include <stdlib.h>
+                #include <stdio.h>
+                #include <stdbool.h>
+                #define sametypeof(x, y) _Generic((x),typeof((y) + 0): 1, default: 0)
+                {functionList}
                 """
 
 class Function(Node):
@@ -115,8 +117,9 @@ class BlockStatement(Statement):
         for stmt in self.statements:
             stmtList += stmt.to_c() + "\n"
         return f"""{{
-        {stmtList}
-        }}"""
+            {stmtList}
+            }}"""
+
 
 class VarDeclaration(Statement):
     def __init__(self, type: str, name: str, value: Expression, line: int, column: int):
@@ -169,7 +172,7 @@ class AssignStatement(Statement):
         if self.offset is None:
             return f"{self.name} = {self.value.to_c()};"
         else:
-            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()}"
+            return f"{self.name}[{self.offset.to_c()}] = {self.value.to_c()};"
 
 class IfStatement(Statement):
     def __init__(self, condition: Expression, then_branch: Statement, else_branch: Statement | None, line: int, column: int):
@@ -249,12 +252,12 @@ class ExpressionStatement(Statement):
         return f"{self.expression.to_c()};"
 
 class ArrayDeclaration(Statement):
-    def __init__(self, type: str, name: str, elements: list, line: int, column: int):
+    def __init__(self, type: str, name: str, elements: list, size: Expression, line: int, column: int):
         super().__init__(line, column)
         self.type = type
         self.name = name 
         self.elements = elements
-        self.size = len(elements)
+        self.size = size
     
     def to_dict(self):
         return {
@@ -294,7 +297,13 @@ class ArrayDeclarationEmpty(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'double',
+            'string': "char*",
+            'boolean': "bool"
         }
+
+        if self.type == 'string':
+            return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
         return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
@@ -307,7 +316,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return {"type": "integer", "value": self.value}
-        elif value_type == "float":
+        elif value_type == "double":
             return {"type": "double", "value": self.value}
         elif value_type == "bool":
             return {"type": "boolean", "value": self.value}
@@ -320,7 +329,7 @@ class Literal(Expression):
         value_type = type(self.value).__name__
         if value_type == "int":
             return f"{self.value}"
-        if value_type == "float":
+        if value_type == "double":
             return f"{self.value}"
         if value_type == "bool":
             return f"{self.value}".lower()
@@ -357,14 +366,33 @@ class FunctionCall(Expression):
         }
 
     def to_c(self):
-        argString = ""
-        for arg in self.arguments:
-            argString += arg.to_c() + ","
         if(self.name == "print"):
-            self.name = "printf"
+            return self.to_print()
+        else:
+            argString = ""
+            for arg in self.arguments:
+                argString += arg.to_c() + ","
+            
 
-        #argString[:-1] removes the last comma
-        return f"{self.name}({argString[:-1]})"
+            #argString[:-1] removes the last comma
+            return f"{self.name}({argString[:-1]})"
+    
+    def to_print(self):
+        text = ""
+        for arg in self.arguments:
+            s = f"""
+                if (sametypeof(1.2,{arg.to_c()})){{
+                    printf("%f",{arg.to_c()});
+                }} else if (sizeof({arg.to_c()}) == 1) {{
+                    printf("%s", {arg.to_c()} ? "true" : "false");
+                }} else if (sametypeof(1, {arg.to_c()})){{
+                    printf("%d", {arg.to_c()});
+                }} else if (sametypeof("string",{arg.to_c()})){{
+                    printf("%s",{arg.to_c()});
+                }} 
+                """
+            text = text + s
+        return text
 
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
@@ -398,7 +426,7 @@ class Binary(Expression):
         }
         return {
             "type": "BinaryOp",
-            "op": op_map.get(self.operator, self.operator),
+            "op": op_map[self.operator],
             "left": self.left.to_dict(),
             "right": self.right.to_dict()
         }
@@ -408,8 +436,8 @@ class Binary(Expression):
             '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
             'AND': '&&', 'OR': '||'
-        }
-        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
+        } 
+        return f"({self.left.to_c()} {op_map[self.operator]} {self.right.to_c()})"
     
 class ArrayAccess(Expression):
     def __init__(self, name: str, offset: Expression, line: int, column: int):

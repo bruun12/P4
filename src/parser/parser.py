@@ -26,6 +26,8 @@ class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.position = 0
+        self.errors: list[ParserError] = []
+
 
     #Return current token
     def current(self) -> Token:
@@ -33,7 +35,7 @@ class Parser:
 
     #Return previous token
     def previous(self) -> Token:
-        if self.position-1 is None:
+        if self.position == 0:
             return None
         return self.tokens[self.position-1]
 
@@ -48,7 +50,10 @@ class Parser:
     def consume(self, token_type: TokenType) -> Token:
         if self.current().type == token_type:
             return self.advance()
-        raise self.error(ErrorCode.STRUCTURE_ERROR)
+        raise self.error(
+            f"Parser Error: Unexpected '{self.current().value}' after '{"Start" if self.previous() is None else self.previous().value}'",
+            ErrorCode.STRUCTURE_ERROR
+        )
 
     #Return true if current token is of type "EOF"
     def is_at_end(self) -> bool:
@@ -75,18 +80,21 @@ class Parser:
             return None
         return self.tokens[self.position+1]
 
-    #Return parser error with costum message
-    def error(self, error_code: ErrorCode) -> ParserError:
-        return ParserError(error_code, self.current(), self.previous())
-
+    #Return parser error with custom message
+    def error(self, message: str, error_code: ErrorCode):
+        return ParserError(message, error_code, self.current().line, self.current().column)
 
     def parse(self) -> Program:
         functions = []
-        while not self.is_at_end():
-            functions.append(self.function())
-        return Program(functions, self.current().line, self.current().column)
-
+        try:
+            while not self.is_at_end():
+                functions.append(self.function())
+            return Program(functions, self.current().line, self.current().column)
+        except ParserError as err:
+            self.errors.append(err)
+            raise
     def function(self) -> Function:
+        
         type = self.consume(TokenType.TYPE)
         name = self.consume(TokenType.IDENTIFIER)
         parameters = self.parameters()
@@ -125,6 +133,9 @@ class Parser:
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
             return self.expression_statement()
         
+        if self.current().type == TokenType.IDENTIFIER and self.peek().type != TokenType.ASSIGN and self.peek().type != TokenType.LBRACE:
+            return self.expression_statement()
+        
         if self.match(TokenType.IDENTIFIER):
             return self.assign_statement()
 
@@ -134,16 +145,15 @@ class Parser:
         type = self.previous()
         name = self.advance() #integer b = a[3]
         
-        if self.match(TokenType.LBRACE): 
-            if self.match(TokenType.RBRACE): #integer a[] = {1,2,3,4}
-                self.consume(TokenType.ASSIGN) 
-                if self.check(TokenType.LCBRACE):
+        if self.match(TokenType.LBRACE):
+            size = self.parse_expression()
+            self.consume(TokenType.RBRACE)
+            if self.match(TokenType.ASSIGN): #integer a[] = [1,2,3,4]
+                if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)
-                    return ArrayDeclaration(type.value, name.value, elements, name.line, name.column)
+                    return ArrayDeclaration(type.value, name.value, elements, size, name.line, name.column)
             else: # Integer arr[3]
-                size = self.parse_expression()
-                self.consume(TokenType.RBRACE)
                 self.consume(TokenType.SEMICOLON)
                 return ArrayDeclarationEmpty(type.value, name.value, size, name.line, name.column)
         
@@ -154,13 +164,13 @@ class Parser:
         return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
     def parse_array_literal(self) -> list:
-        self.consume(TokenType.LCBRACE)  # spiser {
+        self.consume(TokenType.LBRACE)  # spiser {
         elements = []
-        if not self.check(TokenType.RCBRACE):
+        if not self.check(TokenType.RBRACE):
             elements.append(self.parse_expression())
         while self.match(TokenType.COMMA):
             elements.append(self.parse_expression())
-        self.consume(TokenType.RCBRACE)  # spiser ]
+        self.consume(TokenType.RBRACE)  # spiser ]
         return elements
     
     def block_statement(self) -> BlockStatement:
@@ -292,7 +302,7 @@ class Parser:
         if self.match(TokenType.INTEGER):
             return Literal(tok.value, tok.line, tok.column)
         
-        if self.match(TokenType.FLOAT):
+        if self.match(TokenType.DOUBLE):
             return Literal(tok.value, tok.line, tok.column)
         
         if self.match(TokenType.TRUE):
@@ -326,7 +336,13 @@ class Parser:
         if self.match(TokenType.LPAREN):
             expr = self.parse_expression()
             if not self.match(TokenType.RPAREN):
-                raise self.error(ErrorCode.STRUCTURE_ERROR) 
+                raise self.error(
+                    f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value}'",
+                    ErrorCode.STRUCTURE_ERROR
+                    ) 
             return expr
 
-        raise self.error(ErrorCode.UNEXPECTED_TOKEN_ERROR)
+        raise self.error(
+            f"Parser Error: Unexpected Token '{self.current().value}'",
+            ErrorCode.UNEXPECTED_TOKEN_ERROR
+            )

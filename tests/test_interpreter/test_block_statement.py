@@ -24,5 +24,5 @@ def test_block_statement_with_3():
     assert correctLines[0] == "{"
     assert correctLines[1] == "int y = 3;"
     assert correctLines[2] == "int x = 2;"
-    assert correctLines[3] == "float abe = 4.2;"
+    assert correctLines[3] == "double abe = 4.2;"
     assert correctLines[4] == "}"

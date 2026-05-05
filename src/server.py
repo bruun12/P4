@@ -23,6 +23,13 @@ async def style():
 async def script():
     return FileResponse("webapp/src/app.js")
 
+@app.get("/documentation")
+async def documentation():
+    return FileResponse("webapp/cimple-documentation-english.pdf")
+
+@app.get("/dokumentation")
+async def dokumentation():
+    return FileResponse("webapp/cimple-dokumentation-dansk.pdf")
 
 @app.post("/api/compile")
 def compile_code(body: dict):
@@ -46,12 +53,13 @@ def compile_code(body: dict):
             capture_output=True,
             text=True,
             timeout=5,
-            cwd=cwd_path  # Kør fra /src mappen
+            cwd=cwd_path 
         )
+
 
         if cimpleToC.returncode != 0:
             return cimpleToC
-
+        
         cToExecutable = subprocess.run(
             ["gcc", "output.c", "-o", "output"],
             capture_output=True,
@@ -59,6 +67,7 @@ def compile_code(body: dict):
             timeout=5,
             cwd=cwd_path  # Kør fra /src mappen
         )
+
 
         if cToExecutable.returncode != 0:
             return cToExecutable
