@@ -792,12 +792,6 @@ class TypeChecker:
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
                 return ERROR
-            if expr.offset.value < 0:
-                self.report(
-                    expr.offset,
-                    ErrorCode.INVALID_ARGUMENT_COUNT,
-                    f"Array index must be positive, got {expr.offset.value}."
-                )
             return array_type.element_type
         
         if isinstance(expr, Literal):

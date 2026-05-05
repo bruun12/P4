@@ -48,12 +48,10 @@ class Parser:
     #If token is of specific type; advance position and return previous token.
     #If not of specific type; raise error with argument message.
     def consume(self, token_type: TokenType) -> Token:
-        
-        
         if self.current().type == token_type:
             return self.advance()
         raise self.error(
-            f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value}'",
+            f"Parser Error: Unexpected '{self.current().value}' after '{"Start" if self.previous() is None else self.previous().value}'",
             ErrorCode.STRUCTURE_ERROR
         )
 

@@ -297,7 +297,13 @@ class ArrayDeclarationEmpty(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'double',
+            'string': "char*",
+            'boolean': "bool"
         }
+
+        if self.type == 'string':
+            return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
         return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
@@ -420,7 +426,7 @@ class Binary(Expression):
         }
         return {
             "type": "BinaryOp",
-            "op": op_map.get(self.operator, self.operator),
+            "op": op_map[self.operator],
             "left": self.left.to_dict(),
             "right": self.right.to_dict()
         }
@@ -431,7 +437,7 @@ class Binary(Expression):
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
             'AND': '&&', 'OR': '||'
         }
-        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
+        return f"({self.left.to_c()} {op_map[self.operator]} {self.right.to_c()})"
     
 class ArrayAccess(Expression):
     def __init__(self, name: str, offset: Expression, line: int, column: int):

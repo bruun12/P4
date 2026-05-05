@@ -46,7 +46,7 @@ compileBtn.addEventListener("click", async () =>{
 
 
 function setCode(){
-    editor.value = tasks[taskDropDown.value];
+    editor.value = tasks[taskDropDown.value] ? tasks[taskDropDown.value] : "";
 }
 
 

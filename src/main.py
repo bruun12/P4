@@ -12,15 +12,14 @@ def interprete_source(source: str) -> str:
     ast = parser.parse()
   
     
-    #checker = TypeChecker(source)
-    #checker.check(ast)
+    checker = TypeChecker(source)
+    checker.check(ast)
 
-    #if checker.errors:
-    #    for err in checker.formatted_errors():
-    #        print(err, file=sys.stderr)
-    #    return None
+    if checker.errors:
+        for err in checker.formatted_errors():
+            print(err, file=sys.stderr)
+        return None
 
-    
     return ast.to_c()
 
 
