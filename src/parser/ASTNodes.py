@@ -436,7 +436,7 @@ class Binary(Expression):
             '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
             'AND': '&&', 'OR': '||'
-        }
+        } 
         return f"({self.left.to_c()} {op_map[self.operator]} {self.right.to_c()})"
     
 class ArrayAccess(Expression):

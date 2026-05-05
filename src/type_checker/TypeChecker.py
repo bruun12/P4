@@ -866,7 +866,7 @@ class TypeChecker:
                 return ERROR
 
             # Arithmetic
-            if op in {"+", "-", "*", "/", "%"}:
+            if op in {"+", "-", "*", "/", "MOD"}:
                 if op == "+" and left_type == STRING and right_type == STRING:
                     return STRING
 
@@ -907,7 +907,7 @@ class TypeChecker:
                 return BOOLEAN
 
             # Logical 
-            if op in {"&&", "||"}:
+            if op in {"AND", "OR"}:
                 if left_type != BOOLEAN or right_type != BOOLEAN:
                     self.report(
                         expr,
