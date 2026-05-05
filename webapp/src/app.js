@@ -8,8 +8,8 @@ const tasks = new Object();
 
 document.addEventListener("DOMContentLoaded", defineTasks());
 taskDropDown.addEventListener("change", () => {setCode();});
-clearBtn.addEventListener("click", () => {editor.value = "";});
-resetBtn.addEventListener("click", () =>{setCode();});
+clearBtn.addEventListener("click", () => {editor.value = ""; output.value="";});
+resetBtn.addEventListener("click", () =>{setCode(); output.value="";});
 
 editor.addEventListener("keydown", (e) => {
     if (e.keyCode === 9) {
