@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from dataclasses import dataclass
+from error_handling import ErrorCode, TypeCheckError, format_compiler_error
 
 from parser.ASTNodes import (
     AssignStatement,
@@ -25,73 +25,23 @@ from parser.ASTNodes import (
     FunctionCall,
     ArrayAccess
 )
-from error_handling import ErrorCode, TypeCheckError, format_compiler_error
+from type_checker.TypeCheckerClassesAndHelpers import (
+    Type,
+    INTEGER,
+    DOUBLE,
+    BOOLEAN,
+    STRING,
+    VOID,
+    ERROR,
+    ArrayType,
+    FunctionType,
+    type_name,
+    is_numeric,
+    can_assign,
+    numeric_result_type,
+    parse_declared_type
+)
 
-
-class Type:
-    pass
-
-
-@dataclass(frozen=True)
-class IntegerType(Type):
-    pass
-
-
-@dataclass(frozen=True)
-class DoubleType(Type):
-    pass
-
-
-@dataclass(frozen=True)
-class BooleanType(Type):
-    pass
-
-
-@dataclass(frozen=True)
-class StringType(Type):
-    pass
-
-@dataclass(frozen=True)
-class VoidType(Type):
-    pass
-
-
-@dataclass(frozen=True)
-class ErrorType(Type):
-    pass
-
-
-@dataclass(frozen=True)
-class ArrayType(Type):
-    """
-    Array type with an element type.
-
-    Example:
-        ArrayType(INTEGER, 1)
-    """
-    element_type: Type
-    size: int
-
-
-@dataclass(frozen=True)
-class FunctionType(Type):
-    """
-    Function signature type.
-
-    CHANGE APPLIED IN TYPECHECKER DESIGN:
-    Because programs are now function-centered, the checker
-    stores function signatures separately from local variables.
-    """
-    parameter_types: tuple[Type, ...] 
-    return_type: Type
-
-
-INTEGER = IntegerType()
-DOUBLE = DoubleType()
-BOOLEAN = BooleanType()
-STRING = StringType()
-VOID = VoidType()
-ERROR = ErrorType()
 
 # ============================================================
 # ENVIRONMENTS
@@ -116,7 +66,7 @@ class TypeEnvironment:
             return self.values[name]
 
         if self.parent is not None:
-            return self.parent.get(name)
+            return self.parent.get(name) 
 
         raise TypeCheckError(f"Undefined variable '{name}'.", ErrorCode.UNDEFINED_VARIABLE_ERROR, 0, 0)
 
@@ -137,78 +87,6 @@ class FunctionEnvironment:
         raise TypeCheckError(f"Undefined function '{name}'.", ErrorCode.UNDEFINED_FUNCTION_ERROR, 0, 0)
 
 
-# ============================================================
-# HELPERS
-# ============================================================
-# Returns matching string of type object.
-# Mainly used for printing.
-def type_name(t: Type) -> str:
-    if t == INTEGER:
-        return "integer"
-    if t == DOUBLE:
-        return "double"
-    if t == BOOLEAN:
-        return "boolean"
-    if t == STRING:
-        return "string"
-    if t == VOID:
-        return "void"
-    if t == ERROR:
-        return "<error>"
-    if isinstance(t, ArrayType):
-        return f"{type_name(t.element_type)}[]"
-    if isinstance(t, FunctionType):
-        # 1. Convert each type object into its string name (e.g., [integer, float])
-        name_list = []
-        for p in t.parameter_types:
-            name_list.append(type_name(p))
-
-        # 2. Join them with commas (e.g., "integer, float")
-        params_string = ", ".join(name_list)
-
-        # 3. Build the final function signature
-        return f"function({params_string}) -> {type_name(t.return_type)}"
-    return repr(t)
-
-
-def is_numeric(t: Type) -> bool:
-    return t == INTEGER or t == DOUBLE
-
-
-def can_assign(target: Type, value: Type) -> bool:
-
-    if target == value:
-        return True
-
-    if target == DOUBLE and value == INTEGER:
-        return True
-
-    if isinstance(target, ArrayType) and isinstance(value, ArrayType):
-        return can_assign(target.element_type, value.element_type)
-
-    return False
-
-
-def numeric_result_type(left: Type, right: Type) -> Type:
-    if left == DOUBLE or right == DOUBLE:
-        return DOUBLE
-    return INTEGER
-
-
-def parse_declared_type(declared_type: str) -> Type:
-
-    if declared_type == "integer":
-        return INTEGER
-    if declared_type == "double":
-        return DOUBLE
-    if declared_type == "boolean":
-        return BOOLEAN
-    if declared_type == "string":
-        return STRING
-    if declared_type == "void":
-        return VOID
-
-    raise TypeCheckError(f"Unknown declared type '{declared_type}'.", ErrorCode.UNKNOWN_DECLARED_TYPE, 0, 0)
 
 
 class TypeChecker:
@@ -754,19 +632,18 @@ class TypeChecker:
                     f"Undefined variable '{expr.name}'."
                 )
                 return ERROR
-        
+
             if not isinstance(array_type, ArrayType):
                 self.report(
                     expr,
                     ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Variable '{expr.name}' is not an array, so it cannot be indexed."
                 )
-                # Still check the offset so errors inside it are not hidden
                 self.check_expression(expr.offset, env)
                 return ERROR
-        
+
             offset_type = self.check_expression(expr.offset, env)
-        
+
             if offset_type != ERROR and offset_type != INTEGER:
                 self.report(
                     expr.offset,
@@ -774,14 +651,24 @@ class TypeChecker:
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
                 return ERROR
-            if expr.offset.value < 0:
-                self.report(
-                    expr.offset,
-                    ErrorCode.INVALID_ARGUMENT_COUNT,
-                    f"Array index must be positive, got {expr.offset.value}."
-                )
+
+            # Only do value-based checks when index is a literal integer
+            if isinstance(expr.offset, Literal) and isinstance(expr.offset.value, int):
+                if expr.offset.value < 0:
+                    self.report(
+                        expr.offset,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        f"Array index must be non-negative, got {expr.offset.value}."
+                    )
+                elif expr.offset.value >= array_type.size:
+                    self.report(
+                        expr.offset,
+                        ErrorCode.INVALID_ARGUMENT_COUNT,
+                        f"Array index {expr.offset.value} is out of range for array '{expr.name}' of size {array_type.size}."
+                    )
+
             return array_type.element_type
-        
+
         if isinstance(expr, Literal):
             value = expr.value
 
@@ -854,7 +741,7 @@ class TypeChecker:
                 return ERROR
 
             # Arithmetic
-            if op in {"+", "-", "*", "/", "%"}:
+            if op in {"+", "-", "*", "/", "MOD"}:
                 if op == "+" and left_type == STRING and right_type == STRING:
                     return STRING
 
@@ -895,7 +782,7 @@ class TypeChecker:
                 return BOOLEAN
 
             # Logical 
-            if op in {"&&", "||"}:
+            if op in {"AND", "OR"}:
                 if left_type != BOOLEAN or right_type != BOOLEAN:
                     self.report(
                         expr,
