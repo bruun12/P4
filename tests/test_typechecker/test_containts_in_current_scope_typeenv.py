@@ -1,18 +1,16 @@
 from type_checker.TypeChecker import TypeEnvironment, STRING
 
-def test_contains():
-    obj_type = TypeEnvironment()
-    obj_type.define("hej med dig din seje reje", STRING)
+# tjekker om miljøet indeholder det defineret objekt, 
+# og ikke indeholder et udefineret objekt
+def test_contains_and_not_contains():
+    i_miljø = TypeEnvironment()
+    i_miljø.define("ligger i miljøet", STRING)
 
-    assert obj_type.contains_in_current_scope("hej med dig din seje reje")
+    assert i_miljø.contains_in_current_scope("ligger i miljøet")
+    assert not i_miljø.contains_in_current_scope("ligger ikke i miljøet")
 
-def test_does_not_contain():
-    obj_type = TypeEnvironment()
-    obj_type.define("hej med dig din seje reje", STRING)
-
-    assert not obj_type.contains_in_current_scope("hej")
-
+# tjekker at miljøet SKAL indeholde et eller andet (må ikke indeholde ingenting)
 def test_contains_empty():
-    obj_type = TypeEnvironment()
+    i_miljø = TypeEnvironment()
 
-    assert not obj_type.contains_in_current_scope("")
+    assert not i_miljø.contains_in_current_scope("")

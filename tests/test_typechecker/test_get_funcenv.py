@@ -1,15 +1,17 @@
 from type_checker.TypeChecker import FunctionEnvironment, TypeCheckError, STRING, INTEGER
 import pytest
 
+# tjekker om et objekt er i det nuværende miljø
 def test_get_current_scope():
-    obj_type = FunctionEnvironment()
-    obj_type.define("hej med dig din seje reje", STRING)
+    nu_miljø = FunctionEnvironment()
+    nu_miljø.define("nuværende miljø", STRING)
 
-    assert obj_type.get("hej med dig din seje reje") == STRING
+    assert nu_miljø.get("nuværende miljø") == STRING
 
+# tjekker om den laver en error, hvis et objekt ikke ligger i det nuværende miljø
 def test_raise_error():
-    obj_type = FunctionEnvironment()
-    obj_type.define("wow du er cool", STRING)
+    nu_miljø = FunctionEnvironment()
+    nu_miljø.define("nuværende miljø", STRING)
 
     with pytest.raises(TypeCheckError):
-        obj_type.get("does_not_exist")
+        nu_miljø.get("dette objekt er udefineret")
