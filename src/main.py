@@ -38,7 +38,7 @@ integer main() {
         x = 5;
     }
 
-    while (x < 20) {
+    while (x < 20 AND x < 21) {
         x = add(x, 1);
     }
 
