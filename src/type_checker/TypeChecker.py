@@ -71,6 +71,7 @@ class TypeEnvironment:
 
 
 class FunctionEnvironment:
+    """Flat registry of function signatures collected before body checking."""
     def __init__(self):
         self.values: dict[str, FunctionType] = {}
 
@@ -85,19 +86,17 @@ class FunctionEnvironment:
             return self.values[name]
         raise TypeCheckError(f"Undefined function '{name}'.", ErrorCode.UNDEFINED_FUNCTION_ERROR, 0, 0)
 
-
-
-
 class TypeChecker:
     def __init__(self, source_code: str):
         self.source_code = source_code
         self.source_lines = source_code.splitlines()
         self.errors: list[TypeCheckError] = []
 
-        # Global function signatures live here.
+        # Pass 1 stores every function signature here so calls can be checked
+        # before or while later function bodies are analyzed.
         self.function_env = FunctionEnvironment()
 
-        # These are set while checking a function body.
+        # These fields track the active function while its body is being checked.
         self.current_function_name: str | None = None
         self.expected_return_type: Type | None = None
         self.does_return_correctly: bool 
@@ -110,7 +109,8 @@ class TypeChecker:
         self.errors.append(TypeCheckError(message, error_code, node.line, node.column))
 
     def formatted_errors(self) -> list[str]:
-        
+        # Keep source-aware formatting separate from error collection so the
+        # checker can accumulate multiple diagnostics in one pass.
         error_list = []
 
         for err in self.errors:
@@ -140,11 +140,12 @@ class TypeChecker:
 
 
     def check(self, program: Program) -> None:
-
+        # Run in two passes: first collect all signatures, then validate bodies.
         self.collect_function_signatures(program)
         self.check_all_functions(program)
 
     def collect_function_signatures(self, program: Program) -> None:
+        # This pass makes function calls order-independent.
         for function in program.functions:
             if self.function_env.contains_in_current_scope(function.name):
                 self.report(function, ErrorCode.ALREADY_DECLARED_ERROR, f"Function '{function.name}' is already declared.")
@@ -174,14 +175,15 @@ class TypeChecker:
             self.check_function(function)
 
     def check_function(self, function: Function) -> None:
-        # Every time a new function is checked, the current function name and 
-        # expected return type is set on the TypeChecker object
+        # Save outer function state in case nested checking reuses the same
+        # TypeChecker instance in the future.
         previous_function_name = self.current_function_name
         previous_expected_return_type = self.expected_return_type
 
         self.current_function_name = function.name
         self.expected_return_type = self.parse_type_node(function.return_type, function)
 
+        # Each function starts with a fresh local scope containing parameters.
         local_env = TypeEnvironment()
 
         # Add parameters as local variables
@@ -205,14 +207,14 @@ class TypeChecker:
 
             local_env.define(parameter.name, param_type)
         
+        # This flag is updated only when a structurally valid final return is seen.
         self.does_return_correctly = False
         self.check_statement(function.statement, local_env, True)
         
-       
-        # Enforce that the function returns correctly.
+        # Non-void functions must end in a valid return on the final path.
         if self.expected_return_type not in (VOID, ERROR) and not self.does_return_correctly:
             self.report(
-                function,
+                function, 
                 ErrorCode.MISSING_RETURN_ERROR,
                 f"Function '{function.name}' must include return statement at the end."
             )
@@ -228,18 +230,21 @@ class TypeChecker:
         stmt: Statement,
         env: TypeEnvironment,
         within_function: bool
-         ) -> None:
+        ) -> None:
 
         # ----------------------------------------------------
         # BlockStatement
         # ----------------------------------------------------
 
         if isinstance(stmt, BlockStatement):
+            # Blocks introduce a nested scope but inherit access to outer names.
             block_env = TypeEnvironment(parent=env)
 
             for i, inner_stmt in enumerate(stmt.statements):
                 is_last_statement = i == len(stmt.statements) - 1
 
+                # Only the last statement in the active function body may count
+                # as the function's required return statement.
                 inner_within_function = within_function and is_last_statement
 
                 self.check_statement(inner_stmt, block_env, inner_within_function)
@@ -250,11 +255,10 @@ class TypeChecker:
         # VarDeclaration
         # ----------------------------------------------------
         if isinstance(stmt, VarDeclaration):
-            #Returns a Type object that matches the type declared in the statement
-            #parse_type_node will raise an TypeCheckError and append it self.errors if type is unknown
+            # Resolve the declared type first so later checks can compare against it.
             declared_type = self.parse_type_node(stmt.type, stmt)
             
-            #Void is not allowed as a declared type
+            # Variables must always hold a material value type.
             if declared_type == VOID:
                 self.report(
                     stmt, 
@@ -263,14 +267,16 @@ class TypeChecker:
                     )
             value_type = self.check_expression(stmt.value, env)
             
-            #Check if a variable name already is in the environment
+            # Reject shadowing within the same scope while still allowing outer
+            # scope names to exist in parent environments.
             if env.contains_in_current_scope(stmt.name):
                 self.report(
                     stmt, 
                     ErrorCode.ALREADY_DECLARED_ERROR,
                     f"Variable '{stmt.name}' is already declared in this scope."
                     )
-            #If declared type and value type cannot be assigned
+
+            # Initializer type must be assignable to the declared variable type.
             if declared_type != ERROR and value_type != ERROR:
                 if not can_assign(declared_type, value_type):
                     self.report(
@@ -279,7 +285,9 @@ class TypeChecker:
                         f"Cannot initialize variable '{stmt.name}' of type "
                         f"{type_name(declared_type)} with value of type {type_name(value_type)}."
                     )
-            #Variable is defined in current environment
+
+            # Keep the binding even after an error so later uses report against a
+            # stable environment instead of cascading as undefined-variable errors.
             env.define(stmt.name, declared_type)
             return
 
@@ -302,7 +310,8 @@ class TypeChecker:
                     ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Array size must be integer, got {type_name(size_type)}."
                 )
-            #Create ArrayType object
+
+            # Arrays carry both element type and declared size for later bounds checks.
             array_type_size = ArrayType(element_type, stmt.size.value)
         
             if env.contains_in_current_scope(stmt.name):
@@ -319,6 +328,7 @@ class TypeChecker:
                         f" Expected {stmt.size.value} number of elements, but got {len(stmt.elements)}."
                     )
                 
+            # Every literal initializer is validated against the declared element type.
             for element in stmt.elements:
                 element_expr_type = self.check_expression(element, env)
                 if element_type != ERROR and element_expr_type != ERROR:
@@ -361,6 +371,7 @@ class TypeChecker:
                     f"Array size must be integer, got {type_name(size_type)}."
                 )
 
+            # Empty arrays still enter the environment with full static shape info.
             env.define(stmt.name, array_type_size)
             return
 
@@ -378,7 +389,7 @@ class TypeChecker:
                 )
                 target_type = ERROR
             
-            # Normal assignment: x = value;
+            # Scalar assignment reuses the same assignability rules as declarations.
             if stmt.offset is None:
                 value_type = self.check_expression(stmt.value, env)
 
@@ -393,7 +404,7 @@ class TypeChecker:
 
                 return
 
-            # Array assignment: arr[index] = value;
+            # Indexed assignment additionally validates the target shape and index.
             if target_type != ERROR and not isinstance(target_type, ArrayType):
                 self.report(
                     stmt,
@@ -414,6 +425,8 @@ class TypeChecker:
                     ErrorCode.TYPE_MISMATCH_ERROR,
                     f"Array index must be integer, got {type_name(offset_type)}."
                 )
+
+            # Literal indices are checked statically; non-literals are only type-checked.
             if isinstance(stmt.offset, Literal) and isinstance(stmt.offset.value, int):    
                 if stmt.offset.value < 0:
                     self.report(
@@ -455,6 +468,7 @@ class TypeChecker:
                     f"If condition must be boolean, got {type_name(condition_type)}."
                 )
 
+            # Branches get isolated child scopes so declarations do not leak out.
             then_env = TypeEnvironment(parent=env)
             self.check_statement(stmt.then_branch, then_env, False)
 
@@ -463,7 +477,6 @@ class TypeChecker:
 
             else_env = TypeEnvironment(parent=env)
             self.check_statement(stmt.else_branch, else_env, False)
-            # Return flow result based on if then and else block definitely return,
             return 
     
         # ----------------------------------------------------
@@ -479,6 +492,7 @@ class TypeChecker:
                     f"While condition must be boolean, got {type_name(condition_type)}."
                 )
 
+            # Loop bodies type-check in their own scope but never guarantee a return.
             body_env = TypeEnvironment(parent=env)
             self.check_statement(stmt.body, body_env, False)
 
@@ -504,6 +518,7 @@ class TypeChecker:
                     )
                 return
 
+            # Void functions may only return without a value.
             if stmt.value is None:
                 if self.expected_return_type == VOID:
                     self.does_return_correctly = True
@@ -519,7 +534,7 @@ class TypeChecker:
                 return 
            
             if self.expected_return_type == VOID:
-               
+                # Still type-check the expression to preserve diagnostics inside it.
                 self.check_expression(stmt.value, env)
                 self.report(
                     stmt.value,
@@ -527,11 +542,12 @@ class TypeChecker:
                     "Void function must not return a value."
                 )
                 self.does_return_correctly = False
-               # still check the expression so errors inside it are found
                 return
             
             value_type = self.check_expression(stmt.value, env)
 
+            # Non-void returns are validated with the same assignment rules used
+            # elsewhere, allowing compatible numeric widening if supported.
             if value_type != ERROR and not can_assign(self.expected_return_type, value_type):
                 self.report(
                     stmt.value,
@@ -563,7 +579,7 @@ class TypeChecker:
 
     def check_expression(self, expr: Expression, env: TypeEnvironment) -> Type:
         if isinstance(expr, FunctionCall):
-            
+            # `print` is treated as a built-in rather than a user-declared function.
             if expr.name == "print":
                 if len(expr.arguments) == 0:
                     self.report(
@@ -585,8 +601,7 @@ class TypeChecker:
 
                 return VOID
 
-            #Check if the function name exists in the function environment 
-            #Return function object if it exist, else return type check error
+            # User-defined calls are checked against the signature table built in pass 1.
             try:    
                 function_type = self.function_env.get(expr.name)
             except TypeCheckError:
@@ -595,7 +610,8 @@ class TypeChecker:
 
             expected_count = len(function_type.parameter_types)
             actual_count = len(expr.arguments)
-            # Compare expected parameter count to the argument count from the function call
+
+            # Arity mismatch is reported before per-argument checks to avoid index issues.
             if actual_count != expected_count:
                 self.report(
                     expr,
@@ -604,7 +620,8 @@ class TypeChecker:
                     f"but got {actual_count}."
                 )
                 return ERROR
-            #Check all argument types against the expected parameter types
+
+            # Each argument is checked independently so multiple mismatches can be reported.
             for i in range(actual_count):
                 argument_expr = expr.arguments[i]
                 parameter_type = function_type.parameter_types[i]
@@ -651,7 +668,7 @@ class TypeChecker:
                 )
                 return ERROR
 
-            # Only do value-based checks when index is a literal integer
+            # Bounds can only be checked statically when the index is a literal integer.
             if isinstance(expr.offset, Literal) and isinstance(expr.offset.value, int):
                 if expr.offset.value < 0:
                     self.report(
@@ -671,7 +688,7 @@ class TypeChecker:
         if isinstance(expr, Literal):
             value = expr.value
 
-            # bool before int because Python bool is a subclass of int
+            # `bool` must be checked before `int` because Python models bool as an int subclass.
             if isinstance(value, bool):
                 return BOOLEAN
 
@@ -727,7 +744,8 @@ class TypeChecker:
                     )
                     return ERROR
                 return BOOLEAN
-            #This should never run if parser works correctly
+
+            # Reaching this branch means the parser admitted an unsupported operator.
             self.report(expr, f"Unknown unary operator '{expr.operator}'.")
             return ERROR
 
@@ -736,10 +754,11 @@ class TypeChecker:
             right_type = self.check_expression(expr.right, env)
             op = expr.operator
 
+            # Once either side has already failed, avoid layering follow-up type noise.
             if left_type == ERROR or right_type == ERROR:
                 return ERROR
 
-            # Arithmetic
+            # Arithmetic supports numeric operators plus string concatenation for `+`.
             if op in {"+", "-", "*", "/", "MOD"}:
                 if op == "+" and left_type == STRING and right_type == STRING:
                     return STRING
@@ -756,7 +775,7 @@ class TypeChecker:
 
                 return numeric_result_type(left_type, right_type)
 
-            # Comparison
+            # Relational comparisons are numeric-only and always yield booleans.
             if op in {"<", "<=", ">", ">="}:
                 if not is_numeric(left_type) or not is_numeric(right_type):
                     self.report(
@@ -768,7 +787,7 @@ class TypeChecker:
                     return ERROR
                 return BOOLEAN
 
-            # Equality
+            # Equality is strict: both sides must have the exact same type.
             if op in {"==", "!="}:
                 if left_type != right_type:
                     self.report(
@@ -780,7 +799,7 @@ class TypeChecker:
                     return ERROR
                 return BOOLEAN
 
-            # Logical 
+            # Logical operators require boolean operands on both sides.
             if op in {"AND", "OR"}:
                 if left_type != BOOLEAN or right_type != BOOLEAN:
                     self.report(

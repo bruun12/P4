@@ -15,7 +15,7 @@ def test_within_function_in_block_stmt():
     checker = SpyChecker()
     exp_stmt = ExpressionStatement(Literal(1, 2, 3), 1, 2) #Random line and column numbers
     exp_stmt2 = ExpressionStatement(Literal(2, 3, 4), 2, 2)
-           
+
     block = BlockStatement([exp_stmt, exp_stmt2], 4,5)
     env = TypeEnvironment()
     
