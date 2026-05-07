@@ -94,7 +94,7 @@ Prog     -> FuncDef
 FuncDef  -> TYPE IDF (Param,...,Param) { Stm return Exp; } FuncDef | ε
 Stm      -> TYPE Def | IDF = Exp | if(Exp){Stm}else{Stm} | while(Exp){Stm} | skip
 Exp      -> ExpAnd | ExpOr | ExpAdd | ...
-TYPE     -> integer | doubleFloatingPoint | string | boolean | void
+TYPE     -> integer | double | string | boolean | void
 ```
 
 ---
