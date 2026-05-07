@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import can_assign, INTEGER, DOUBLE, STRING, BOOLEAN, ArrayType
+from type_checker.ClassesAndHelpers import can_assign, INTEGER, DOUBLE, STRING, BOOLEAN, ArrayType
 
 
 def test_same_type():
