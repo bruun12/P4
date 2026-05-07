@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from error_handling import ErrorCode, TypeCheckError, format_compiler_error
 
@@ -25,7 +24,7 @@ from parser.ASTNodes import (
     FunctionCall,
     ArrayAccess
 )
-from type_checker.TypeCheckerClassesAndHelpers import (
+from type_checker.ClassesAndHelpers import (
     Type,
     INTEGER,
     DOUBLE,

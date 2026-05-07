@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import type_name, ArrayType, FunctionType, Type, INTEGER, DOUBLE, BOOLEAN, VOID, STRING, ERROR
+from type_checker.ClassesAndHelpers import type_name, ArrayType, FunctionType, Type, INTEGER, DOUBLE, BOOLEAN, VOID, STRING, ERROR
 
 class DummyTest(Type):
     pass
