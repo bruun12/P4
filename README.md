@@ -27,10 +27,10 @@ Cimple is a simple, statically typed language that supports:
 
 | Feature | Details |
 |---|---|
-| **Types** | `integer`, `doubleFloatingPoint`, `string`, `boolean`, `void` |
+| **Types** | `integer`, `double`, `string`, `boolean`, `void` |
 | **Variables & Arrays** | Declaration and assignment |
 | **Functions** | With parameters and return values |
-| **Control Flow** | `if/else`, `while`, `skip` |
+| **Control Flow** | `if/else`, `while` |
 | **Arithmetic** | `+`, `-`, `*`, `/`, `MOD` |
 | **Comparisons** | `==`, `!=`, `<`, `>`, `<=`, `>=` |
 | **Logic** | `AND`, `OR`, `!` |
