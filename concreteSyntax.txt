@@ -1,18 +1,19 @@
 
-Prog            -> FuncDef                                   
+Prog            -> FuncDec                                   
 
-FuncDef         -> TYPE IDF (Param,...,Param){Stm return e;} FuncDef 
+FuncDec         -> TYPE IDF (ParamList){Stm return e;} FuncDec 
                    | \epsilon                                    
+ParamList       -> Param,...,Param | \epsilon
 Param           -> TYPE IDF                                      
 
 Stm             -> StmBStm |StmA                             
 StmB            -> StmA |\epsilon                            
-StmA            -> TYPE Def                                  
+StmA            -> TYPE Dec                                  
                    | IDF = Exp | AIDF[Exp] = Exp     
                    | if(Exp){Stm}else{Stm}| while(Exp){Stm} 
                    | {Stm} | Exp; | 
-Def             -> IDF = Exp;Stm | AIDF ArrDef
-ArrDef          -> [Exp,...,Exp];Stm | [NAT];Stm
+Dec             -> IDF = Exp;Stm | AIDF ArrDec
+ArrDec          -> = [Exp,...,Exp];Stm | [EXP];Stm
 
 Exp             -> ExpAnd
 
@@ -56,11 +57,11 @@ ExpDiv          -> ExpDivA/ExpDiv | ExpMod
 ExpDivA         -> ExpMod | \epsilon
 
 ExpMod          -> ExpModA MOD ExpMod | ExpNot
-ExpModA         -> ExpNot | \epsilon
+ExpModA         -> ExpNot | Term | \epsilon
 
-ExpNot          -> !Term
+ExpNot          -> !Term 
 
-Term            ->  INT | IDF | DOUBLE | BOOL | AIDF[NAT]| IDF(Exp,...,Exp)|(Exp)                                 
+Term            ->  INT | IDF | DOUBLE | BOOL | AIDF[Exp]| IDF(Exp,...,Exp)|(Exp)                                 
 
 FormatString    -> FormatStringA + FormatString | "String"
 FormatStringA   -> "String" | \epsilon             
@@ -73,11 +74,10 @@ NAT             -> 0 | ... | 9 | NAT0 | ... | NAT9
 INT             -> NAT | -INT                
 DOUBLE          -> INT.NAT                   
 BOOL            -> TRUE | FALSE              
-ASCII           -> Everything in ascii table 
+ASCII           -> Everything in ASCII table 
 IDF             -> a | ... | z | IDFIDF | IDFNAT                         
 AIDF            -> a | ... | z | IDFIDF | IDFNAT
-TYPE            -> integer | double 
-                   | string | boolean | void
+TYPE            -> integer | double | string | boolean | void
 
 
 
