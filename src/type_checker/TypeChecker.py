@@ -50,7 +50,7 @@ class TypeEnvironment:
     """
     Nested variable environment for parameters and local variables.
     """
-    def __init__(self, parent: "TypeEnvironment | None" = None):
+    def __init__(self, parent: TypeEnvironment | None):
         self.parent = parent
         self.values: dict[str, Type] = {}
 
@@ -184,7 +184,7 @@ class TypeChecker:
         self.expected_return_type = self.parse_type_node(function.return_type, function)
 
         # Each function starts with a fresh local scope containing parameters.
-        local_env = TypeEnvironment()
+        local_env = TypeEnvironment(None)
 
         # Add parameters as local variables
         for parameter in function.parameters:
