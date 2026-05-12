@@ -3,29 +3,16 @@ Prog            -> FuncDef
 
 FuncDef         -> TYPE IDF (Param,...,Param){Stm return e;} FuncDef 
                    | \epsilon                                    
-Param           -> TYPE IDF 
-
-
-FuncCall        -> TYPE IDF(ExpList)                        
-ExpList         -> ExpListElem | \epsilon                   
-ExpListElem     -> ExpA |Exp, ExpListElem                        
-ExpA            -> Exp                                      
-
-
-FuncCall        -> t x(ExpList);                            
-ExpList         -> ExpElemA |\epsilon                       
-ExpElemA        -> Exp | ExpElemB, ExpElemA                 
-ExpElemB        -> Exp                                       
+Param           -> TYPE IDF                                      
 
 Stm             -> StmBStm |StmA                             
 StmB            -> StmA |\epsilon                            
 StmA            -> TYPE Def                                  
-                   | IDF = Exp |AIDFArrChange      
+                   | IDF = Exp | AIDF[Exp] = Exp     
                    | if(Exp){Stm}else{Stm}| while(Exp){Stm} 
-                   | skip
-Def             -> IDF = Exp; | AIDF ArrDef
+                   | {Stm} | Exp; | 
+Def             -> IDF = Exp;Stm | AIDF ArrDef
 ArrDef          -> [Exp,...,Exp];Stm | [NAT];Stm
-ArrChange       -> =[Exp,...,Exp] | [NAT] = Exp
 
 Exp             -> ExpAnd
 
@@ -89,7 +76,7 @@ BOOL            -> TRUE | FALSE
 ASCII           -> Everything in ascii table 
 IDF             -> a | ... | z | IDFIDF | IDFNAT                         
 AIDF            -> a | ... | z | IDFIDF | IDFNAT
-TYPE            -> integer | doubleFloatingPoint 
+TYPE            -> integer | double 
                    | string | boolean | void
 
 
