@@ -17,7 +17,7 @@ def test_within_function_in_block_stmt():
     exp_stmt2 = ExpressionStatement(Literal(2, 3, 4), 2, 2)
 
     block = BlockStatement([exp_stmt, exp_stmt2], 4,5)
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     checker.check_statement(block, env, within_function=True)
     
@@ -36,7 +36,7 @@ def test_within_function_in_block_stmt_type_environment():
     exp_stmt2 = ExpressionStatement(Literal(2, 3, 4), 2, 2)
            
     block = BlockStatement([exp_stmt, exp_stmt2], 4,5)
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     checker.check_statement(block, env, within_function=True)
     
@@ -53,7 +53,7 @@ def test_within_function_in_block_stmt_stmt_order():
     exp_stmt2 = ExpressionStatement(Literal(2, 3, 4), 2, 2)
            
     block = BlockStatement([exp_stmt, exp_stmt2], 4,5)
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     checker.check_statement(block, env, within_function=True)
     stmts_seen = [call[0] for call in checker.call[1:]]
@@ -66,7 +66,7 @@ def test_within_function_false_making_inner_within_function_false():
     exp_stmt2 = ExpressionStatement(Literal(2, 3, 4), 2, 2)
            
     block = BlockStatement([exp_stmt, exp_stmt2], 4,5)
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     checker.check_statement(block, env, within_function=False)
     
@@ -83,7 +83,7 @@ def test_nested_block_stmt():
     if_block = IfStatement(Literal(True, 2, 3), exp_stmt, None, 6, 8) 
     
     block = BlockStatement([exp_stmt2, if_block], 4, 5) 
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
         
     checker.check_statement(block, env, within_function=True)
     
@@ -113,7 +113,7 @@ def test_block_stmt_parent_is_None():
     exp_stmt2 = ExpressionStatement(Literal(4, 2, 3), 1, 2)
         
     block = BlockStatement([exp_stmt, exp_stmt2], 4, 5)  
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
         
     checker.check_statement(block, env, within_function=True)
     
@@ -132,7 +132,7 @@ def test_block_stmt_empty():
     block2 = BlockStatement([], 3, 6)
     block3 = BlockStatement([], 3, 6)
     outer_block = BlockStatement([block2, block3], 4, 5)  
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
         
     checker.check_statement(outer_block, env, within_function=True)
     

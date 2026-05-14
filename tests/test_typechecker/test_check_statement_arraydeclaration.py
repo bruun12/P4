@@ -6,7 +6,7 @@ import pytest
 
 def test_valid_array_declaration():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclaration(
         type="integer",
@@ -34,7 +34,7 @@ def test_valid_array_declaration():
 
 def test_array_declaration_cannot_return_void ():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclaration(
         type="void",
@@ -55,7 +55,7 @@ def test_array_declaration_cannot_return_void ():
 
 def test_array_declaration_requires_integer_size ():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclaration(
         type="integer",
@@ -72,7 +72,7 @@ def test_array_declaration_requires_integer_size ():
 
 def test_array_declaration_duplicate_name():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt1 = ArrayDeclaration(
         type="integer",
@@ -107,7 +107,7 @@ def test_array_declaration_duplicate_name():
     
 def test_invalid_array_declaration_missing_elements ():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclaration(
         type="integer",

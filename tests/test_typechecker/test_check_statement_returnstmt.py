@@ -5,7 +5,7 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, VOID
 
 def test_valid_return_statement_integer():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = INTEGER
     checker.does_return_correctly = False
 
@@ -23,7 +23,7 @@ def test_valid_return_statement_integer():
 
 def test_valid_return_statement_void():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = VOID
     checker.does_return_correctly = False
 
@@ -41,7 +41,7 @@ def test_valid_return_statement_void():
 
 def test_invalid_return_statement_non_void_without_value():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = INTEGER
     checker.does_return_correctly = False
 
@@ -59,7 +59,7 @@ def test_invalid_return_statement_non_void_without_value():
 
 def test_invalid_return_statement_void_with_value():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = VOID
     checker.does_return_correctly = False
 
@@ -74,10 +74,10 @@ def test_invalid_return_statement_void_with_value():
     assert any(err.error_code == ErrorCode.INVALID_RETURN_ERROR for err in checker.errors)
     assert checker.does_return_correctly is False
 
-
 def test_invalid_return_statement_type_mismatch():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
+    checker.current_function_name = "function"
     checker.expected_return_type = INTEGER
     checker.does_return_correctly = False
 
@@ -95,7 +95,7 @@ def test_invalid_return_statement_type_mismatch():
 
 def test_invalid_return_statement_not_final_statement():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = INTEGER
     checker.does_return_correctly = False
 
@@ -112,7 +112,7 @@ def test_invalid_return_statement_not_final_statement():
 
 def test_invalid_return_statement_not_allowed_here():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = None
     checker.does_return_correctly = False
 

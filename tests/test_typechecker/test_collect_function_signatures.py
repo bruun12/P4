@@ -5,7 +5,7 @@ from parser.ASTNodes import (
     Program
 )
 from error_handling import ErrorCode, TypeCheckError
-from type_checker.TypeChecker import TypeChecker, Parameter
+from type_checker.TypeChecker import TypeChecker
 
 # Error with duplication of functionname
 def test_error_for_duplicated_funcs_name():

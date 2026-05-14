@@ -6,7 +6,7 @@ import pytest
 
 def test_valid_assign_statement():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     var = VarDeclaration(
         type="integer",
@@ -34,7 +34,7 @@ def test_valid_assign_statement():
     
 def test_valid_assign_statement_array():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     arr_dec = ArrayDeclaration(
         type="integer",
@@ -70,7 +70,7 @@ def test_valid_assign_statement_array():
     
 def test_invalid_assign_statement_with_unknown_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = AssignStatement(
         name="x",
@@ -85,7 +85,7 @@ def test_invalid_assign_statement_with_unknown_type():
 
 def test_assign_statement_invalid_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     var = VarDeclaration(
         type="integer",
@@ -110,7 +110,7 @@ def test_assign_statement_invalid_type():
 
 def test_assign_statement_array_invalid_element_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     arr_dec = ArrayDeclaration(
         type="integer",
@@ -143,7 +143,7 @@ def test_assign_statement_array_invalid_element_type():
 
 def test_assign_statement_array_invalid_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     var = VarDeclaration(
         type="integer",
@@ -169,7 +169,7 @@ def test_assign_statement_array_invalid_type():
 
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     arr_dec = ArrayDeclaration(
         type="integer",
@@ -202,7 +202,7 @@ def test_assign_statement_array_invalid_offset():
     
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     arr_dec = ArrayDeclaration(
         type="integer",
@@ -235,7 +235,7 @@ def test_assign_statement_array_invalid_offset():
 
 def test_assign_statement_array_invalid_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     arr_dec = ArrayDeclaration(
         type="integer",

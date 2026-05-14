@@ -49,96 +49,36 @@ integer main() {
 }
 """
 source_code1 = """
-integer add(integer a, integer b) {
-    return a + b;
-}
-
-double average(integer a, integer b) {
-    return (a + b) / 2.0;
-}
-
-boolean is_positive(integer x) {
-    return x > 0;
-}
-
-integer bump(integer x) {
-    if (x > 10) {
-        return x + 1;
+integer decide(integer a, integer b){
+    if (a > b){
+        return a;
     } else {
-        return x + 2;
+        return b;
     }
-}
-
-void fill_first(integer arr[], integer value) {
-    arr[0] = value;
-    return;
-}
-
-integer read_first(integer arr[]) {
-    return arr[0];
-}
-
-integer bad_missing_return(integer x) {
-    if (x > 0) {
-        return x;
-    }
+    return 1;
 }
 
 integer main() {
-    integer x = add(3, 4);
-    double y = average(x, 10);
-    boolean ok = is_positive(x);
+    integer c = decide(1,2);
 
-    integer nums[] = {1, 2, 3};
-    integer more[5];
-    string words[] = {"a", "b", "c"};
-
-    nums[1] = add(x, 1);
-    more[0] = nums[1];
-    x = nums[0];
-    y = average(add(1, 2), 8);
-
-    if (is_positive(x)) {
-        x = bump(x);
-    } else {
-        x = add(x, 0);
-    }
-
-    while (x < 20) {
-        x = add(x, 1);
-    }
-
-    fill_first(nums, x);
-    x = read_first(nums);
-
-    nums["bad"] = 3;           
-    x[0] = 1;                 
-    mystery(1, 2);            
-    add(1);                    
-    average("hi", 2);          
-    ok = add(1, 2);            
-    words[1] = 3;              
-    x = words[0];
-    fill_first(words, 7);      
-    nums[1] = is_positive(x);  
-
-    return x;
+    return c;
 }
 """
 
 
 def main():
+    source = source_code1
     try:
         # ----------------------------------------------------
         # LEXING
         # ----------------------------------------------------
-        lexer = Lexer(source_code)
+        lexer = Lexer(source)
         lexer.lexer()
 
         # If your lexer stores errors instead of raising them
         if hasattr(lexer, "errors") and lexer.errors:
             for err in lexer.errors:
-                print(format_compiler_error(err, source_code.splitlines()))
+                print(format_compiler_error(err, source.splitlines()))
             return
 
         # ----------------------------------------------------
@@ -152,7 +92,7 @@ def main():
         # ----------------------------------------------------
         # TYPE CHECKING
         # ----------------------------------------------------
-        checker = TypeChecker(source_code)
+        checker = TypeChecker(source)
         checker.check(program)
 
         if checker.errors:
@@ -164,10 +104,10 @@ def main():
             print("Type check passed.")
 
     except LexerError as err:
-        print(format_compiler_error(err, source_code.splitlines()))
+        print(format_compiler_error(err, source.splitlines()))
 
     except ParserError as err:
-        print(format_compiler_error(err, source_code.splitlines()))
+        print(format_compiler_error(err, source.splitlines()))
 
 
 if __name__ == "__main__":
