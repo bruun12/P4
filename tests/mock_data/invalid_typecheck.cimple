@@ -1,0 +1,34 @@
+integer add(integer a, integer b) {
+    return a + b;
+}
+float average(integer a, integer b) {
+    float x = (a + b) / 2.0; // missing return
+}
+boolean is_positive(integer x) {
+    return x > 0;
+}
+integer main() {
+    integer x = add(3, 4);
+    double y = average(x, 10);
+    boolean ok = is_positive(x);
+    integer nums = [1, 2, 3];
+    integer more[5];
+    nums[1] = add(x, 1);
+    more[0] = nums[1];
+    x = add(x, 1);
+    y = average(add(1, 2), 8);
+    if (is_positive(x)) {
+        x = add(x, 100);
+    } else {
+        x = add(x, 0);
+    }
+    undefined_variable = 5; // undefined variable
+    mystery(1, 2);          // undefined function
+    integer y = 5;          // already declared
+    x = "hello world!"      // cannot assign                     
+    add(1);                 // invalid number of arguments
+    average("hi", 2);       // invalid argument type
+    nums["bad"] = 3;        // bad array index
+    x[0] = 1;               // indexing non-array
+    return nums[1];
+}
