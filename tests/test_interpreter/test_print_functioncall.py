@@ -19,7 +19,7 @@ def test_print_func2():
                 }""")
     assert correctLines[0] == "{"
     assert correctLines[1] == "int x = 5;"
-    assert correctLines[2] == "float a = 3.2;"
+    assert correctLines[2] == "double a = 3.2;"
     assert correctLines[3] == """if(sizeof(x)==8){printf("%f",x);}else if(sizeof(x)==4){printf("%d",x);}else if(sizeof(x)==1){printf("%s",x ? "true" : "false");}else{printf("%s",x);}if(sizeof(a)==8){printf("%f",a);}else if(sizeof(a)==4){printf("%d",a);}else if(sizeof(a)==1){printf("%s",a ? "true" : "false");}else{printf("%s",a);};"""
     assert correctLines[4] == "}"
 

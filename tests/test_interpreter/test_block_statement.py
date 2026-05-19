@@ -7,7 +7,7 @@ def test_block_statement():
 def test_block_statement_with_2():
     correctLines = lineTrim("""{
                 integer x = 2;
-                integer arr[] = {1,2};
+                integer arr[2] = [1,2];
                             }
                 """)
     assert correctLines[0] == "{"

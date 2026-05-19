@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import is_numeric, INTEGER, DOUBLE, STRING, BOOLEAN, VOID
+from type_checker.ClassesAndHelpers import is_numeric, INTEGER, DOUBLE, STRING, BOOLEAN, VOID
 
 def test_valid_numbers():
     assert is_numeric(INTEGER)
