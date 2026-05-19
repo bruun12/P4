@@ -49,7 +49,7 @@ def test_big_program():
             "return (a + b);",
             "}",         
             "void main() {",
-            """char text[] = "This is a test";""",
+            """char* text = "This is a test";""",
             """if(sizeof(text)==8){printf("%f",text);}else if(sizeof(text)==4){printf("%d",text);}else if(sizeof(text)==1){printf("%s",text ? "true" : "false");}else{printf("%s",text);};""",
             "int a = 8;",
             "while ((5 < a))",
