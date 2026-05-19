@@ -391,13 +391,13 @@ class TypeChecker:
                         ErrorCode.INVALID_ARGUMENT_COUNT,
                         f"Array index must be positive, got {stmt.offset.value}."
                     )
-            if stmt.offset.value > target_type.size:
-                    self.report(
-                        stmt.offset,
-                        ErrorCode.INVALID_ARGUMENT_COUNT,
-                        f"Element assigned to array index is out of range."
-                        f" Array maximum index: {target_type.size} but tries to assign to index: {stmt.offset.value}"
-                    )                
+                if stmt.offset.value > target_type.size:
+                        self.report(
+                            stmt.offset,
+                            ErrorCode.INVALID_ARGUMENT_COUNT,
+                            f"Element assigned to array index is out of range."
+                            f" Array maximum index: {target_type.size} but tries to assign to index: {stmt.offset.value}"
+                        )                
                 
             if isinstance(target_type, ArrayType) and value_type != ERROR:
                 element_type = target_type.element_type

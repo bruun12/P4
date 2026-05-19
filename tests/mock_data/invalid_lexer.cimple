@@ -8,7 +8,7 @@ boolean reverse(boolean b){
 
 integer main(){
     /*Here is a comment*/
-    integer i = 0;
+    integ¤r i = 0;
     integer x = 0; 
     while(i < 5){
         x = add(x, 2);

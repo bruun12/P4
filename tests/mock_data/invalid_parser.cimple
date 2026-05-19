@@ -23,6 +23,6 @@ integer main(){
     } else {
         print("Hello world\n");
     }
-    print(reverse(b));
+    print(reverse(b))
     return 0;
 }
