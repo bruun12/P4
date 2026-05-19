@@ -4,7 +4,7 @@ import subprocess
 from lexer.lexer import Lexer
 from parser.parser import Parser
 from type_checker.TypeChecker import TypeChecker
-from error_handling import LexerError, ParserError, format_compiler_error
+from error_handling import LexerError, ParserError, format_compiler_error, ErrorCode
 
 def interprete_source(source: str) -> str:
     lexer = Lexer(source)
@@ -13,15 +13,15 @@ def interprete_source(source: str) -> str:
     parser = Parser(lexer.tokens)
     ast = parser.parse()
   
-    
+    """
     checker = TypeChecker(source)
     checker.check(ast)
 
     if checker.errors:
         for err in checker.formatted_errors():
             print(err, file=sys.stderr)
-        return None
-
+        return sys.exit(ErrorCode.TYPECHECKER_ERROR)
+    """
     
     return ast.to_c()
 
@@ -33,16 +33,16 @@ def main():
 
         if source is None:
             print("source is empty")
-            return sys.exit(1)
+            return sys.exit(ErrorCode.EMPTY_SOURCE_ERROR)
     else:
         print("no input provided")
-        return  sys.exit(1)
+        return  sys.exit(ErrorCode.ARGUMENT_ERROR)
 
     try:  
         c_code = interprete_source(source)
 
         if c_code is None:
-            return sys.exit(1)
+            return sys.exit(ErrorCode.EMPTY_SOURCE_ERROR)
 
         if len(sys.argv) >= 3:
             with open(sys.argv[2], "w", encoding="utf-8") as file:
@@ -78,11 +78,11 @@ def main():
 
     except LexerError as err:
         print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
-        return sys.exit(1)
+        return sys.exit(ErrorCode.LEXER_ERROR)
 
     except ParserError as err:
         print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
-        return sys.exit(1)
+        return sys.exit(ErrorCode.PARSER_ERROR)
     
 
 
