@@ -16,7 +16,7 @@ def has_error(checker, error_code):
 
 def test_unary_minus_integer():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Unary(
         operator="-",
@@ -33,7 +33,7 @@ def test_unary_minus_integer():
 
 def test_unary_minus_double():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Unary(
         operator="-",
@@ -50,7 +50,7 @@ def test_unary_minus_double():
 
 def test_unary_minus_string_is_invalid():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Unary(
         operator="-",
@@ -67,7 +67,7 @@ def test_unary_minus_string_is_invalid():
 
 def test_unary_not_boolean():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Unary(
         operator="!",
@@ -84,7 +84,7 @@ def test_unary_not_boolean():
 
 def test_unary_not_integer_is_invalid():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Unary(
         operator="!",

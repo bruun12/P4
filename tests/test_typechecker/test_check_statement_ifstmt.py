@@ -12,7 +12,7 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER
 
 def test_if_statement_valid_boolean_condition():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = IfStatement(
         condition=Literal(True, line=1, column=5),
@@ -33,7 +33,7 @@ def test_if_statement_valid_boolean_condition():
 
 def test_if_statement_invalid_condition_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = IfStatement(
         condition=Literal(123, line=1, column=5),
@@ -54,7 +54,7 @@ def test_if_statement_invalid_condition_type():
 
 def test_if_statement_checks_then_branch():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = IfStatement(
         condition=Literal(True, line=1, column=5),
@@ -83,7 +83,7 @@ def test_if_statement_checks_then_branch():
 
 def test_if_statement_checks_else_branch():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = IfStatement(
         condition=Literal(True, line=1, column=5),
@@ -116,7 +116,7 @@ def test_if_statement_checks_else_branch():
 
 def test_if_statement_then_branch_has_its_own_scope():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = IfStatement(
         condition=Literal(True, line=1, column=5),

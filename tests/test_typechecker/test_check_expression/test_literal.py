@@ -17,7 +17,7 @@ def has_error(checker, error_code):
 
 def test_integer_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal(5, line=1, column=1)
 
@@ -29,7 +29,7 @@ def test_integer_literal():
 
 def test_double_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal(5.5, line=1, column=1)
 
@@ -41,7 +41,7 @@ def test_double_literal():
 
 def test_boolean_true_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal(True, line=1, column=1)
 
@@ -53,7 +53,7 @@ def test_boolean_true_literal():
 
 def test_boolean_false_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal(False, line=1, column=1)
 
@@ -65,7 +65,7 @@ def test_boolean_false_literal():
 
 def test_string_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal("hello", line=1, column=1)
 
@@ -77,7 +77,7 @@ def test_string_literal():
 
 def test_unsupported_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Literal([1, 2, 3], line=1, column=1)
 

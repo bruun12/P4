@@ -15,7 +15,7 @@ def has_error(checker, error_code):
 
 def test_valid_array_access_returns_element_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     env.define("nums", ArrayType(INTEGER, 5))
 
     expr = ArrayAccess(
@@ -33,7 +33,7 @@ def test_valid_array_access_returns_element_type():
 
 def test_array_access_undefined_variable():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = ArrayAccess(
         name="nums",
@@ -50,7 +50,7 @@ def test_array_access_undefined_variable():
 
 def test_array_access_on_non_array():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     env.define("x", INTEGER)
 
     expr = ArrayAccess(
@@ -68,7 +68,7 @@ def test_array_access_on_non_array():
 
 def test_array_access_requires_integer_index():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     env.define("nums", ArrayType(INTEGER, 5))
 
     expr = ArrayAccess(
@@ -86,7 +86,7 @@ def test_array_access_requires_integer_index():
 
 def test_array_access_negative_literal_index():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     env.define("nums", ArrayType(INTEGER, 5))
 
     expr = ArrayAccess(

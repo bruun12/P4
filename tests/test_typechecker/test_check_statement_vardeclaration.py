@@ -5,7 +5,7 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, VOID
 
 def test_valid_var_declaration():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = VarDeclaration(
         type="integer",
@@ -23,7 +23,7 @@ def test_valid_var_declaration():
 
 def test_var_declaration_duplicate_name():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt1 = VarDeclaration(
         type="integer",
@@ -49,7 +49,7 @@ def test_var_declaration_duplicate_name():
 
 def test_var_declaration_invalid_initializer_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = VarDeclaration(
         type="integer",
@@ -66,7 +66,7 @@ def test_var_declaration_invalid_initializer_type():
 
 def test_var_declaration_void_type_is_invalid():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = VarDeclaration(
         type="void",
@@ -83,7 +83,7 @@ def test_var_declaration_void_type_is_invalid():
 
 def test_var_declaration_unknown_declared_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = VarDeclaration(
         type="banana",

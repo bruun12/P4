@@ -6,7 +6,7 @@ import pytest
 
 def test_valid_array_access_with_literal():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclaration(
         type="integer",
@@ -45,7 +45,7 @@ def test_valid_array_access_with_literal():
 
 def test_valid_array_access_with_variable():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     index = VarDeclaration(
                     type="integer",
@@ -86,7 +86,7 @@ def test_valid_array_access_with_variable():
     assert checker.errors == []
 #def test_empty_array_declaration_requires_integer_size():
 #    checker = TypeChecker(source_code="")
-#    env = TypeEnvironment()
+#    env = TypeEnvironment(None)
 #
 #    stmt = ArrayDeclarationEmpty(
 #        type="integer",
@@ -103,7 +103,7 @@ def test_valid_array_access_with_variable():
 #    
 #def test_empty_array_declaration_cannot_have_void_element_type():
 #    checker = TypeChecker(source_code="")
-#    env = TypeEnvironment()
+#    env = TypeEnvironment(None)
 #    
 #    stmt = ArrayDeclarationEmpty(
 #        type="void",
@@ -119,7 +119,7 @@ def test_valid_array_access_with_variable():
 #    
 #def test_empty_array_declaration_duplicate_name():
 #    checker = TypeChecker(source_code="")
-#    env = TypeEnvironment()
+#    env = TypeEnvironment(None)
 #    
 #    stmt1 = ArrayDeclarationEmpty(
 #        type="integer",

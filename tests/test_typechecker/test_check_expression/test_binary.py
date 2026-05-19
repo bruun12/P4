@@ -15,7 +15,7 @@ def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
 def test_binary_add_integer_and_integer():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Binary(
         left=Literal(1, line=1, column=1),
@@ -33,7 +33,7 @@ def test_binary_add_integer_and_integer():
 
 def test_binary_add_integer_and_double():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Binary(
         left=Literal(1, line=1, column=1),
@@ -51,7 +51,7 @@ def test_binary_add_integer_and_double():
 
 def test_binary_string_plus_string():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Binary(
         left=Literal("hello", line=1, column=1),
@@ -69,7 +69,7 @@ def test_binary_string_plus_string():
 
 def test_binary_string_plus_integer_is_invalid():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Binary(
         left=Literal("hello", line=1, column=1),

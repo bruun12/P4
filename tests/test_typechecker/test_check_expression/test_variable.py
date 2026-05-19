@@ -13,7 +13,7 @@ def has_error(checker, error_code):
 
 def test_valid_variable():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = VarDeclaration(
         type="integer",
@@ -32,7 +32,7 @@ def test_valid_variable():
 
 def test_invalid_variable_use():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = Variable("x", line=1, column=1)
 

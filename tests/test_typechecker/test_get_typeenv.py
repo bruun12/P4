@@ -3,14 +3,14 @@ import pytest
 
 # tjekker om et objekt er i det nuværende miljø
 def test_get_current_scope():
-    nu_miljø = TypeEnvironment()
+    nu_miljø = TypeEnvironment(None)
     nu_miljø.define("nuværende miljø", STRING)
 
     assert nu_miljø.get("nuværende miljø") == STRING
 
 # tjekker om et objekt er i parent scope
 def test_get_parent_scope():
-    parent = TypeEnvironment()
+    parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
 
     child = TypeEnvironment(parent)    
@@ -19,7 +19,7 @@ def test_get_parent_scope():
 
 # tjekker om et objekt defineret i parent også ligger i child (globalt miljø)
 def test_defined_in_parent():
-    parent = TypeEnvironment()
+    parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
 
     child = TypeEnvironment(parent) 
@@ -28,7 +28,7 @@ def test_defined_in_parent():
 
 # tjekker om den laver en error, hvis et objekt ikke ligger i det nuværende miljø
 def test_raise_error():
-    parent = TypeEnvironment()
+    parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
 
     child = TypeEnvironment(parent)

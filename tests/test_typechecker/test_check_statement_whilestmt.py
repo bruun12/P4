@@ -13,7 +13,7 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment
 
 def test_while_statement_valid_boolean_condition():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = WhileStatement(
         condition=Literal(True, line=1, column=8),
@@ -33,7 +33,7 @@ def test_while_statement_valid_boolean_condition():
 
 def test_while_statement_invalid_condition_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = WhileStatement(
         condition=Literal(123, line=1, column=8),
@@ -53,7 +53,7 @@ def test_while_statement_invalid_condition_type():
 
 def test_while_statement_checks_body():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = WhileStatement(
         condition=Literal(True, line=1, column=8),
@@ -81,7 +81,7 @@ def test_while_statement_checks_body():
 
 def test_while_statement_body_has_its_own_scope():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = WhileStatement(
         condition=Literal(True, line=1, column=8),
@@ -110,7 +110,7 @@ def test_while_statement_body_has_its_own_scope():
 
 def test_while_statement_nested_return_is_invalid():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     checker.expected_return_type = None
 
     stmt = WhileStatement(

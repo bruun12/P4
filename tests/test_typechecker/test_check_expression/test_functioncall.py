@@ -20,7 +20,7 @@ def has_error(checker, error_code):
 
 def test_valid_function_call_returns_declared_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     checker.function_env.define(
         "add",
@@ -48,7 +48,7 @@ def test_valid_function_call_returns_declared_type():
 
 def test_function_call_undefined_function():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = FunctionCall(
         name="mystery",
@@ -67,7 +67,7 @@ def test_function_call_undefined_function():
 
 def test_function_call_wrong_argument_count():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     checker.function_env.define(
         "add",
@@ -94,7 +94,7 @@ def test_function_call_wrong_argument_count():
 
 def test_function_call_wrong_argument_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     checker.function_env.define(
         "add",
@@ -122,7 +122,7 @@ def test_function_call_wrong_argument_type():
 
 def test_valid_print_function_multiple_arguments():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     env.define("x", INTEGER)
     env.define("y", INTEGER)
 
@@ -146,7 +146,7 @@ def test_valid_print_function_multiple_arguments():
 
 def test_print_requires_at_least_one_argument():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     expr = FunctionCall(
         name="print",
@@ -163,7 +163,7 @@ def test_print_requires_at_least_one_argument():
 
 def test_print_rejects_non_printable_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     env.define("arr", ArrayType(INTEGER, 3))
 
