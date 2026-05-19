@@ -36,3 +36,19 @@ services:
     command: tail -f /dev/null  # Keeps container alive
     stdin_open: true
     tty: true
+
+  api:
+      build:
+        context: .
+        dockerfile: Dockerfile
+        target: api
+      ports:
+        - "8000:8000"
+      volumes:
+        - .:/app:z
+      environment:
+        - PYTHONPATH=/app/src
+      working_dir: /app/
+      command: uvicorn server:app --host 0.0.0.0 --port 8000
+      stdin_open: true
+      tty: true

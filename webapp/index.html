@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ACE: A Cimple Editor</title>
+    <link rel="stylesheet" href="style">
+</head>
+<body>
+<div class="app">
+    <div class="top-bar">
+        <div class="logo-area">
+            <div class="logo-text">ACE: A Cimple Editor</div>
+        </div>
+        <div class="action-group">
+            <select name="tasks" id="taskDD">
+            <option>Select a Task</option>
+            <option value="print">print strings</option>
+            <option value="count">iterate a variable</option>
+            <option value="check">check for 0</option>
+            <option value="sum">get the sum a two numbers</option>
+            <option value="square">draw squares</option>
+
+            </select>
+            <button class="btn" id="resetBtn" title="Reset to default example"><span>Reset</span></button>
+            <button class="btn" id="clearBtn" title="Clear all code"><span>Clear</span></button>
+            <button class="btn btn-primary" id="compileBtn"><span>Compile</span></button>
+        </div>
+    </div>
+    <div class="editor-container" id="editorContainer">
+        <!-- Coding Panel -->
+        <div class="panel" id="cimplePanel">
+            <div class="panel-header">
+                <span>Cimple</span>
+            </div>
+            <textarea class="code-area" id="editor"></textarea>
+        </div>
+        <!-- Console Panel -->
+        <div class="panel" id="console-panel">
+            <div class="panel-header">
+                <span>Console</span>
+            </div> 
+            <textarea class="code-area" id="console">
+            </textarea>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="script"></script>
+</body>
+</html>

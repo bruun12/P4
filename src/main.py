@@ -1,113 +1,61 @@
+import sys
 from lexer.lexer import Lexer
 from parser.parser import Parser
 from type_checker.TypeChecker import TypeChecker
 from error_handling import LexerError, ParserError, format_compiler_error
 
-source_code = """
-integer add(integer a, integer b) {
-    return a + b;
-}
+def interprete_source(source: str) -> str:
+    lexer = Lexer(source)
+    lexer.lexer()
+    
+    parser = Parser(lexer.tokens)
+    ast = parser.parse()
+  
+    
+    checker = TypeChecker(source)
+    checker.check(ast)
 
-double average(integer a, integer b) {
-    return (a + b) / 2.0;
-}
+    if checker.errors:
+        for err in checker.formatted_errors():
+            print(err, file=sys.stderr)
+        return None
 
-boolean is_positive(integer x) {
-    return x > 0;
-}
-
-integer main() {
-    integer x = add(3, 4);
-    double y = average(x, 10);
-    boolean ok = is_positive(x);
-
-    integer nums[3] = [1, 2, 3];
-    integer more[5];
-    string words[3] = ["a", "b", "c"];
-
-    nums[1] = add(x, 1);
-    more[4] = nums[1];
-    print("x = : ", x);
-
-    x = nums[0];
-    y = average(add(1, 2), 8);
-
-    if (is_positive(x)){
-        x = 2;
-    } else {
-        x = 5;
-    }
-
-    while (x < 20 AND x < 21) {
-        x = add(x, 1);
-    }
-
-    words[1] = "updated";
-    ok = is_positive(nums[1]);
-
-    return x;
-}
-"""
-source_code1 = """
-integer decide(integer a, integer b){
-    if (a > b){
-        return a;
-    } else {
-        return b;
-    }
-    return 1;
-}
-
-integer main() {
-    integer c = decide(1,2);
-
-    return c;
-}
-"""
+    
+    return ast.to_c()
 
 
-def main():
-    source = source_code1
-    try:
-        # ----------------------------------------------------
-        # LEXING
-        # ----------------------------------------------------
-        lexer = Lexer(source)
-        lexer.lexer()
+def main():  
+    if len(sys.argv) >= 2: #sys.argv = ["main.py", "program.cimple", "output.c"]
+        with open(sys.argv[1], "r", encoding="utf-8") as file: # r står for read i python
+            source = file.read()
 
-        # If your lexer stores errors instead of raising them
-        if hasattr(lexer, "errors") and lexer.errors:
-            for err in lexer.errors:
-                print(format_compiler_error(err, source.splitlines()))
-            return
+        if source is None:
+            print("source is empty")
+            return 1
+    else:
+        return "no input provided"
 
-        # ----------------------------------------------------
-        # PARSING
-        # ----------------------------------------------------
-        parser = Parser(lexer.tokens)
-        program = parser.parse()
+    try:  
+        c_code = interprete_source(source)
 
-        print("Parsing succeeded.\n")
+        if c_code is None:
+            return sys.exit(1)
 
-        # ----------------------------------------------------
-        # TYPE CHECKING
-        # ----------------------------------------------------
-        checker = TypeChecker(source)
-        checker.check(program)
-
-        if checker.errors:
-            print("Type check failed:\n")
-            for err in checker.formatted_errors():
-                print(err)
-                print()
-        else:
-            print("Type check passed.")
+        if len(sys.argv) >= 3:
+            with open(sys.argv[2], "w", encoding="utf-8") as file:
+                file.write(c_code)
+    
 
     except LexerError as err:
-        print(format_compiler_error(err, source.splitlines()))
+        print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
+        return sys.exit(1)
 
     except ParserError as err:
-        print(format_compiler_error(err, source.splitlines()))
+        print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
+        return sys.exit(1)
+    
+
+
 
 
 if __name__ == "__main__":
