@@ -9,11 +9,12 @@ from type_checker.TypeChecker import (
     ERROR,
 )
 
-
+# makes use of the has_error function
 def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
 
 
+# Checks it correctly handles a minus with an integer
 def test_unary_minus_integer():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -31,6 +32,7 @@ def test_unary_minus_integer():
     assert checker.errors == []
 
 
+# Checks it correctly handles a minus with a double
 def test_unary_minus_double():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -48,6 +50,7 @@ def test_unary_minus_double():
     assert checker.errors == []
 
 
+# Checks it correctly handles an error when minuses a string
 def test_unary_minus_string_is_invalid():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -65,6 +68,7 @@ def test_unary_minus_string_is_invalid():
     assert has_error(checker, ErrorCode.TYPE_MISMATCH_ERROR)
 
 
+# Checks it correctly handles the NOT symbol in front of a boolean value
 def test_unary_not_boolean():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -82,6 +86,8 @@ def test_unary_not_boolean():
     assert checker.errors == []
 
 
+# Checks it correctly handles the NOT symbol in front of an integer value
+# should give error as you cannot do that
 def test_unary_not_integer_is_invalid():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

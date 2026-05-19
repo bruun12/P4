@@ -1,6 +1,9 @@
 from type_checker.TypeChecker import TypeChecker
 from type_checker.ClassesAndHelpers import INTEGER, ERROR
 
+# Checks it can correctly parse a valid datatype, 
+# and throw an error when invalid
+
 class MockASTNode:
     def __init__(self, line: int, column: int):
         self.line = line
@@ -12,7 +15,6 @@ def test_parse_valid_type():
         node = MockASTNode(1, 1)
 
         result = checker.parse_type_node("integer", node)
-
 
         assert result == INTEGER
         assert result != ERROR

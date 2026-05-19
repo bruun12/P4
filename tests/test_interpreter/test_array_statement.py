@@ -2,6 +2,8 @@ from parser.parser import Parser
 from lexer.lexer import Lexer
 from parser.ASTNodes import ArrayDeclaration, ArrayDeclarationEmpty
 
+# Checks if the functions checks correct for respectively empty and none-empty array declarations, 
+# by initiatising a lexer with a source code, and then checks if it is true
 def test_arrayDeclarationEmpty():
     lex = Lexer("integer arr[3];")
     lex.lexer()

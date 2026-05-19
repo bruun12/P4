@@ -29,6 +29,8 @@ class ErrorCode(Enum):
     UNKNOWN_AST_NODE_ERROR = 79
 
 
+# Below are the classes that contains properties that is used as errormessages
+
 class CompilerError(Exception):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int, stage: str):
         super().__init__(message)
@@ -38,22 +40,20 @@ class CompilerError(Exception):
         self.column = column
         self.stage = stage
 
-
 class LexerError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "lexer")
 
-
 class ParserError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "parser")
-
 
 class TypeCheckError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "type")
 
 
+# Functino to format the compiler errors so the errors becomes readable for the user
 def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     line = error.line
     column = error.column

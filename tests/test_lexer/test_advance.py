@@ -1,5 +1,6 @@
 from lexer.lexer import Lexer
 
+# checks if it can advance one line
 def test_advance_one_line():
     string = "int x = 20 // initilizing x\ny = x * 5"
     lex = Lexer(string)

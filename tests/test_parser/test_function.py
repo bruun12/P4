@@ -5,6 +5,8 @@ from error_handling import ParserError
 from parser.parser import Parser
 from parser.ASTNodes import BlockStatement
 
+# Checks if it correctly ??
+
 def parse_function(source: str):
     lex = Lexer(source)
     lex.lexer()

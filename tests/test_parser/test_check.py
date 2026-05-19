@@ -1,6 +1,8 @@
 from parser.parser import Parser
 from lexer.lexer import Token, TokenType
 
+# Checks if it correctly checks the existing tokens
+
 def test_check_stopper():
     tokens = [Token(TokenType.TYPE, "string", 1, 1), 
               Token(TokenType.IDENTIFIER, "x", 2, 1),

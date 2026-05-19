@@ -1,14 +1,14 @@
 from type_checker.TypeChecker import TypeEnvironment, TypeCheckError, STRING, INTEGER
 import pytest
 
-# tjekker om et objekt er i det nuværende miljø
+# Checks if the object is in the current environment
 def test_get_current_scope():
     nu_miljø = TypeEnvironment(None)
     nu_miljø.define("nuværende miljø", STRING)
 
     assert nu_miljø.get("nuværende miljø") == STRING
 
-# tjekker om et objekt er i parent scope
+# Checks if the object is in the parent scope
 def test_get_parent_scope():
     parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
@@ -17,7 +17,7 @@ def test_get_parent_scope():
 
     assert child.get("globalt objekt") == STRING
 
-# tjekker om et objekt defineret i parent også ligger i child (globalt miljø)
+# Checks if the object defined in the parent also lies within the child (global scope)
 def test_defined_in_parent():
     parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
@@ -26,7 +26,7 @@ def test_defined_in_parent():
 
     assert child.get("globalt objekt") == STRING
 
-# tjekker om den laver en error, hvis et objekt ikke ligger i det nuværende miljø
+# Checks if it makes an error, if the object is not in the current environment
 def test_raise_error():
     parent = TypeEnvironment(None)
     parent.define("globalt objekt", STRING)
@@ -38,4 +38,4 @@ def test_raise_error():
         child.get("dette objekt er udefineret i child")
 
     with pytest.raises (TypeCheckError):
-        parent.get(child) # parent node burde ikke have adgang til child node
+        parent.get(child) # parent node should not have access to the child node

@@ -14,6 +14,9 @@ from parser.ASTNodes import (
 from type_checker.TypeChecker import TypeChecker
 
 
+# An overall test of the type checker with a valid and invalid program integration
+
+
 def test_typechecker_valid_program_integration():
     source_code = """
 integer add(integer a, integer b) {

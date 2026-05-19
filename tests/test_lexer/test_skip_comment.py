@@ -2,6 +2,8 @@ import pytest
 from lexer.lexer import Lexer
 from error_handling import LexerError
 
+# Checks if it correctly skips the comments
+
 def test_skip_comment_with_inline_comment():
     lexer = Lexer("hello world*/x ")
 
