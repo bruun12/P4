@@ -28,6 +28,12 @@ class ErrorCode(Enum):
     INVALID_ARGUMENT_COUNT = 78
     UNKNOWN_AST_NODE_ERROR = 79
 
+    # Compilation Error
+    ARGUMENT_ERROR = 80
+    LEXER_ERROR = 81
+    PARSER_ERROR = 82
+    TYPECHECKER_ERROR = 83
+    EMPTY_SOURCE_ERROR = 84
 
 class CompilerError(Exception):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int, stage: str):

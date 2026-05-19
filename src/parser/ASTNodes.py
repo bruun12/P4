@@ -70,6 +70,7 @@ class Function(Node):
         type_map = {
             'integer': 'int',
             'double': 'double',
+            'boolean': "bool",
             'string': 'char*',
             'void': 'void'
         }
