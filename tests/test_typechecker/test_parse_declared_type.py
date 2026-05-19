@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import parse_declared_type, TypeCheckError, INTEGER, DOUBLE, BOOLEAN, STRING, VOID
+from type_checker.ClassesAndHelpers import parse_declared_type, TypeCheckError, INTEGER, DOUBLE, BOOLEAN, STRING, VOID
 import pytest
 
 def test_correct_type():

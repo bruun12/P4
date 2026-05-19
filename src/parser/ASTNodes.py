@@ -97,10 +97,7 @@ class Parameter(Node):
             'boolean': 'bool',
             'void': 'void'
         }
-        if(self.type == 'string'):
-            return f"{type_map[self.type]} {self.name}[]"
-        else:
-            return f"{type_map[self.type]} {self.name}"
+        return f"{type_map[self.type]} {self.name}"
         
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
@@ -141,13 +138,11 @@ class VarDeclaration(Statement):
         type_map = {
             'integer': 'int',
             'double': 'double',
-            'string': 'char',
-            'boolean': 'bool'
+            'string': 'char*',
+            'boolean': 'bool',
+            'void': 'void'
         }
-        if(self.type == 'string'):
-            return f"{type_map[self.type]} {self.name}[] = {self.value.to_c()};" 
-        else:
-            return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
+        return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
          
 
 class AssignStatement(Statement):
