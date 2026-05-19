@@ -1,4 +1,6 @@
 import sys
+import os
+import subprocess
 from lexer.lexer import Lexer
 from parser.parser import Parser
 from type_checker.TypeChecker import TypeChecker
@@ -26,14 +28,15 @@ def interprete_source(source: str) -> str:
 
 def main():  
     if len(sys.argv) >= 2: #sys.argv = ["main.py", "program.cimple", "output.c"]
-        with open(sys.argv[1], "r", encoding="utf-8") as file: # r står for read i python
+        with open(sys.argv[1], "r", encoding="utf-8") as file: # read the file
             source = file.read()
 
         if source is None:
             print("source is empty")
-            return 1
+            return sys.exit(1)
     else:
-        return "no input provided"
+        print("no input provided")
+        return  sys.exit(1)
 
     try:  
         c_code = interprete_source(source)
@@ -44,7 +47,34 @@ def main():
         if len(sys.argv) >= 3:
             with open(sys.argv[2], "w", encoding="utf-8") as file:
                 file.write(c_code)
+
+
+        # current working directory (src) 
+        cwd_path = os.path.join(os.path.dirname(__file__), "")
+
     
+        cToExecutable = subprocess.run(
+            ["gcc", sys.argv[2], "-o", "output"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=cwd_path
+        )
+
+        if cToExecutable.returncode != 0:
+            return cToExecutable
+        
+        executeC = subprocess.run(
+            ["./output"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=cwd_path
+        )
+
+        print(executeC.stdout, file=sys.stdout)
+
+        return sys.exit(0)
 
     except LexerError as err:
         print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
