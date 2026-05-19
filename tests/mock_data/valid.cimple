@@ -1,4 +1,28 @@
+integer add (integer a, integer b){
+    return a + b;
+}
+
+boolean reverse(boolean b){
+    return !b;
+}
+
 integer main(){
-    print(1)
+    /*Here is a comment*/
+    integer i = 0;
+    integer x = 0; 
+    while(i < 5){
+
+        i = i + 1;
+    }
+
+    boolean b = 2 < 3 AND true; 
+    print(add(1,0), "\n");
+
+    if (reverse(b)){
+        print("Hej Verden\n");
+    } else {
+        print("Hello world\n");
+    }
+    print(reverse(b));
     return 0;
 }

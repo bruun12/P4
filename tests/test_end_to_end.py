@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 from pathlib import Path
+from error_handling import ErrorCode
 
 
 def test_valid_program():
@@ -21,5 +22,9 @@ def test_valid_program():
     outputLines = result.stdout.split("\n")
     
     # Assert the stdout (program output)
-    assert result == "1"
+    assert result.returncode == 0
+    assert outputLines[0] == "1"
+    assert outputLines[1] == "Hello world"
+    assert outputLines[2] == "false"
+    
 
