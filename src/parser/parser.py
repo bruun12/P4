@@ -262,8 +262,23 @@ class Parser:
         left = self.parse_additive()
         while self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
             op = self.previous()
-            left = Binary(left, op.value, self.parse_additive(), op.line, op.column)
+            right = self.parse_additive()
+            left = Binary(left, op.value, right, op.line, op.column)
+            if(self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE)):
+                op = self.previous()
+                right = Binary(right, op.value, self.parse_chain(), op.line, op.column)
+                left =  Binary(left, 'AND', right, op.line, op.column)
+        return left 
+    
+    def parse_chain(self):
+        left = self.parse_additive()
+        if(self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE)):
+                op = self.previous()
+                #right = Binary(right, op.value, self.parse_chain(), op.line, op.column)
+                left =  Binary(left, 'AND', self.parse_chain(), op.line, op.column)
         return left
+
+
     
     def parse_additive(self):
         left = self.parse_multiplicative()
