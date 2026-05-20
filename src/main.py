@@ -27,7 +27,7 @@ def interprete_source(source: str) -> str:
 def main():  
     if "--help" in sys.argv:
         print("""
-OBS: This program require that have gcc set up on your machine
+OBS: This program require that have gcc avaiable in this folder
               
 Usage: cimple CIMPLEFILE EXECUTABLE [Optionals]
               
@@ -44,9 +44,9 @@ cimple cimple.cimple exec -r -k exec.c
     cFileName = None
 
     if len(sys.argv) >= 3: #sys.argv = ["main.py", "program.cimple", "output"]
-        if "-r" in sys.argv: #update the flags
+        if "-r" in sys.argv[3:]: #update the flags
             autoRun = True
-        if "-k" in sys.argv:
+        if "-k" in sys.argv[3:]:
             cFileName = sys.argv[sys.argv.index("-k") + 1]
             if not cFileName.endswith(".c"):
                 print("The c file needs to end with .c", file=sys.stderr)
@@ -90,7 +90,8 @@ cimple cimple.cimple exec -r -k exec.c
         )
 
         if cToExecutable.returncode != 0:
-            return cToExecutable.returncode
+            print("This program requies you to have gcc avaiable in this folder", file=sys.stderr)
+            sys.exit(cToExecutable.returncode)
         
         # Deletes output.c if name is not specified
         if cFileName is None:
@@ -117,10 +118,6 @@ cimple cimple.cimple exec -r -k exec.c
     except ParserError as err:
         print(format_compiler_error(err, source.splitlines()), file=sys.stderr)
         sys.exit(ErrorCode.PARSER_ERROR.value)
-    
-
-
-
 
 if __name__ == "__main__":
     main()
