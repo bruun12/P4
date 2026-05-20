@@ -28,6 +28,14 @@ class ErrorCode(Enum):
     INVALID_ARGUMENT_COUNT = 78
     UNKNOWN_AST_NODE_ERROR = 79
 
+    # Compilation Error
+    ARGUMENT_ERROR = 80
+    LEXER_ERROR = 81
+    PARSER_ERROR = 82
+    TYPECHECKER_ERROR = 83
+    EMPTY_SOURCE_ERROR = 84
+
+# Below are the classes that contains properties that is used as errormessages
 
 class CompilerError(Exception):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int, stage: str):
@@ -38,27 +46,26 @@ class CompilerError(Exception):
         self.column = column
         self.stage = stage
 
-
 class LexerError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "lexer")
 
-
 class ParserError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "parser")
-
 
 class TypeCheckError(CompilerError):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int):
         super().__init__(message, error_code, line, column, "type")
 
 
+# Functino to format the compiler errors so the errors becomes readable for the user
 def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     line = error.line
     column = error.column
     stage_name = error.stage.capitalize()
 
+    #Format of code
     if line < 1 or line > len(source_lines):
         return (
             f"{stage_name} error [{error.error_code.name}]: {error.message} "
@@ -68,6 +75,7 @@ def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     code_line = source_lines[line - 1]
     caret_line = " " * max(column - 1, 0) + "^"
 
+    #Return a string with the correct errormessage
     return (
         f"{stage_name} error [{error.error_code.name}]: {error.message}\n"
         f" --> line {line}, col {column}\n"

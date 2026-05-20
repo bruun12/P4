@@ -2,6 +2,8 @@ import pytest
 from lexer.lexer import Lexer
 from lexer.token import TokenType
 
+# Checks if it correctly reads the words
+
 def test_read_word_identifier():
     lexer = Lexer('id')
     token = lexer.read_word()

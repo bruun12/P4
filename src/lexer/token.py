@@ -1,18 +1,20 @@
 from enum import Enum, auto
 
 class Token:
-
+    # Properties within the Token 
     def __init__(self, type, value, line, column):
         self.type = type
         self.value = value
         self.line = line
         self.column = column
-    #Printer function
+    # Printer function
     def __repr__(self):
         return f"Token(type={self.type}, value='{self.value}', line={self.line}, col={self.column})"
     
 
+# Global variable token types
 class TokenType(Enum):
+
     # Special
     EOF = auto()
     INVALID = auto()
@@ -64,6 +66,7 @@ class TokenType(Enum):
     SEMICOLON = auto()    # ;
     COMMA = auto()        # ,
 
+# Global variables that assign values used in the source code to their respectively token type
 KEYWORDS = {
     "if": TokenType.IF,
     "else": TokenType.ELSE,

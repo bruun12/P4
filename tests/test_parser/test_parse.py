@@ -21,6 +21,8 @@ from parser.ASTNodes import (
 from parser.parser import Parser
 from error_handling import ParserError
 
+# Checks if it correctly parses the entire program
+
 def parse_program(source: str):
     lex = Lexer(source)
     lex.lexer()

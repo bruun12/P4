@@ -6,7 +6,7 @@ class MockASTNode:
         self.line = line
         self.column = column
 
-# tjekker om der er mere end 0 errors i error listen
+# Checks if there is more than 0 errors in the list
 def test_has_errors():
     checker = TypeChecker(source_code="")
 
@@ -20,7 +20,7 @@ def test_has_errors():
 
     assert checker.has_errors() is True
 
-# tjekker at der ingen errors er
+# Check that there are no errors
 def test_has_no_errors():
     checker = TypeChecker(source_code="")
 

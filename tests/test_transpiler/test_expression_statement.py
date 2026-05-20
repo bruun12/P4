@@ -31,6 +31,6 @@ def test_expression_statement_funccall():
     lex = Lexer("""x(1,2,3);""")
     lex.lexer()
     node = Parser(lex.tokens).statement()
-    #assert isinstance(node, ExpressionStatement)
-    #assert node.to_c() == "test(1,2,3);"
+    assert isinstance(node, ExpressionStatement)
+    assert node.to_c() == "x(1,2,3);"
 

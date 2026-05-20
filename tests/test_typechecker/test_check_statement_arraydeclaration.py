@@ -4,6 +4,8 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment, ArrayType, IN
 
 import pytest
 
+
+# Checks if it correctly handles an array declaration
 def test_valid_array_declaration():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -32,6 +34,7 @@ def test_valid_array_declaration():
     assert declared.element_type == INTEGER
     assert declared.size == 5
 
+# Checks if it correctly handles an array with elements with a void type
 def test_array_declaration_cannot_return_void ():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -53,6 +56,7 @@ def test_array_declaration_cannot_return_void ():
 
     assert any(err.error_code == ErrorCode.INVALID_DECLARED_TYPE for err in checker.errors)
 
+# Checks if it correctly handles an array with a wrong element data type
 def test_array_declaration_requires_integer_size ():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -70,6 +74,7 @@ def test_array_declaration_requires_integer_size ():
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
 
+# Checks if it handles two declared arrays with the same name and input
 def test_array_declaration_duplicate_name():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -105,6 +110,8 @@ def test_array_declaration_duplicate_name():
     
     assert any(err.error_code == ErrorCode.ALREADY_DECLARED_ERROR for err in checker.errors)
     
+    
+# Checks if it correctly handles an array with missing elements
 def test_invalid_array_declaration_missing_elements ():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

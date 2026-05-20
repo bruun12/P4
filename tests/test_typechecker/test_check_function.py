@@ -11,6 +11,7 @@ from parser.ASTNodes import (
 )
 from type_checker.TypeChecker import TypeChecker
 
+# Checks if the type checker correctly handles each individual function by making source code
 
 def make_checker():
     return TypeChecker(source_code="")

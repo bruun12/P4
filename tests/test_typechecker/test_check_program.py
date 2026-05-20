@@ -3,7 +3,7 @@ from parser.ASTNodes import BlockStatement, ReturnStatement, Literal
 from error_handling import TypeCheckError, ErrorCode
 
 
-# tjekker om den køre programmet igennem rigtigt
+# Checks if the program is handled correctly 
 def test_check_program():
     checker = TypeChecker(source_code="")
 
@@ -27,10 +27,10 @@ def test_check_program():
     checker.check(program)
 
     assert len(checker.errors) == 0
-    assert not checker.has_errors() # for at eksplicitere at der ikke er nogen errors
+    assert not checker.has_errors() # to explicit that there are no errors
 
 
-# tjekker om programmet kan køre selvom den ikke har nogen returværdi
+# Checks if the program can run without a return value
 def test_check_missing_return():
     checker = TypeChecker(source_code="")
 
@@ -53,10 +53,10 @@ def test_check_missing_return():
 
     checker.check(program)
 
-    assert len(checker.errors) == 0 # nul errors fordi en blockstmt ikke returnere noget
+    assert len(checker.errors) == 0 # null errors as a blockstmt does not return anything
 
 
-# tjekker om programmet kan håndtere et tomt program
+# Checks if the program can handle an empty program
 def test_check_empty_program():
     checker = TypeChecker(source_code="")
     
@@ -66,7 +66,7 @@ def test_check_empty_program():
 
     assert len(checker.errors) == 0
 
-
+# Checks if the program wont run with two of the same functions 
 def test_error_two_same_functions():
     checker = TypeChecker(source_code="")
 
@@ -102,12 +102,12 @@ def test_error_two_same_functions():
 
     err = checker.errors[0] 
 
-    # for at sikre det er det rigtige objekt der bliver brugt
+    # isintance to make sure it is the correct object that is used
     assert isinstance(err, TypeCheckError)
 
-    # tjekker at det er den korrekte fejl vi har at gøre med
-    assert err.line != 1 # det er ikke den første func der er den duplicate
-    assert err.line == 5 # det er den anden func der er den duplicate
+    # Checks if it is the correct error we are handling
+    assert err.line != 1 # it is not the first func that is the duplicate
+    assert err.line == 5 # it is the second func that is the duplicate
     assert err.column == 1
     assert err.error_code == ErrorCode.ALREADY_DECLARED_ERROR
     assert err.message == "Function 'test_function' is already declared."

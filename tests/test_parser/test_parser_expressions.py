@@ -22,7 +22,7 @@ from parser.ASTNodes import (
 from parser.parser import Parser
 from error_handling import ParserError
 
-# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens
+# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens (tidligere kommentar, Mia eller Kat har ikke ændret den)
 def parse_expr(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -31,9 +31,9 @@ def parse_expr(source: str):
     
     return expr
 
-# Lav hvor vi ikke forventer errors
 
 # Empty / missing expressions
+###############################################################################################
 
 def test_empty_expression_raises():
     with pytest.raises(ParserError):
@@ -57,6 +57,7 @@ def test_only_or_raises():
 
 
 #Missing right operand
+###############################################################################################
 
 def test_missing_right_operand_plus():
     with pytest.raises(ParserError):
@@ -113,6 +114,7 @@ def test_missing_right_operand_ne():
 
 
 #Double operator
+###############################################################################################
 
 def test_double_plus_raises():
     with pytest.raises(ParserError):
@@ -136,6 +138,7 @@ def test_double_and_raises():
 
 
 #Parenthesis errors
+###############################################################################################
 
 def test_missing_rparen_raises():
     with pytest.raises(ParserError):
@@ -152,8 +155,6 @@ def test_nested_missing_rparen_raises():
 def test_expr():
     print(parse_expr("2").value)
     print("test")
-
-# Expression, is it working?
 
 # Primary
 ###############################################################################################
@@ -220,7 +221,7 @@ def test_expression_unary_minus():
     assert node.right.value
 
 
-#Multiplicative
+#Multiplicative, Division and Modulo
 ######################################################################################################
 
 def test_expression_multiplicative():

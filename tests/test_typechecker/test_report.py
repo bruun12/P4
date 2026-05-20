@@ -6,7 +6,7 @@ class MockASTNode:
         self.line = line
         self.column = column
 
-# tjekker om den smider det korrekt ind i error listen
+# Checks if it throws an error correctly into the error list
 def test_report_adds_error():
     checker = TypeChecker(source_code="")
 
@@ -18,16 +18,16 @@ def test_report_adds_error():
         "Variable cannot have type void."
     )
 
-    # tjekker at error listen indeholder præcis 1 error
+    # Checks if the error list contains exactly 1 error
     assert len(checker.errors) == 1 
     assert len(checker.errors) != 2
 
     err = checker.errors[0] 
 
-    # for at sikre det er det rigtige objekt der bliver brugt
+    # to ensure it is the correct object that is used
     assert isinstance(err, TypeCheckError)
 
-    # tjekker at informationerne er blevet sat korrekt ind i listen
+    # checks the information is placed correctly inside the list
     assert err.line == 1
     assert err.column == 1
     assert err.error_code == ErrorCode.INVALID_DECLARED_TYPE

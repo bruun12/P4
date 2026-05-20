@@ -1,12 +1,14 @@
 from lexer.lexer import Lexer
 from lexer.lexer import TokenType
 
+# Checks if it can correctly read a string declaration 
 def test_lexer_string_declaration():
-    lex = Lexer('string x = "Hejsa";')
+    # Given string 
+    lex = Lexer('string x = "Hejsa";') 
 
     lex.lexer()
 
-    expected = [
+    expected = [ # Expected outcome and what value they should have
         (TokenType.TYPE, "string"),
         (TokenType.IDENTIFIER, "x"),
         (TokenType.ASSIGN, "="),
@@ -18,8 +20,9 @@ def test_lexer_string_declaration():
     actual = [(t.type, t.value) for t in lex.tokens]
     assert actual == expected
 
-
+# Checks if it can correctly read an integer assignment
 def test_lexer_integer_assignment():
+    # Given string
     lex = Lexer("""
                 integer i = 1;
                 i = 455;
@@ -27,7 +30,7 @@ def test_lexer_integer_assignment():
 
     lex.lexer()
 
-    expected = [
+    expected = [ # Expected outcome and what value they should have
         (TokenType.TYPE, "integer"),
         (TokenType.IDENTIFIER, "i"),
         (TokenType.ASSIGN, "="),
@@ -44,9 +47,9 @@ def test_lexer_integer_assignment():
     assert actual == expected
 
 
-
-
+# Checks if it can correctly read an if-statement
 def test_lexer_if_statement():
+    # Given string
     lex = Lexer("""
                 boolean b = true;
                 if (b) {
@@ -57,6 +60,8 @@ def test_lexer_if_statement():
                 """)
     lex.lexer()
     
+    # Beneath is the expected outcome and what value they should have
+
     # boolean b = True;
     assert lex.tokens[0].type == TokenType.TYPE
     assert lex.tokens[0].value == "boolean"
@@ -101,9 +106,9 @@ def test_lexer_if_statement():
     assert lex.tokens[22].type == TokenType.EOF
 
 
-
-
+# Checks if it can correctly read a while-statement
 def test_lexer_while_statement():
+    # Given string
     lex = Lexer("""
                 integer i = 0;
                 double f = 2.0; 
@@ -115,7 +120,7 @@ def test_lexer_while_statement():
     
     lex.lexer()
     
-    expected = [
+    expected = [ # Expected outcome and what value they should have
         (TokenType.TYPE, "integer"),
         (TokenType.IDENTIFIER, "i"),
         (TokenType.ASSIGN, "="),
@@ -152,14 +157,16 @@ def test_lexer_while_statement():
     actual = [(t.type, t.value) for t in lex.tokens]
     assert actual == expected
 
+
 def test_lexer_array():
+    # Given string
     lex = Lexer("""
                 integer array = [1,2,3,4];     
                 """)
     
     lex.lexer()
     
-    expected = [
+    expected = [ # Expected outcome and what value they should have
         (TokenType.TYPE, "integer"),
         (TokenType.IDENTIFIER, "array"),
         (TokenType.ASSIGN, "="),
@@ -177,4 +184,4 @@ def test_lexer_array():
     ]
     
     actual = [(t.type, t.value) for t in lex.tokens]
-    assert actual == expected
+    assert actual == expected 

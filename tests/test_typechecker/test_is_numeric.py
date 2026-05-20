@@ -1,5 +1,7 @@
 from type_checker.ClassesAndHelpers import is_numeric, INTEGER, DOUBLE, STRING, BOOLEAN, VOID
 
+# Checks whether or not the char is a number
+
 def test_valid_numbers():
     assert is_numeric(INTEGER)
     assert is_numeric(DOUBLE)

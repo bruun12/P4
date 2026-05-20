@@ -3,6 +3,9 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 from error_handling import ParserError
 
+# Checks if it correctly takes the parameters in 
+# or throws an error if incorrectly
+
 def parse_params(source: str):
     lex = Lexer(source)
     lex.lexer()

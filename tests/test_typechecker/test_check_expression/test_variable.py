@@ -8,9 +8,11 @@ from type_checker.TypeChecker import (
     ERROR,
 )
 
+# makes use of the has_error function
 def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
 
+# # Checks it correctly handles a valid variable
 def test_valid_variable():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -30,6 +32,7 @@ def test_valid_variable():
     assert result == INTEGER
     assert checker.errors == []
 
+# Checks it correctly handles use of an invalid variable
 def test_invalid_variable_use():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

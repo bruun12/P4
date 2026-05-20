@@ -1,16 +1,21 @@
 import json
 
+# synes det var difficult at sætte kommentare til det her, så der er nothing
+
 class Node:
     def __init__(self, line: int, column: int):
         self.line = line
         self.column = column
     
-    def __repr__(self):
+    #For printing a class nicely int print()
+    def __repr__(self): 
         return json.dumps(self.to_dict(), indent=4)
     
+    #Default print function
     def to_dict(self):
         return {"type": self.__class__.__name__}
     
+    #Default error for to_c
     def to_c(self):
         raise NotImplementedError(f"to_c is not implemented for {__class__.__name__}")
 
@@ -36,6 +41,7 @@ class Program(Node):
             "functions": [func.to_dict() for func in self.functions]
         }
 
+    #to_c for the program. Includes libraries needed in C
     def to_c(self):
         functionList = ""
         for func in self.functions:
@@ -49,6 +55,7 @@ class Program(Node):
                 {functionList}
                 """
 
+#Node for a function definition
 class Function(Node):
     def __init__(self, return_type: str, name: str, parameters: list, statement: Statement, line: int, column: int):
         super().__init__(line, column)
@@ -70,6 +77,7 @@ class Function(Node):
         type_map = {
             'integer': 'int',
             'double': 'double',
+            'boolean': "bool",
             'string': 'char*',
             'void': 'void'
         }
@@ -91,6 +99,7 @@ class Parameter(Node):
             "name": self.name
         }
     
+    #to_c includes a map, so that Cimple types are matched to C types
     def to_c(self):
         type_map = {
             'integer': 'int',
@@ -100,7 +109,8 @@ class Parameter(Node):
             'void': 'void'
         }
         return f"{type_map[self.type]} {self.name}"
-        
+
+#A block statement meaning anything in {}        
 class BlockStatement(Statement):
     def __init__(self, statements: list, line: int, column: int):
         super().__init__(line, column)
@@ -305,7 +315,7 @@ class Literal(Expression):
     def __init__(self, value, line: int, column: int):
         super().__init__(line, column)
         self.value = value
-    
+    #Prints differently based on the type
     def to_dict(self):
         value_type = type(self.value).__name__
         if value_type == "int":
@@ -359,6 +369,7 @@ class FunctionCall(Expression):
             "arguments": [arg.to_dict() for arg in self.arguments]
         }
 
+    #If the function is print() to_print is called
     def to_c(self):
         if(self.name == "print"):
             return self.to_print()
@@ -371,6 +382,7 @@ class FunctionCall(Expression):
             #argString[:-1] removes the last comma
             return f"{self.name}({argString[:-1]})"
     
+    #Creates an if-statement in C, which prints based on the type
     def to_print(self):
         text = ""
         for arg in self.arguments:
@@ -388,22 +400,10 @@ class FunctionCall(Expression):
             text = text + s
         return text
 
-        #self.name = "printf"
-        #s = ""
-        #for arg in self.arguments:
-        #    if type(arg.value).__name__ == "str":
-        #        s = s + arg.to_c() + ","
-        #    if type(arg.value).__name__ == "int":
-        #        s = s + "%d,"
-        #    if type(arg.value).__name__ == "float":
-        #        s = s + "%f,"
-        #    if type(arg.value).__name__ == "bool":
-        #        s = s + "%b,"
-        #return s
 
 
 
-
+#Unary expression ex. !True
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -420,6 +420,7 @@ class Unary(Expression):
     def to_c(self):
         return f"{self.operator}{self.right.to_c()}" 
 
+#Binary expressions ex. 1 + 2
 class Binary(Expression):
     def __init__(self, left: Expression, operator: str, right: Expression, line: int, column: int):
         super().__init__(line, column)

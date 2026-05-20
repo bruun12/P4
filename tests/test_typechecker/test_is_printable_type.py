@@ -1,6 +1,8 @@
 from type_checker.ClassesAndHelpers import INTEGER, DOUBLE, BOOLEAN, STRING, ERROR, VOID, ArrayType, FunctionType
 from type_checker.TypeChecker import TypeChecker
 
+# Checks whether or not the char is one of the printable datatypes
+
 def test_is_printable_type():
     checker = TypeChecker(source_code="")
 

@@ -1,7 +1,8 @@
-import pytest
-
 from lexer.lexer import Lexer, TokenType
 from error_handling import LexerError, ErrorCode
+import pytest
+
+# Checks if it correctly reads the string
 
 def test_read_number_with_int_input():
     lex = Lexer("123")

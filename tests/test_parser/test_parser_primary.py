@@ -3,6 +3,7 @@ import pytest
 from lexer.lexer import Lexer
 from parser.parser import Parser
 
+# Tests that primary values are evaluated correctly
 
 def test_parser_primary_int():
     lex = Lexer("1")
