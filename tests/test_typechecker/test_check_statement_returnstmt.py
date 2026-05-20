@@ -78,7 +78,7 @@ def test_invalid_return_statement_void_with_value():
     assert checker.does_return_correctly is False
 
 
-# Checks that it correctly handles when a return type has a mismatch in return value ??
+# Checks that it correctly handles when a return type has a mismatch in return value
 def test_invalid_return_statement_type_mismatch():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -98,7 +98,7 @@ def test_invalid_return_statement_type_mismatch():
     assert checker.does_return_correctly is True
 
 
-# Checks it correctly handles ???
+# Checks it correctly handles that return is not the final statement
 def test_invalid_return_statement_not_final_statement():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

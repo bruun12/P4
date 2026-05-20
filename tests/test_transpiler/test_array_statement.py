@@ -17,5 +17,3 @@ def test_arrayDeclaration():
     node = Parser(lex.tokens).statement()
     assert isinstance(node, ArrayDeclaration)
     assert node.to_c() == f"""int arr[] = {{{18}}};"""
-
-    # Parameter, Function

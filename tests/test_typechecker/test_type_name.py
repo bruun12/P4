@@ -27,8 +27,10 @@ def test_array_type():
     assert type_name(arrayObj_bool) != "boolean"
     assert type_name(arrayObj_void) == "void[]"
     assert type_name(arrayObj_void) != "void" 
-    
-def test_nested_array_type():
+
+
+#Vi har ikke nested arrays, skal bare væk:    
+"""def test_nested_array_type():
     arrayObj_nested_int = ArrayType(ArrayType(INTEGER, 1),1)
     arrayObj_nested_str = ArrayType(ArrayType(STRING,1), 1)
     arrayObj_nested_bool = ArrayType(ArrayType(BOOLEAN, 1), 1)
@@ -42,6 +44,7 @@ def test_nested_array_type():
     assert type_name(arrayObj_nested_bool) != "boolean[]"
     assert type_name(arrayObj_nested_void) == "void[][]"
     assert type_name(arrayObj_nested_void) != "void[]"
+    """
 
 def test_function_type():
     funcObj = FunctionType(

@@ -10,7 +10,7 @@ class SpyChecker(TypeChecker):
         super().check_statement(stmt, env, within_function) #Forwards the information to the real check_statement
 
 
-#Test amount of staatement in block statement using within_function
+#Test amount of statement in block statement using within_function
 def test_within_function_in_block_stmt():
     checker = SpyChecker()
     exp_stmt = ExpressionStatement(Literal(1, 2, 3), 1, 2) #Random line and column numbers
@@ -29,7 +29,7 @@ def test_within_function_in_block_stmt():
     assert outer_flag == True
     assert inner_flag == [False, True]
     
-#Test amount of staatement in block statement using within_function
+#Test amount of statement in block statement using within_function
 def test_within_function_in_block_stmt_type_environment():
     checker = SpyChecker()
     exp_stmt = ExpressionStatement(Literal(1, 2, 3), 1, 2) #Random line and column numbers
@@ -71,7 +71,7 @@ def test_within_function_false_making_inner_within_function_false():
     checker.check_statement(block, env, within_function=False)
     
     inner_flag = [call[2] for call in checker.call[1:]]
-    assert inner_flag == [False, False] #Returns false eventhough the is_last_statment is true
+    assert inner_flag == [False, False] #Returns false even though the is_last_statment is true
     
     
 #Test for nested block statements is in different environments/scopes
@@ -106,7 +106,7 @@ def test_nested_block_stmt():
     assert if_env is not block_env
     assert if_env.parent is block_env
     
-#Check that the outmost blocktament is has None as the environment
+#Check that the outmost blockstatement is has None as the environment
 def test_block_stmt_parent_is_None():
     checker = SpyChecker()
     exp_stmt = ExpressionStatement(Literal(1, 2, 3), 1, 2) #Random line and column numbers

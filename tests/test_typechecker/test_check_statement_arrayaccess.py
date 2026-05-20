@@ -38,11 +38,7 @@ def test_valid_array_access_with_literal():
     checker.check_statement(assign_stmt, env, within_function=False)
 
     assert checker.errors == []
-    
-    #declared = env.get("arr")
-    #assert isinstance(declared, ArrayType)
-    #assert declared.element_type == INTEGER
-    #assert declared.size == 5
+
 
 def test_valid_array_access_with_variable():
     checker = TypeChecker(source_code="")

@@ -53,7 +53,7 @@ def test_if_statement_invalid_condition_type():
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
 
 
-# Checks if it correctly handles a then-branch??
+# Checks if it correctly handles a an assignment of undefined variable
 def test_if_statement_checks_then_branch():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -83,7 +83,7 @@ def test_if_statement_checks_then_branch():
     assert any(err.error_code == ErrorCode.UNDEFINED_VARIABLE_ERROR for err in checker.errors)
 
 
-# ??? 
+# Checks if it correctly handles a an assignment of undefined variable in an else 
 def test_if_statement_checks_else_branch():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -116,7 +116,7 @@ def test_if_statement_checks_else_branch():
 
     assert any(err.error_code == ErrorCode.UNDEFINED_VARIABLE_ERROR for err in checker.errors)
 
-# ???
+# Checks that a decleration only exists in scope
 def test_if_statement_then_branch_has_its_own_scope():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

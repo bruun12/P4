@@ -3,7 +3,7 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 from error_handling import ParserError
 
-# Checks if it takes the arguements correctly in?? 
+# Checks if it takes the arguements correctly in
 
 def parse_args(source: str):
     lex = Lexer(source)

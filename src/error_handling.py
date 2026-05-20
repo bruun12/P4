@@ -65,6 +65,7 @@ def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     column = error.column
     stage_name = error.stage.capitalize()
 
+    #Format of code
     if line < 1 or line > len(source_lines):
         return (
             f"{stage_name} error [{error.error_code.name}]: {error.message} "
@@ -74,6 +75,7 @@ def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     code_line = source_lines[line - 1]
     caret_line = " " * max(column - 1, 0) + "^"
 
+    #Return a string with the correct errormessage
     return (
         f"{stage_name} error [{error.error_code.name}]: {error.message}\n"
         f" --> line {line}, col {column}\n"

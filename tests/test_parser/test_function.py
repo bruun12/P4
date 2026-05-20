@@ -5,7 +5,7 @@ from error_handling import ParserError
 from parser.parser import Parser
 from parser.ASTNodes import BlockStatement
 
-# Checks if it correctly ??
+# Checks if it correctly parses function declerations
 
 def parse_function(source: str):
     lex = Lexer(source)

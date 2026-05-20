@@ -22,7 +22,7 @@ from parser.ASTNodes import (
 from parser.parser import Parser
 from error_handling import ParserError
 
-# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens (tidligere kommentar, Mia har ikke ændret den)
+# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens (tidligere kommentar, Mia eller Kat har ikke ændret den)
 def parse_expr(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -156,8 +156,6 @@ def test_expr():
     print(parse_expr("2").value)
     print("test")
 
-# Expression, is it working?
-
 # Primary
 ###############################################################################################
 def test_expression_integer_literal():
@@ -223,7 +221,7 @@ def test_expression_unary_minus():
     assert node.right.value
 
 
-#Multiplicative
+#Multiplicative, Division and Modulo
 ######################################################################################################
 
 def test_expression_multiplicative():
