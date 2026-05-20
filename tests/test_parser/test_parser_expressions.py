@@ -368,6 +368,101 @@ def test_expression_precedence_min_over_add():
     assert node.operator == "+"
     assert node.left.operator == "-"
 
+#Chaining
+#############################################################################################################
+
+def test_chaining_less_than():
+    node = parse_expr("2 < 10 < 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert node.left.left.value == 2
+    assert node.left.right.value == 10
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+    assert node.right.left.value == 10
+    assert node.right.right.value == 9
+
+def test_chaining_greater_than():
+    node = parse_expr("2 > 10 > 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">"
+
+def test_chaining_less_great():
+    node = parse_expr("2 < 10 > 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">"
+
+def test_chaining_great_less():
+    node = parse_expr("2 > 10 < 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+
+def test_chaining_leq():
+    node = parse_expr("2 <= 10 <= 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<="
+
+def test_chaining_geq():
+    node = parse_expr("2 >= 10 >= 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">="
+
+def test_chaining_four():
+    node = parse_expr("2 < 10 < 9 < 8")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+    assert isinstance(node.right.right, Binary)
+    assert node.right.right.operator == "AND"
+
+def test_chaining_five():
+    node = parse_expr("2 < 10 < 9 < 8 < 7")
+    print(node)
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+    assert isinstance(node.right.right, Binary)
+    assert node.right.right.operator == "AND"
+    assert isinstance(node.right.right, Binary)
+    assert node.right.right.operator == "AND"
+
+
 #ArrayAccess
 ###########################################################################################################
 
