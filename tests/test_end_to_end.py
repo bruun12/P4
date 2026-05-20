@@ -9,7 +9,7 @@ def test_valid_program():
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(inputFile), "output.c"],
+        ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
         timeout=10,
@@ -30,7 +30,7 @@ def test_sad_lexer_program():
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(inputFile), "output.c"],
+        ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
         timeout=10,
@@ -48,7 +48,7 @@ def test_sad_parser_program():
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(inputFile), "output.c"],
+        ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
         timeout=10,
@@ -68,7 +68,7 @@ def test_sad_typecheck_program():
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(inputFile), "output.c"],
+        ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
         timeout=10,
