@@ -4,6 +4,7 @@ from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, Arra
 
 import pytest
 
+# Checks if it correctly handles a valid regular assignment 
 def test_valid_assign_statement():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -32,6 +33,8 @@ def test_valid_assign_statement():
     assigned = env.get("x")
     assert assigned == INTEGER
     
+
+# Checks if it correctly handles an array assignment
 def test_valid_assign_statement_array():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -68,6 +71,8 @@ def test_valid_assign_statement_array():
     assigned = env.get("arr")
     assert isinstance(assigned, ArrayType)
     
+
+# Checks if it correctly handles an invalid assignment with unknown type
 def test_invalid_assign_statement_with_unknown_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -83,6 +88,8 @@ def test_invalid_assign_statement_with_unknown_type():
 
     assert any(err.error_code == ErrorCode.UNDEFINED_VARIABLE_ERROR for err in checker.errors)
 
+
+# Checks if it correctly handles a regular assignment with invalid type
 def test_assign_statement_invalid_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -108,6 +115,8 @@ def test_assign_statement_invalid_type():
 
     assert any(err.error_code == ErrorCode.CANNOT_ASSIGN for err in checker.errors)
 
+
+# Checks if it correctly handles an array assignment with invalid element type 
 def test_assign_statement_array_invalid_element_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -141,6 +150,8 @@ def test_assign_statement_array_invalid_element_type():
 
     assert any(err.error_code == ErrorCode.CANNOT_ASSIGN for err in checker.errors)
 
+
+# Checks if it correctly handles an array assignment with an invalid type
 def test_assign_statement_array_invalid_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -167,6 +178,8 @@ def test_assign_statement_array_invalid_type():
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
 
+
+# Checks if it correctly handles an array assignment with an invalid offset
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -200,6 +213,8 @@ def test_assign_statement_array_invalid_offset():
 
     assert any(err.error_code == ErrorCode.INVALID_ARGUMENT_COUNT for err in checker.errors)
     
+
+# Checks if it correctly handles an array assignment with invalid offset
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -233,6 +248,8 @@ def test_assign_statement_array_invalid_offset():
 
     assert any(err.error_code == ErrorCode.INVALID_ARGUMENT_COUNT for err in checker.errors)
 
+
+# Checks if it correctly handles an array assignment with invalid types
 def test_assign_statement_array_invalid_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

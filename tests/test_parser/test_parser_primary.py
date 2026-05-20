@@ -3,6 +3,7 @@ import pytest
 from lexer.lexer import Lexer
 from parser.parser import Parser
 
+# Forstår ikke funktionen i sig selv (mia)
 
 def test_parser_primary_int():
     lex = Lexer("1")

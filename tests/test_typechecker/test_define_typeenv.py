@@ -1,6 +1,6 @@
 from type_checker.TypeChecker import STRING, INTEGER, TypeEnvironment
 
-# tjekker om der bliver added values til dictionary og de har den rigtige type
+# Checks if the value is added to the dictionary with the correct type
 def test_define_add_value():
     env = TypeEnvironment(None)
     env.define(1, INTEGER)

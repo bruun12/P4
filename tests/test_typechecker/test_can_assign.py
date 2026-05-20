@@ -1,6 +1,8 @@
 from type_checker.ClassesAndHelpers import can_assign, INTEGER, DOUBLE, STRING, BOOLEAN, ArrayType
 
+# Checks the different scenarios in which values can be assigned
 
+# can_assign(target, value)
 def test_same_type():
     assert can_assign(INTEGER, INTEGER)
     assert can_assign(DOUBLE, DOUBLE)

@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
+# Global variable datatypes
 class DataType(Enum):
-    # types
     IDENTIFIER = auto()
     INTEGER = auto()
     FLOAT = auto()
@@ -10,6 +10,7 @@ class DataType(Enum):
 
     VOID = auto()
 
+# Global variables that assign values used in the source code to their respectively datatype
 TYPES = {
     "integer": DataType.INTEGER,
     "double": DataType.FLOAT,

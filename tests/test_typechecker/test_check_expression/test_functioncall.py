@@ -13,11 +13,12 @@ from type_checker.TypeChecker import (
     ArrayType,
 )
 
-
+# makes use of the has_error function
 def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
 
 
+# Checks it correctly handles ??? 
 def test_valid_function_call_returns_declared_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

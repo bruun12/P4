@@ -1,5 +1,7 @@
 from type_checker.ClassesAndHelpers import type_name, ArrayType, FunctionType, Type, INTEGER, DOUBLE, BOOLEAN, VOID, STRING, ERROR
 
+# Checks if the type checker correctly returns the matching string type object
+
 class DummyTest(Type):
     pass
 

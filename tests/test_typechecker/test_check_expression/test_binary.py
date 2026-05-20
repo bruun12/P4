@@ -10,9 +10,11 @@ from type_checker.TypeChecker import (
     ERROR,
 )
 
-
+# makes use of the has_error function
 def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
+
+# checks if it correctly handles two of the same datatype added together
 def test_binary_add_integer_and_integer():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -30,7 +32,7 @@ def test_binary_add_integer_and_integer():
     assert result == INTEGER
     assert checker.errors == []
 
-
+# checks if it correctly handles implicit type conversion between integers and doubles
 def test_binary_add_integer_and_double():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -49,6 +51,7 @@ def test_binary_add_integer_and_double():
     assert checker.errors == []
 
 
+# checks if it correctly handles adding two strings
 def test_binary_string_plus_string():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
@@ -67,6 +70,7 @@ def test_binary_string_plus_string():
     assert checker.errors == []
 
 
+# checks it correctly handles invalid binary addition, and adds it to the list
 def test_binary_string_plus_integer_is_invalid():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)

@@ -4,6 +4,8 @@ from parser.parser import Parser
 from parser.ASTNodes import ArrayDeclaration
 import pytest
 
+# Checks if it correctly parses all the different statements
+
 def test_statements_if_and_blockStatement_match():
     lex = Lexer(""" 
                 {

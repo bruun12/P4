@@ -1,6 +1,6 @@
 from parser.parser import Parser
 from lexer.lexer import Lexer
-from tests.test_interpreter.test_functions import lineTrimFunction
+from tests.test_transpiler.test_functions import lineTrimFunction
 
 def test_small_program():
     correctLines = lineTrimFunction("""void main(){

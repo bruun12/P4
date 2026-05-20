@@ -1,5 +1,7 @@
 import json
 
+# synes det var difficult at sætte kommentare til det her, så der er nothing
+
 class Node:
     def __init__(self, line: int, column: int):
         self.line = line
