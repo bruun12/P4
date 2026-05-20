@@ -9,7 +9,7 @@ def test_valid_program():
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(inputFile), "output"],
+        ["python", "main.py", str(inputFile), "output", "-r"],
         capture_output=True,
         text=True,
         timeout=10,
