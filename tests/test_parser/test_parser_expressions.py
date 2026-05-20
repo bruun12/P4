@@ -441,26 +441,31 @@ def test_chaining_four():
     assert isinstance(node, Binary)
     assert node.operator == "AND"
     assert isinstance(node.left, Binary)
-    assert node.left.operator == "<"
+    assert node.left.operator == "AND"
     assert isinstance(node.right, Binary)
     assert node.right.operator == "<"
-    assert isinstance(node.right.right, Binary)
-    assert node.right.right.operator == "AND"
+    assert node.left.left.operator == "<"
+    assert node.left.right.operator == "<"
 
 def test_chaining_five():
+    # 2 < 10 AND 10 < 9 AND 9 < 8 AND 8 < 7
     node = parse_expr("2 < 10 < 9 < 8 < 7")
     print(node)
 
     assert isinstance(node, Binary)
     assert node.operator == "AND"
     assert isinstance(node.left, Binary)
-    assert node.left.operator == "<"
+    assert node.left.operator == "AND"
+    assert isinstance(node.left.left, Binary)
+    assert node.left.left.operator == "AND"
+    assert isinstance(node.left.right, Binary)
+    assert node.left.right.operator == "<"
+    assert isinstance(node.left.left.left, Binary)
+    assert node.left.left.left.operator == "<"
+    assert isinstance(node.left.left.right, Binary)
+    assert node.left.left.right.operator == "<"
     assert isinstance(node.right, Binary)
     assert node.right.operator == "<"
-    assert isinstance(node.right.right, Binary)
-    assert node.right.right.operator == "AND"
-    assert isinstance(node.right.right, Binary)
-    assert node.right.right.operator == "AND"
 
 
 #ArrayAccess
