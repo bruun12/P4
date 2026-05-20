@@ -55,8 +55,10 @@ class Lexer:
         self.advance()
         self.advance()
         return self.current_char()
-
-    # Function to read number; can be integer or float
+ 
+        
+    #Function to read number; can be integer or float
+    ##
     def read_number(self) -> Token:
         startPos = self.position
         startColumn = self.column
@@ -101,6 +103,7 @@ class Lexer:
         # self.source[] from position "startPos" to "self.position"
         value = self.source[startPos:self.position]
 
+        #Return a token that mathces the value
         if value in KEYWORDS:
             return Token(KEYWORDS[value] , value, startLine, startColumn)
         elif value in TYPES:
@@ -150,7 +153,7 @@ class Lexer:
                 self.skip_comment()
                 continue
             
-            # Checks if a current char is a number or a string
+            #Check for number, word or string
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
@@ -195,7 +198,7 @@ class Lexer:
                 token = Token(TokenType.ASSIGN, '=', self.line, self.column)
                 self.advance()
 
-            # Checks if the current char is a delimiter
+            #Delimiters (parenthesis, semicolon and comma)
             elif char in DELIMITERS:
                 token = Token(DELIMITERS[char], char, self.line, self.column)
                 self.advance()

@@ -4,7 +4,7 @@ from error_handling import TypeCheckError, ErrorCode
 class Type:
     pass
 
-
+#frozen = True makes the class unchangable 
 @dataclass(frozen=True)
 class IntegerType(Type):
     pass

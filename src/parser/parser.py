@@ -85,7 +85,7 @@ class Parser:
     def error(self, message: str, error_code: ErrorCode):
         return ParserError(message, error_code, self.current().line, self.current().column)
 
-    # Function to ???
+    # Function to parse the full program
     def parse(self) -> Program:
         functions = []
         try:
@@ -96,7 +96,7 @@ class Parser:
             self.errors.append(err)
             raise
     
-    # Function to return a function with specific properties??
+    # Function to return a function
     def function(self) -> Function:
         type = self.consume(TokenType.TYPE)
         name = self.consume(TokenType.IDENTIFIER)
@@ -181,7 +181,7 @@ class Parser:
         # Return the properties of the variable declaration
         return VarDeclaration(type.value, name.value, value, name.line, name.column)
     
-    # Function to parse array elements ?? 
+    # Function to parse array elements
     def parse_array_literal(self) -> list:
         self.consume(TokenType.LBRACE) 
         elements = []
@@ -227,7 +227,7 @@ class Parser:
     # Function to return an assignement statement
     def assign_statement(self) -> AssignStatement:
         name = self.previous()
-        offset = None # aner ik hvad der menes med offset
+        offset = None
 
         # Checks if the statement contains a left brace, 
         # then check its content
@@ -269,7 +269,7 @@ class Parser:
         return_token = self.previous()
         value = None
 
-        # Checks to make sure there ??
+        # Checks to make sure there is an end ;
         if not self.check(TokenType.SEMICOLON):
             value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
@@ -345,7 +345,7 @@ class Parser:
             return Unary(op.value, self.parse_unary(),op.line, op.column)
         return self.parse_primary()
     
-    # Function to ???
+    # Function to parse arguments in functionCall
     def arguments(self) -> list:
         arguments = []
         self.consume(TokenType.LPAREN)
@@ -356,7 +356,7 @@ class Parser:
         self.consume(TokenType.RPAREN)
         return arguments
     
-    # Function to ??? 
+    # Function to parse a primary value (ex. 5, True, 'hello') 
     def parse_primary(self):
         tok = self.current()
 
