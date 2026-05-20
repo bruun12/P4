@@ -1,22 +1,19 @@
 import subprocess
-import os
-import sys
 from pathlib import Path
 from error_handling import ErrorCode
 
-
 def test_valid_program():
-    main_path = Path(__file__).parent.parent / "src" #path to main
-    mockdata_path = Path(__file__).parent / "mock_data" #path to the cimple file 
-    input_file = mockdata_path / "valid.cimple"  #The file we want to test
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "valid.cimple"  #The file we want to test
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(input_file), "output.c"],
+        ["python", "main.py", str(inputFile), "output.c"],
         capture_output=True,
         text=True,
         timeout=10,
-        cwd=main_path
+        cwd=mainPath
     )
 
     outputLines = result.stdout.split("\n")
@@ -27,34 +24,34 @@ def test_valid_program():
     assert outputLines[2] == "false"
 
 def test_sad_lexer_program():
-    main_path = Path(__file__).parent.parent / "src" #path to main
-    mockdata_path = Path(__file__).parent / "mock_data" #path to the cimple file 
-    input_file = mockdata_path / "invalid_lexer.cimple"  #The file we want to test
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "invalid_lexer.cimple"  #The file we want to test
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(input_file), "output.c"],
+        ["python", "main.py", str(inputFile), "output.c"],
         capture_output=True,
         text=True,
         timeout=10,
-        cwd=main_path
+        cwd=mainPath
     )
 
     assert result.returncode == ErrorCode.LEXER_ERROR.value
     assert result.stdout == ""    
 
 def test_sad_parser_program():
-    main_path = Path(__file__).parent.parent / "src" #path to main
-    mockdata_path = Path(__file__).parent / "mock_data" #path to the cimple file 
-    input_file = mockdata_path / "invalid_parser.cimple"  #The file we want to test
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "invalid_parser.cimple"  #The file we want to test
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(input_file), "output.c"],
+        ["python", "main.py", str(inputFile), "output.c"],
         capture_output=True,
         text=True,
         timeout=10,
-        cwd=main_path
+        cwd=mainPath
     )
 
     assert result.returncode == ErrorCode.PARSER_ERROR.value
@@ -63,17 +60,17 @@ def test_sad_parser_program():
 
 
 def test_sad_typecheck_program():
-    main_path = Path(__file__).parent.parent / "src" #path to main
-    mockdata_path = Path(__file__).parent / "mock_data" #path to the cimple file 
-    input_file = mockdata_path / "invalid_typecheck.cimple"  #The file we want to test
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "invalid_typecheck.cimple"  #The file we want to test
     
     # Run main.py with input file and capture everything
     result = subprocess.run(
-        ["python", "main.py", str(input_file), "output.c"],
+        ["python", "main.py", str(inputFile), "output.c"],
         capture_output=True,
         text=True,
         timeout=10,
-        cwd=main_path
+        cwd=mainPath
     )
 
     # Assert the stdout (program output)
