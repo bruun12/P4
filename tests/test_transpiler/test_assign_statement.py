@@ -1,4 +1,4 @@
-from tests.test_interpreter.test_line_trim import lineTrim
+from tests.test_transpiler.test_line_trim import lineTrim
 
 # With the use of lineTime check for different scenarios in which the function assign() checks if it can assign a name to a value
 

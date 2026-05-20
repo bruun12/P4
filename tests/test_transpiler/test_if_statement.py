@@ -1,5 +1,5 @@
 
-from tests.test_interpreter.test_line_trim import lineTrim
+from tests.test_transpiler.test_line_trim import lineTrim
 
 def test_if_statement_simple():
     correctLines = lineTrim("""if(true){}""")
