@@ -38,7 +38,8 @@ def test_sad_lexer_program():
     )
 
     assert result.returncode == ErrorCode.LEXER_ERROR.value
-    assert result.stdout == ""    
+    assert result.stdout == ""
+    assert "INVALID_CHARACTER" in result.stderr    
 
 def test_sad_parser_program():
     mainPath = Path(__file__).parent.parent / "src" #path to main
@@ -56,6 +57,7 @@ def test_sad_parser_program():
 
     assert result.returncode == ErrorCode.PARSER_ERROR.value
     assert result.stdout == ""
+    assert "STRUCTURE_ERROR" in result.stderr
 
 
 
@@ -73,6 +75,12 @@ def test_sad_typecheck_program():
         cwd=mainPath
     )
 
-    # Assert the stdout (program output)
     assert result.returncode == ErrorCode.TYPECHECKER_ERROR.value
     assert result.stdout == ""    
+    assert "MISSING_RETURN_ERROR" in result.stderr
+    assert "UNDEFINED_VARIABLE_ERROR" in result.stderr
+    assert "UNDEFINED_FUNCTION_ERROR" in result.stderr
+    assert "ALREADY_DECLARED_ERROR" in result.stderr
+    assert "CANNOT_ASSIGN" in result.stderr
+    assert "INVALID_ARGUMENT_COUNT" in result.stderr
+    assert "TYPE_MISMATCH_ERROR" in result.stderr
