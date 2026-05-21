@@ -44,7 +44,6 @@ Cimple is a simple, statically typed language that supports:
 ```
 P4/
 ├── src/                  # Compiler source code
-│   ├── interpreter/      # Interpreter
 │   ├── lexer/            # Lexer
 │   ├── parser/           # Parser
 │   └── type_checker/     # Type checker
