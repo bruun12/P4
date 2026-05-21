@@ -2,7 +2,6 @@ from parser.ASTNodes import AssignStatement, VarDeclaration, ArrayDeclaration, L
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, ArrayType
 
-import pytest
 
 # Checks if it correctly handles a valid regular assignment 
 def test_valid_assign_statement():
