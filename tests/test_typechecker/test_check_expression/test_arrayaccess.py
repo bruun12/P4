@@ -8,7 +8,6 @@ from type_checker.TypeChecker import (
     ERROR,
 )
 
-# ved ikke om den skal slettes så har ikke skrevet noget 
 
 def has_error(checker, error_code):
     return any(err.error_code == error_code for err in checker.errors)
