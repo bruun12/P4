@@ -1,7 +1,6 @@
 import json
 
-# synes det var difficult at sætte kommentare til det her, så der er nothing
-
+# The main class of the whole AST-tree
 class Node:
     def __init__(self, line: int, column: int):
         self.line = line
@@ -11,7 +10,7 @@ class Node:
     def __repr__(self): 
         return json.dumps(self.to_dict(), indent=4)
     
-    #Default print function
+    #Default print function for the AST tree
     def to_dict(self):
         return {"type": self.__class__.__name__}
     
@@ -19,11 +18,14 @@ class Node:
     def to_c(self):
         raise NotImplementedError(f"to_c is not implemented for {__class__.__name__}")
 
+# The main class for statement - Single inheritance
 class Statement(Node):
-    def __init__(self, line: int, column: int):
+    def __init__(self, line: int, column: int): 
         super().__init__(line, column)
+# init calls the parent class (Node) constructor to initialize line and column
+# Super initializes it
 
-
+# The main class for expession - Single inheritance
 class Expression(Node):
     def __init__(self, line: int, column: int):
         super().__init__(line, column)
@@ -85,7 +87,8 @@ class Function(Node):
         for param in self.parameters:
             paraList += param.to_c() + ","
         return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
-        
+
+# Node for parameter        
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
         super().__init__(line, column)
