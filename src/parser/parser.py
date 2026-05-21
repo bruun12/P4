@@ -125,6 +125,7 @@ class Parser:
     
     # Function to return a specific statement depending on the token read
     def statement(self) -> Statement:
+        # Checks if any tokentypes match
         if self.match(TokenType.LCBRACE):
             return self.block_statement()
 
@@ -218,7 +219,7 @@ class Parser:
     def while_statement(self) -> WhileStatement:
         # Checks if the statement contains () and {
         while_token = self.previous()
-        self.consume(TokenType.LPAREN)
+        self.consume(TokenType.LPAREN) # "Eats" the (
         condition = self.parse_expression()
         self.consume(TokenType.RPAREN)
         self.consume(TokenType.LCBRACE)
