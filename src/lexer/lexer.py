@@ -138,12 +138,14 @@ class Lexer:
     # Lexerfunction; makes use of the helper functions and reads through the source code
     def lexer(self):
         while(self.position < self.length):
+            # Token is initialized to None
+            # If token is none in the buttom of the loop an error is throw   
             token = None
             
             char = self.current_char()
             peek = self.peek_next_char()
             
-            # Skip to next token
+            # Skip white space
             if char.isspace():
                 self.advance()
                 continue
@@ -153,7 +155,7 @@ class Lexer:
                 self.skip_comment()
                 continue
             
-            #Check for number, word or string
+            # Check for number, word or string
             if char.isdigit():
                 token = self.read_number()
             elif char.isalpha():
@@ -202,14 +204,12 @@ class Lexer:
             elif char in DELIMITERS:
                 token = Token(DELIMITERS[char], char, self.line, self.column)
                 self.advance()
-
-            # If none of the above; throw error
+            
+            # Add existing token to the tokenlist else throw error
+            if token is not None:
+                self.add_token(token)
             else:
                 raise LexerError("Invalid token", ErrorCode.INVALID_CHARACTER, self.line, self.column)
             
-            # Add existing token to the tokenlist
-            if token is not None:
-                self.add_token(token)
-            
-        # Gives the token the value EOF (?)        
+        # After the source has been read fully add End of File token        
         self.add_token(Token(TokenType.EOF, "EOF", self.line, self.column))

@@ -135,7 +135,8 @@ class TypeChecker:
         self.collect_function_signatures(program)
         self.check_all_functions(program)
 
-    # idk 
+    # Collecting function signatures are storing them in function_env
+    # It is used to check if function calls are valid  
     def collect_function_signatures(self, program: Program) -> None:
         # This pass makes function calls order-independent.
         for function in program.functions:

@@ -1,4 +1,4 @@
-from type_checker.TypeChecker import FunctionEnvironment, TypeCheckError, STRING, INTEGER
+from type_checker.TypeChecker import FunctionEnvironment, TypeCheckError, STRING
 import pytest
 
 # Checks if the object is in the current environment

@@ -1,5 +1,3 @@
-import pytest
-
 from error_handling import ErrorCode
 from parser.ASTNodes import (
     BlockStatement,

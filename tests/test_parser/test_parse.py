@@ -1,25 +1,5 @@
-import pytest
-from error_handling import ParserError
 from lexer.lexer import Lexer
-from parser.ASTNodes import (
-    AssignStatement,
-    Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    IfStatement,
-    Literal,
-    Node,
-    Program,
-    ReturnStatement,
-    Statement,
-    Unary,
-    Variable,
-    WhileStatement,
-    VarDeclaration,
-)
 from parser.parser import Parser
-from error_handling import ParserError
 
 # Checks if it correctly parses the entire program
 

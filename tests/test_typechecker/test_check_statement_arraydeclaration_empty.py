@@ -2,8 +2,6 @@ from parser.ASTNodes import ArrayDeclarationEmpty, Literal
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, ArrayType, INTEGER
 
-import pytest
-
 # Checks if it can declare an empty array
 def test_valid_empty_array_declaration():
     checker = TypeChecker(source_code="")

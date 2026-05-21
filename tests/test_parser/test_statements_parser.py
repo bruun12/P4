@@ -1,7 +1,6 @@
 from lexer.lexer import Lexer
 from error_handling import ParserError
 from parser.parser import Parser
-from parser.ASTNodes import ArrayDeclaration
 import pytest
 
 # Checks if it correctly parses all the different statements

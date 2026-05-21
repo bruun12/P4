@@ -1,8 +1,5 @@
-from parser.ASTNodes import ArrayDeclaration, Literal, AssignStatement, ArrayAccess, VarDeclaration, Variable
-from error_handling import ErrorCode
-from type_checker.TypeChecker import TypeChecker, TypeEnvironment, ArrayType, INTEGER
-
-import pytest
+from parser.ASTNodes import ArrayDeclaration, Literal, ArrayAccess, VarDeclaration, Variable
+from type_checker.TypeChecker import TypeChecker, TypeEnvironment
 
 
 def test_valid_array_access_with_literal():

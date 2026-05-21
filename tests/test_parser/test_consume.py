@@ -4,7 +4,6 @@ from lexer.lexer import TokenType, Token
 from error_handling import ParserError
 
 # Checks if it correctly and incorrectly consumes the token
-
 def test_consume_success():
     tokens = [Token(TokenType.TYPE, "integer", 1, 1), 
             Token(TokenType.IDENTIFIER, "x", 2, 1)

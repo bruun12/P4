@@ -4,7 +4,6 @@ from parser.ASTNodes import (
     Literal,
     ReturnStatement,
     VarDeclaration,
-    Variable,
     WhileStatement,
 )
 from error_handling import ErrorCode

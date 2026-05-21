@@ -36,15 +36,17 @@ Optionals:
     -k      Keeps the transpiled c-file followed by c-file exmaple: -k output.c
               
 Example:
-cimple cimple.cimple exec -r -k exec.c
+python main.py cimple.cimple exec -r -k exec.c
 """, file=sys.stdout)
         sys.exit(0) 
     
     autoRun = False
     cFileName = None
 
-    if len(sys.argv) >= 3: #sys.argv = ["main.py", "program.cimple", "output"]
-        if "-r" in sys.argv[3:]: #update the flags
+    if len(sys.argv) >= 3: #sys.argv = ["main.py", "program.cimple", "output", {Optionals}]
+        
+        # Checks for optionals parsed as arguments
+        if "-r" in sys.argv[3:]:
             autoRun = True
         if "-k" in sys.argv[3:]:
             cFileName = sys.argv[sys.argv.index("-k") + 1]
@@ -53,23 +55,23 @@ cimple cimple.cimple exec -r -k exec.c
                 sys.exit(1)
         
         try:
-            with open(sys.argv[1], "r", encoding="utf-8") as file: # read the file
+            with open(sys.argv[1], "r", encoding="utf-8") as file: # read the file parsed
                 source = file.read()
         except FileNotFoundError:
-            print("No file is found.\n\nTo get help:\ncimple --help", file=sys.stderr)
+            print("No file is found.\n\nTo get help:\npython main.py --help", file=sys.stderr)
             sys.exit(1)
 
         if source is None:
             print("The provided file is empty. Try another file", file=sys.stderr)
             sys.exit(ErrorCode.EMPTY_SOURCE_ERROR.value)
     else:
-        print("not the valid arguments. \n\nTo get help:\ncimple --help")
+        print("not the valid arguments. \n\nTo get help:\npython main.py --help")
         sys.exit(ErrorCode.ARGUMENT_ERROR.value)
 
     try:  
         c_code = interprete_source(source)
 
-        #if the program finds typechecker errors
+        #if the program finds typechecker errors exit with error code. The ere msg is being printed in interprete_source  
         if c_code is None:
             sys.exit(ErrorCode.TYPECHECKER_ERROR.value)
 
@@ -88,7 +90,7 @@ cimple cimple.cimple exec -r -k exec.c
             timeout=5,
             cwd=cwd_path
         )
-
+        # If issues happened during the execution of gcc
         if cToExecutable.returncode != 0:
             print("This program requies you to have gcc avaiable in this folder", file=sys.stderr)
             sys.exit(cToExecutable.returncode)
@@ -108,6 +110,8 @@ cimple cimple.cimple exec -r -k exec.c
             )
 
             print(executeC.stdout, file=sys.stdout)
+        else:
+            print("Compilation succeeded", file=sys.stdout)
 
         return sys.exit(0)
 

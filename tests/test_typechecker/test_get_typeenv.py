@@ -1,12 +1,12 @@
-from type_checker.TypeChecker import TypeEnvironment, TypeCheckError, STRING, INTEGER
+from type_checker.TypeChecker import TypeEnvironment, TypeCheckError, STRING
 import pytest
 
 # Checks if the object is in the current environment
 def test_get_current_scope():
-    nu_miljø = TypeEnvironment(None)
-    nu_miljø.define("nuværende miljø", STRING)
+    current_environment = TypeEnvironment(None)
+    current_environment.define("nuværende miljø", STRING)
 
-    assert nu_miljø.get("nuværende miljø") == STRING
+    assert current_environment.get("nuværende miljø") == STRING
 
 # Checks if the object is in the parent scope
 def test_get_parent_scope():

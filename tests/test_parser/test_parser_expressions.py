@@ -2,25 +2,13 @@ import pytest
 from error_handling import ParserError
 from lexer.lexer import Lexer
 from parser.ASTNodes import (
-    AssignStatement,
     Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    IfStatement,
     Literal,
-    Node,
-    Program,
-    ReturnStatement,
-    Statement,
     Unary,
     Variable,
-    WhileStatement,
-    VarDeclaration,
     ArrayAccess,
 )
 from parser.parser import Parser
-from error_handling import ParserError
 
 # Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens (tidligere kommentar, Mia eller Kat har ikke ændret den)
 def parse_expr(source: str):

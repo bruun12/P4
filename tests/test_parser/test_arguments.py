@@ -1,7 +1,5 @@
-import pytest
 from lexer.lexer import Lexer
 from parser.parser import Parser
-from error_handling import ParserError
 
 # Checks if it takes the arguements correctly in
 

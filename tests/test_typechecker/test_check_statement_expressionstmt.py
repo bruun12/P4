@@ -1,15 +1,5 @@
-from parser.ASTNodes import (
-    AssignStatement,
-    BlockStatement,
-    Literal,
-    ReturnStatement,
-    VarDeclaration,
-    Variable,
-    WhileStatement,
-    ExpressionStatement
-)
+from parser.ASTNodes import Literal, ExpressionStatement
 
-from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment
 
 # Checks valid expression

@@ -3,11 +3,10 @@ from parser.ASTNodes import (
     BlockStatement,
     IfStatement,
     Literal,
-    VarDeclaration,
-    Variable,
-)
+    VarDeclaration
+    )
 from error_handling import ErrorCode
-from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER
+from type_checker.TypeChecker import TypeChecker, TypeEnvironment
 
 # Checks if it correctly handles an if-statement with a boolean value
 def test_if_statement_valid_boolean_condition():

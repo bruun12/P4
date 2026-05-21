@@ -123,7 +123,7 @@ class Parser:
 
         return parameters
     
-    # Function to return a specific statement 
+    # Function to return a specific statement depending on the token read
     def statement(self) -> Statement:
         if self.match(TokenType.LCBRACE):
             return self.block_statement()
@@ -140,9 +140,11 @@ class Parser:
         if self.match(TokenType.TYPE):
             return self.var_declaration()
         
+        # Expression statement starting with a function
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
             return self.expression_statement()
         
+        # Expression statement starting with a array
         if self.current().type == TokenType.IDENTIFIER and self.peek().type != TokenType.ASSIGN and self.peek().type != TokenType.LBRACE:
             return self.expression_statement()
         
@@ -161,7 +163,7 @@ class Parser:
             size = self.parse_expression()
             self.consume(TokenType.RBRACE)
 
-            if self.match(TokenType.ASSIGN): # example; integer a[] = [1,2,3,4]
+            if self.match(TokenType.ASSIGN): # example; integer a[4] = [1,2,3,4]
                 if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)
@@ -186,12 +188,12 @@ class Parser:
         self.consume(TokenType.LBRACE) 
         elements = []
 
-        # If it isn't a right bracket, then append the array elements,
+        # If it isn't a ], then append the array elements,
         # and see if there is a comma between elements
-        if not self.check(TokenType.RBRACE):
+        if not self.check(TokenType.RBRACE): # First element
             elements.append(self.parse_expression())
 
-        while self.match(TokenType.COMMA):
+        while self.match(TokenType.COMMA): # Following elements
             elements.append(self.parse_expression())
 
         self.consume(TokenType.RBRACE)
@@ -214,6 +216,7 @@ class Parser:
 
     # Function to return a while statement
     def while_statement(self) -> WhileStatement:
+        # Checks if the statement contains () and {
         while_token = self.previous()
         self.consume(TokenType.LPAREN)
         condition = self.parse_expression()
@@ -256,7 +259,7 @@ class Parser:
 
         else_branch = None
 
-        # If else-statement, then consume } and make it a blockstmt
+        # If else-statement, then consume { and make it a blockstmt
         if self.match(TokenType.ELSE):
             self.consume(TokenType.LCBRACE)
             else_branch = self.block_statement()
@@ -269,7 +272,7 @@ class Parser:
         return_token = self.previous()
         value = None
 
-        # Checks to make sure there is an end ;
+        # Checks if an expression is returned;
         if not self.check(TokenType.SEMICOLON):
             value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
@@ -288,8 +291,10 @@ class Parser:
         return self.parse_or()
 
     # Arithmetic OR
+    # We start with weakest precedence so it will be resolved by the end 
+    # (the top note in the tree will be "or" if it is present)
     def parse_or(self): #self.match do self.advance
-        left = self.parse_and()
+        left = self.parse_and() 
         while self.match(TokenType.OR):
             op = self.previous()
             left = Binary(left, op.value, self.parse_and(), op.line, op.column)
@@ -318,20 +323,18 @@ class Parser:
             op = self.previous()
             right = self.parse_additive()
             comparison = Binary(left, op.value, right, op.line, op.column)
-            left = self.parse_chain(comparison, right) 
+            left = self.parse_chain(comparison, right) # checks if it is a chain of comparisons 1 < 2 < 3
         return left
     
     def parse_chain(self, comparison, left):
-        if not self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE):
-            return comparison
+        if not self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE): 
+            return comparison # if it is not a chain return the statement
         op = self.previous()
         right = self.parse_additive()
-        new_comparison = Binary(left, op.value, right, op.line, op.column)
-        combined = Binary(comparison, 'AND', new_comparison, op.line, op.column)
-        return self.parse_chain(combined, right)
+        new_comparison = Binary(left, op.value, right, op.line, op.column) # uses the right side of the last comparison as left and the new as right 
+        combined = Binary(comparison, 'AND', new_comparison, op.line, op.column) # 1 < 2 < 3 becomes 1 < 2 AND 2 < 3
+        return self.parse_chain(combined, right) # calls itself to check for more chained comparisons
 
-
-    
     # Arithmetic operators (+, -)
     def parse_additive(self):
         left = self.parse_multiplicative()
@@ -389,9 +392,7 @@ class Parser:
             return Literal(tok.value, tok.line, tok.column)
         
         # Array access: a[3]
-        if (self.current().type == TokenType.IDENTIFIER 
-                and self.peek() is not None 
-                and self.peek().type == TokenType.LBRACE):
+        if (self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LBRACE):
             name = self.consume(TokenType.IDENTIFIER)
             self.consume(TokenType.LBRACE)
             index = self.parse_expression()

@@ -2,9 +2,6 @@ from parser.ASTNodes import ArrayDeclaration, Literal
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, ArrayType, INTEGER
 
-import pytest
-
-
 # Checks if it correctly handles an array declaration
 def test_valid_array_declaration():
     checker = TypeChecker(source_code="")
