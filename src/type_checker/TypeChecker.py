@@ -55,7 +55,7 @@ class TypeEnvironment:
     def contains_in_current_scope(self, name: str) -> bool:
         return name in self.values
 
-    # Function to check whether or not the datatype exist within the parent scope ??
+    # Function to check whether or not the datatype exist within the parent scope
     def get(self, name: str) -> Type:
         if name in self.values:
             return self.values[name]
@@ -482,7 +482,7 @@ class TypeChecker:
                     )
                 return
 
-            # Void functions may only return without a value.
+            # Void functions may only return without a value, if not report it. 
             if stmt.value is None:
                 if self.expected_return_type == VOID:
                     self.does_return_correctly = True
