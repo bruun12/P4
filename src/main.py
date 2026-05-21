@@ -6,6 +6,7 @@ from parser.parser import Parser
 from type_checker.TypeChecker import TypeChecker
 from error_handling import LexerError, ParserError, format_compiler_error, ErrorCode
 
+# Function that combines our lexer, parser, typechecker, error_handling.
 def interprete_source(source: str) -> str:
     lexer = Lexer(source)
     lexer.lexer()
@@ -55,7 +56,7 @@ python main.py cimple.cimple exec -r -k exec.c
                 sys.exit(1)
         
         try:
-            with open(sys.argv[1], "r", encoding="utf-8") as file: # read the file parsed
+            with open(sys.argv[1], "r", encoding="utf-8") as file: # read the file parsed - "r" = read
                 source = file.read()
         except FileNotFoundError:
             print("No file is found.\n\nTo get help:\npython main.py --help", file=sys.stderr)
