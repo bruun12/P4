@@ -2,7 +2,6 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 
 # Checks if it correctly parses the entire program
-
 def parse_program(source: str):
     lex = Lexer(source)
     lex.lexer()

@@ -2,7 +2,6 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 
 # Checks if it takes the arguements correctly in
-
 def parse_args(source: str):
     lex = Lexer(source)
     lex.lexer()

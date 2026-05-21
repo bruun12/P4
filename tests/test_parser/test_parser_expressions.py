@@ -10,7 +10,7 @@ from parser.ASTNodes import (
 )
 from parser.parser import Parser
 
-# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens (tidligere kommentar, Mia eller Kat har ikke ændret den)
+# Helper function 
 def parse_expr(source: str):
     lex = Lexer(source)
     lex.lexer()

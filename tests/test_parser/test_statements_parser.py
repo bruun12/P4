@@ -4,7 +4,6 @@ from parser.parser import Parser
 import pytest
 
 # Checks if it correctly parses all the different statements
-
 def test_statements_if_and_blockStatement_match():
     lex = Lexer(""" 
                 {
@@ -137,7 +136,8 @@ def test_statements_array_assignment_expression():
     assert node.offset.right.value == 2
     assert node.value.value == 2
 
-# Errors for statements
+
+# Errors for statements #####################################################################
 def parse_stmt(source: str):
     lex = Lexer(source)
     lex.lexer()
