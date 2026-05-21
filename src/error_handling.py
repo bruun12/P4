@@ -1,6 +1,6 @@
 from enum import Enum
 
-
+# Class for all our error codes
 class ErrorCode(Enum):
     # LEXER
     INVALID_CHARACTER = 1
@@ -36,7 +36,6 @@ class ErrorCode(Enum):
     EMPTY_SOURCE_ERROR = 84
 
 # Below are the classes that contains properties that is used as errormessages
-
 class CompilerError(Exception):
     def __init__(self, message: str, error_code: ErrorCode, line: int, column: int, stage: str):
         super().__init__(message)
@@ -59,7 +58,7 @@ class TypeCheckError(CompilerError):
         super().__init__(message, error_code, line, column, "type")
 
 
-# Functino to format the compiler errors so the errors becomes readable for the user
+# Function to format the compiler errors so the errors becomes readable for the user
 def format_compiler_error(error: CompilerError, source_lines: list[str]) -> str:
     line = error.line
     column = error.column
