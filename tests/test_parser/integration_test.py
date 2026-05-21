@@ -23,7 +23,7 @@ from parser.ASTNodes import (
     Literal,
 )
 
-
+# The source function, that calls our parser
 def parse_source(source_code: str):
     lexer = Lexer(source_code)
     lexer.lexer()
