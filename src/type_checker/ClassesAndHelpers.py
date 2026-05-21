@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from error_handling import TypeCheckError, ErrorCode
 
+# pass means it is a class that dont contains anything
 class Type:
     pass
 
@@ -117,7 +118,7 @@ def numeric_result_type(left: Type, right: Type) -> Type:
         return DOUBLE
     return INTEGER
 
-# ???
+# To get the value string from the AST-tree and makes the string to a type object
 def parse_declared_type(declared_type: str) -> Type:
     if declared_type == "integer":
         return INTEGER
