@@ -20,7 +20,7 @@ def test_lexer_string_declaration():
     actual = [(t.type, t.value) for t in lex.tokens]
     assert actual == expected
 
-def test_lexer_string_edge_case_with_ascii():
+def test_lexer_string_edge_case_with_all_ascii():
     lex = Lexer('string mis = "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~€‚ƒ„…†‡ˆ‰Š‹ŒŽ•–—˜™š›œžŸ ¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"')
 
 
@@ -218,3 +218,79 @@ def test_lexer_array():
     
     actual = [(t.type, t.value) for t in lex.tokens]
     assert actual == expected 
+
+# Because it the name isnt integer, it gets handled as a identifer and the error gets handled in the parser
+def test_lexer_declaration_intéger_edge_case():
+    lex = Lexer("""
+                intéger x = 2;     
+                """)
+
+    lex.lexer()
+
+    expected = [
+        (TokenType.IDENTIFIER, "intéger"),
+        (TokenType.IDENTIFIER, "x"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.INTEGER, 2),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.EOF, "EOF")
+    ]  
+
+    actuel = [(t.type, t.value) for t in lex.tokens]
+    assert actuel == expected
+
+def test_lexer_declaration_døuble_edge_case():
+    lex = Lexer("""
+                døuble x = 2.1;     
+                """)
+
+    lex.lexer()
+
+    expected = [
+        (TokenType.IDENTIFIER, "døuble"),
+        (TokenType.IDENTIFIER, "x"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.DOUBLE, 2.1),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.EOF, "EOF")
+    ]  
+
+    actuel = [(t.type, t.value) for t in lex.tokens]
+    assert actuel == expected
+
+def test_lexer_declaration_böólean_edge_case():
+    lex = Lexer("""
+                böólean x = true;     
+                """)
+
+    lex.lexer()
+
+    expected = [
+        (TokenType.IDENTIFIER, "böólean"),
+        (TokenType.IDENTIFIER, "x"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.TRUE, "true"),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.EOF, "EOF")
+    ]  
+
+    actuel = [(t.type, t.value) for t in lex.tokens]
+    assert actuel == expected
+
+def test_lexer_declaration_voíd_edge_case():
+    lex = Lexer("""
+                voíd x;     
+                """)
+
+    lex.lexer()
+
+    expected = [
+        (TokenType.IDENTIFIER, "voíd"),
+        (TokenType.IDENTIFIER, "x"),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.EOF, "EOF")
+    ]  
+
+    actuel = [(t.type, t.value) for t in lex.tokens]
+    assert actuel == expected
+
