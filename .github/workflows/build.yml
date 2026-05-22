@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONPATH: src
+          PYTHONPATH: src:.
         run: pytest -v tests/
 
   build:
@@ -68,7 +68,7 @@ jobs:
 
       - name: Compile valid.cimple
         env:
-          PYTHONPATH: src
+          PYTHONPATH: src:.
         run: python src/main.py tests/mock_data/valid.cimple ${{ matrix.executable }} -k output.c
 
       - name: Upload artifacts
