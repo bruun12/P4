@@ -79,10 +79,9 @@ python main.py cimple.cimple exec -r -k exec.c
             file.write(c_code)
 
 
-        # current working directory (src) 
-        cwd_path = os.path.join(os.path.dirname(__file__), "")
+        # current working directory where the file is being called from
+        cwd_path = os.getcwd()
 
-    
         cToExecutable = subprocess.run(
             ["gcc", "output.c" if cFileName is None else cFileName, "-o", sys.argv[2]],
             capture_output=True,
