@@ -177,42 +177,6 @@ def test_assign_statement_array_invalid_type():
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
 
-
-# Checks if it correctly handles an array assignment with an invalid offset
-def test_assign_statement_array_invalid_offset():
-    checker = TypeChecker(source_code="")
-    env = TypeEnvironment(None)
-    
-    arr_dec = ArrayDeclaration(
-        type="integer",
-        name="arr",
-        elements=[
-            Literal(5, line=1, column=13),
-            Literal(6, line=1, column=13),
-            Literal(7, line=1, column=13),
-            Literal(8, line=1, column=13),
-            Literal(9, line=1, column=13)
-        ],
-        size=Literal(5, line=1, column=13),
-        line=1,
-        column=1,
-    )
-
-    
-    stmt = AssignStatement(
-        name="arr",
-        offset=Literal(-3, line=1, column=13),
-        value=Literal(5, line=1, column=13),
-        line=1,
-        column=1,
-    )
-
-    checker.check_statement(arr_dec, env, within_function=False)
-    checker.check_statement(stmt, env, within_function=False)
-
-    assert any(err.error_code == ErrorCode.INVALID_ARGUMENT_COUNT for err in checker.errors)
-    
-
 # Checks if it correctly handles an array assignment with invalid offset
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
