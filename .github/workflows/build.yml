@@ -1,0 +1,78 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main, mainCWDErrorFixBranch]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest -v tests/
+
+  build:
+    name: Compile (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            executable: program
+            install_gcc: sudo apt-get install -y gcc
+
+          - os: macos-latest
+            executable: program
+            install_gcc: brew install gcc
+
+          - os: windows-latest
+            executable: program.exe
+            install_gcc: choco install mingw -y
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install GCC (best effort)
+        run: ${{ matrix.install_gcc }}
+        continue-on-error: true
+
+      - name: Compile valid.cimple
+        working-directory: src
+        run: python main.py ../tests/mock_data/valid.cimple ${{ matrix.executable }} -k output.c
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimple-output-${{ matrix.os }}
+          path: |
+            src/output.c
+            src/${{ matrix.executable }}
+          retention-days: 14
