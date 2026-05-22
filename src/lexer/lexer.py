@@ -1,4 +1,4 @@
-from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS,C_KEYWORDS
+from lexer.token import Token,TokenType,KEYWORDS,TYPES,DELIMITERS,OPERATORS,C_KEYWORDS, STDIO_AND_STDLIB_FUNCTIONS
 from error_handling import LexerError, ErrorCode
 
 # The lexer reads the input
@@ -108,7 +108,7 @@ class Lexer:
             return Token(KEYWORDS[value] , value, startLine, startColumn)
         elif value in TYPES:
             return Token(TokenType.TYPE, value, startLine, startColumn)
-        elif value not in C_KEYWORDS:
+        elif value not in C_KEYWORDS and value not in STDIO_AND_STDLIB_FUNCTIONS:
             return Token(TokenType.IDENTIFIER, value, startLine, startColumn)
         else:
             raise LexerError(f"{value} is an illegal identifier", ErrorCode.BANNED_WORD, startLine, startColumn)
