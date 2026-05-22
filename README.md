@@ -7,6 +7,8 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![AAU](https://img.shields.io/badge/AAU-P4%20Project-blue)
 
+![Cimple Logo](./cimple.ico)
+
 ---
 
 ## What is this?
