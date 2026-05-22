@@ -55,7 +55,7 @@ class TypeEnvironment:
     def contains_in_current_scope(self, name: str) -> bool:
         return name in self.values
 
-    # Function to check whether or not the datatype exist within the parent scope
+    # Function to check whether or not the datatype exist including within the parent scope
     def get(self, name: str) -> Type:
         if name in self.values:
             return self.values[name]
@@ -113,7 +113,7 @@ class TypeChecker:
             error_list.append(format_compiler_error(err, self.source_lines))           
         return error_list
 
-    # Function that returns true if there is more than one error wihtin the code
+    # Function that returns true if there is one or more errors wihtin the code
     def has_errors(self) -> bool:
         return len(self.errors) > 0
 
@@ -248,7 +248,6 @@ class TypeChecker:
                     )
 
             # Initializer type must be assignable to the declared variable type.
-
             # If either declared_type or value_type is ERROR we want to proceed 
             # so the environemnt does not mess up
             if declared_type != ERROR and value_type != ERROR:
@@ -292,6 +291,7 @@ class TypeChecker:
                     ErrorCode.ALREADY_DECLARED_ERROR,
                     f"Variable '{stmt.name}' is already declared in this scope."
                     )
+            # Check if the array size matches amount of elements
             if stmt.size.value != len(stmt.elements):
                 self.report(
                         stmt,

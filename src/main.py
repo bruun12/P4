@@ -34,7 +34,7 @@ Usage: cimple CIMPLEFILE EXECUTABLE [Optionals]
               
 Optionals:
     -r      Runs the program once it has compiled
-    -k      Keeps the transpiled c-file followed by c-file exmaple: -k output.c
+    -k      Keeps the transpiled c-file followed by c-file example: -k output.c
               
 Example:
 python main.py cimple.cimple exec -r -k exec.c

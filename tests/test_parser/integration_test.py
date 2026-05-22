@@ -318,6 +318,7 @@ void main() {
     assert expr_stmt.expression.name == "print"
     assert len(expr_stmt.expression.arguments) == 4
 
+    # Arguments of the print function
     assert isinstance(expr_stmt.expression.arguments[0], Literal)
     assert isinstance(expr_stmt.expression.arguments[1], Variable)
     assert isinstance(expr_stmt.expression.arguments[2], Literal)

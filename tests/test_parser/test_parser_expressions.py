@@ -358,6 +358,35 @@ def test_expression_precedence_min_over_add():
 
 #Chaining
 #############################################################################################################
+def test_chaining_eq():
+    node = parse_expr("2 == 10 == 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "=="
+
+def test_chaining_ne():
+    node = parse_expr("2 != 10 != 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "!="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "!="
+
+def test_chaining_eqne():
+    node = parse_expr("2 == 10 != 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "!="
 
 def test_chaining_less_than():
     node = parse_expr("2 < 10 < 9")

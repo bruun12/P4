@@ -57,8 +57,7 @@ class Lexer:
         return self.current_char()
  
         
-    #Function to read number; can be integer or float
-    ##
+    #Function to read number; can be integer or double
     def read_number(self) -> Token:
         startPos = self.position
         startColumn = self.column
@@ -83,7 +82,7 @@ class Lexer:
         if number_str.count(".") > 1: # If more than one punctuation; throw error as it is invalid 
             raise LexerError("A error on line: " + str(startLine) + " Invalid number: a number can only have one punctuation", ErrorCode.INVALID_NUMBER, startLine, startColumn)
 
-        # Decides whether or not the number is an integer or float
+        # Decides whether or not the number is an integer or double
         if '.' in number_str:
             return Token(TokenType.DOUBLE, float(number_str), startLine, startColumn)
         else:

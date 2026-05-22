@@ -86,7 +86,7 @@ class Function(Node):
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
+        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}" # {paraList[:-1]} removes the last comma
 
 # Node for parameter        
 class Parameter(Node):
@@ -159,7 +159,7 @@ class VarDeclaration(Statement):
         }
         return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
          
-
+# Assignment of both varibale and arrays. Offset indicates array index.
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -286,11 +286,12 @@ class ArrayDeclaration(Statement):
             'integer': 'int',
             'double': 'double',
             'string': 'char*',
+            'boolean': 'bool',
         }
         arrElements = ""
         for elements in self.elements:
             arrElements += elements.to_c() + ","
-        return f"{type_map[self.type]} {self.name}[] = {{{arrElements[:-1]}}};"
+        return f"{type_map[self.type]} {self.name}[{self.size.to_c()}] = {{{arrElements[:-1]}}};" #{arrElements[:-1]} removes the last comma
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -310,6 +311,9 @@ class ArrayDeclarationEmpty(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'double',
+            'string': 'char*',
+            'boolean': 'bool',
         }
         return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
@@ -380,8 +384,7 @@ class FunctionCall(Expression):
             argString = ""
             for arg in self.arguments:
                 argString += arg.to_c() + ","
-            
-
+                
             #argString[:-1] removes the last comma
             return f"{self.name}({argString[:-1]})"
     
@@ -402,9 +405,6 @@ class FunctionCall(Expression):
                 """
             text = text + s
         return text
-
-
-
 
 #Unary expression ex. !True
 class Unary(Expression):
@@ -434,9 +434,9 @@ class Binary(Expression):
     def to_dict(self):
         # Map operator symbols to their string representations if needed
         op_map = {
-            '+': '+', '-': '-', '*': '*', '/': '/', '%': '%',
+            '+': '+', '-': '-', '*': '*', '/': '/', '%': 'MOD',
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
-            '&&': 'and', '||': 'or'
+            '&&': 'AND', '||': 'OR'
         }
         return {
             "type": "BinaryOp",

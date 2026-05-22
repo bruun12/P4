@@ -51,8 +51,7 @@ def test_function_syntax_error_in_func_declaration():
                                 return "Hello world";
                             } else {
                                 return "hi";      
-                            }
-                                
+                            }   
                         }""")
 
 
