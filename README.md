@@ -1,11 +1,11 @@
 # Cimple Compiler — P4
-
 > 4th semester project @ **Aalborg University**  
 > Course: *Design, Definition and Implementation of Programming Languages*
 
 ![Python](https://img.shields.io/badge/Python-99%25-blue?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![AAU](https://img.shields.io/badge/AAU-P4%20Project-blue)
+![Build & Test](https://github.com/bruun12/P4/actions/workflows/build.yml/badge.svg)
 
 ---
 
@@ -63,26 +63,65 @@ P4/
 
 ## Getting Started
 
+### Option 1 — Download prebuilt binary (recommended)
+
+No Python or Docker required!
+
+1. Go to [**Actions**](https://github.com/bruun12/P4/actions/workflows/build.yml)
+2. Click the latest successful run
+3. Scroll down to **Artifacts** and download the binary for your platform:
+   - `cimple-ubuntu-latest` — Linux
+   - `cimple-macos-latest` — macOS
+   - `cimple-windows-latest` — Windows
+
+#### Linux / macOS
+```bash
+chmod +x cimple
+./cimple myprogram.cimple output
+```
+
+#### Windows
+```cmd
+cimple.exe myprogram.cimple output
+```
+
+#### Options
+```
+Usage: cimple CIMPLEFILE EXECUTABLE [Optionals]
+
+Optionals:
+  -r    Runs the program once compiled
+  -k    Keeps the transpiled C file, e.g: -k output.c
+
+Example:
+  ./cimple hello.cimple myapp -r -k myapp.c
+```
+
+> **Note:** GCC must be installed on your system for compilation to work.
+> - Linux: `sudo apt install gcc`
+> - macOS: `brew install gcc`
+> - Windows: [MinGW](https://www.mingw-w64.org/)
+
+---
+
+### Option 2 — Docker
+
 No local Python setup needed — just **Docker**!
 
-### Prerequisites
-
+#### Prerequisites
 - [Docker](https://www.docker.com/) installed and running
 
-### Build & Setup
-
+#### Build & Setup
 ```
 docker compose up
 ```
 
-### Run the Compiler
-
+#### Run the Compiler
 ```
 docker compose up app
 ```
 
-### Run Tests
-
+#### Run Tests
 ```
 docker compose up test
 ```
@@ -106,6 +145,11 @@ TYPE     -> integer | double | string | boolean | void
 ## CI/CD
 
 Every push and pull request is automatically tested and built using **GitHub Actions**. Workflows live in `.github/workflows/`.
+
+| Workflow | Trigger | Description |
+|---|---|---|
+| `build.yml` | Push / PR | Runs tests and builds standalone binaries for Linux, macOS and Windows |
+| `coverage.yml` | PR to main | Generates a test coverage report and posts it as a PR comment |
 
 ---
 
