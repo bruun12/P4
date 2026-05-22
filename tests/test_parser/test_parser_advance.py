@@ -53,6 +53,7 @@ def test_advance_success_with_even_more():
     parser.advance()
     assert parser.current().type == TokenType.DOUBLE
 
+# Tests if advance right to end of file
 def test_advance_with_one_token():
     tokens = [
         Token(TokenType.TYPE, "string", 1, 1),
@@ -64,6 +65,7 @@ def test_advance_with_one_token():
     parser.advance()
     assert parser.is_at_end() == True
 
+# Check that advance cant advance over end of file
 def test_advance_past_end_of_file_more_times():
     tokens = [
         Token(TokenType.TYPE, "string", 1, 1),
