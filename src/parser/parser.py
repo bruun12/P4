@@ -51,7 +51,7 @@ class Parser:
         if self.current().type == token_type:
             return self.advance()
         raise self.error(
-            f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value}'",
+            f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value if self.previous() else "start"}'",
             ErrorCode.STRUCTURE_ERROR
         )
 
