@@ -20,3 +20,25 @@ def test_check_stopper():
         parser.advance()
 
     assert parser.check(TokenType.EOF)
+
+def test_check_different_types():
+    tokens = [Token(TokenType.TYPE, "string", 1, 1), 
+              Token(TokenType.IDENTIFIER, "x", 2, 1),
+              Token(TokenType.EQ, "=", 3, 1),
+              Token(TokenType.STRING, "hello world", 4, 1),
+              Token(TokenType.SEMICOLON, ";", 5, 1),
+              Token(TokenType.EOF, "EOF", 6, 1)
+              ]
+
+    parser = Parser(tokens)
+    assert parser.check(TokenType.TYPE)
+    parser.advance()
+    assert parser.check(TokenType.IDENTIFIER)
+    parser.advance()
+    assert parser.check(TokenType.EQ)
+    parser.advance()
+    assert parser.check(TokenType.STRING)
+    parser.advance()
+    assert parser.check(TokenType.SEMICOLON)
+    parser.advance()
+    assert parser.check(TokenType.EOF)
