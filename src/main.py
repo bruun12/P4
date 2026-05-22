@@ -86,7 +86,7 @@ python main.py cimple.cimple exec -r -k exec.c
             ["gcc", "output.c" if cFileName is None else cFileName, "-o", sys.argv[2]],
             capture_output=True,
             text=True,
-            timeout=5,
+            timeout=30,
             cwd=cwd_path
         )
         # If issues happened during the execution of gcc
