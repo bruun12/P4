@@ -59,3 +59,14 @@ def test_multi_argument_complex_expression():
     assert args[0].right.value == 1
     assert args[1].left.name == "y"
     assert args[1].right.value == 5
+
+def test_edg_many_args():
+    args = parse_args("""(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10)""")
+
+    assert len(args) == 100
+
+    #Loops to easier assert the values
+    for n in range(10):
+        for i in range(10):
+            assert args[(n*10)+i].value == i+1
+

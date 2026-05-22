@@ -1,5 +1,7 @@
 from parser.parser import Parser
 from lexer.lexer import Token, TokenType
+import pytest
+from error_handling import ParserError
 
 # Checks if it correctly checks the existing tokens
 
@@ -20,3 +22,19 @@ def test_check_stopper():
         parser.advance()
 
     assert parser.check(TokenType.EOF)
+
+def check_fail_check_string():
+    tokens = [Token(TokenType.TYPE, "string", 1, 1)
+              ]
+    
+    parser = Parser(tokens)
+    with pytest.raises(ParserError):
+        parser.check(TokenType.IDENTIFIER)
+
+def check_fail_check_identifier():
+    tokens = [Token(TokenType.IDENTIFIER, "str", 1, 1)
+              ]
+    
+    parser = Parser(tokens)
+    with pytest.raises(ParserError):
+        parser.check(TokenType.TYPE)
