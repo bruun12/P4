@@ -295,5 +295,43 @@ def test_lexer_declaration_voíd_edge_case():
     actuel = [(t.type, t.value) for t in lex.tokens]
     assert actuel == expected
 
-def test_lexer_declaration_if_edge_case():
+def test_lexer_declaration_wh1lé_edge_case():
+    lex = Lexer(""" 
+                wh1lé (i < 5){
+                    f = f * 2;
+                    i = i + 1;
+                }       
+                """)
+    
+    lex.lexer()
+    
+    expected = [ # Expected outcome and what value they should have
+        (TokenType.IDENTIFIER, "wh1lé"),
+        (TokenType.LPAREN, "("),
+        (TokenType.IDENTIFIER, "i"),
+        (TokenType.LT, "<"),
+        (TokenType.INTEGER, 5),
+        (TokenType.RPAREN, ")"),
+        (TokenType.LCBRACE, "{"),
+        (TokenType.IDENTIFIER, "f"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.IDENTIFIER, "f"),
+        (TokenType.STAR, "*"),
+        (TokenType.INTEGER, 2),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.IDENTIFIER, "i"),
+        (TokenType.ASSIGN, "="),
+        (TokenType.IDENTIFIER, "i"),
+        (TokenType.PLUS, "+"),
+        (TokenType.INTEGER, 1),
+        (TokenType.SEMICOLON, ";"),
+        (TokenType.RCBRACE, "}"),
+        (TokenType.EOF, "EOF")
+    ]
+    
+    actual = [(t.type, t.value) for t in lex.tokens]
+    assert actual == expected
+
+
+
     
