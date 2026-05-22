@@ -90,6 +90,19 @@ def test_statements_array_declaration_with_values():
     assert node.name == "abe"
     assert node.size.value == 3
 
+# Array declaration whitespace
+def test_statements_array_whitespace_declaration_with_values():
+    lex = Lexer("""
+                arr[                1                  +                  2         ] =      2    ;
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    node = parser.statement()
+    assert node.name == "arr"
+    assert node.offset.left.value == 1
+    assert node.offset.right.value == 2
+    assert node.value.value == 2
+
 def test_statements_array_declaration_empty():
     lex = Lexer("""
                 double arr[3];
@@ -153,6 +166,18 @@ def test_var_decl_missing_assign():
 def test_var_decl_missing_semicolon():
     with pytest.raises(ParserError):
         parse_stmt("integer m = 1")
+
+def test_var_decl_keyword_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer integer = 1")
+
+def test_var_decl_bool_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer true = 1")
+
+def test_var_decl_number_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer 5 = 1")
 
 # Block statement
 def test_block_statement_missing_closing_brace():
