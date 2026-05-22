@@ -295,3 +295,5 @@ def test_lexer_declaration_voíd_edge_case():
     actuel = [(t.type, t.value) for t in lex.tokens]
     assert actuel == expected
 
+def test_lexer_declaration_if_edge_case():
+    
