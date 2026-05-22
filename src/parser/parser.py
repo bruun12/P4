@@ -156,7 +156,7 @@ class Parser:
     # Function to return a variable declaration, array declaration or an empty array declaration
     def var_declaration(self) -> VarDeclaration | ArrayDeclaration | ArrayDeclarationEmpty:
         type = self.previous()
-        name = self.advance() # example; integer b = a[3]
+        name = self.consume(TokenType.IDENTIFIER) # example; integer b = a[3]
         
         # Checks if it is an array declaration
         if self.match(TokenType.LBRACE):
