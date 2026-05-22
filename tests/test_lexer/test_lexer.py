@@ -220,6 +220,7 @@ def test_lexer_array():
     assert actual == expected 
 
 # Because it the name isnt integer, it gets handled as a identifer and the error gets handled in the parser
+# Same for the rest
 def test_lexer_declaration_intéger_edge_case():
     lex = Lexer("""
                 intéger x = 2;     
