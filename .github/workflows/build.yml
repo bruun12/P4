@@ -26,9 +26,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run tests (unix)
+        if: runner.os != 'Windows'
         env:
           PYTHONPATH: src:.
+        run: pytest -v tests/
+
+      - name: Run tests (windows)
+        if: runner.os == 'Windows'
+        env:
+          PYTHONPATH: src;.
         run: pytest -v tests/
 
   build:
@@ -66,9 +73,16 @@ jobs:
         run: ${{ matrix.install_gcc }}
         continue-on-error: true
 
-      - name: Compile valid.cimple
+      - name: Compile valid.cimple (unix)
+        if: runner.os != 'Windows'
         env:
           PYTHONPATH: src:.
+        run: python src/main.py tests/mock_data/valid.cimple ${{ matrix.executable }} -k output.c
+
+      - name: Compile valid.cimple (windows)
+        if: runner.os == 'Windows'
+        env:
+          PYTHONPATH: src;.
         run: python src/main.py tests/mock_data/valid.cimple ${{ matrix.executable }} -k output.c
 
       - name: Upload artifacts
