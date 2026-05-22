@@ -11,25 +11,25 @@ def test_get_current_scope():
 # Checks if the object is in the parent scope
 def test_get_parent_scope():
     parent = TypeEnvironment(None)
-    parent.define("globalt object", STRING)
+    parent.define("global object", STRING)
 
     child = TypeEnvironment(parent)    
 
-    assert child.get("globalt object") == STRING
+    assert child.get("global object") == STRING
 
 # Checks if the object defined in the parent also lies within the child (global scope)
 def test_defined_in_parent():
     parent = TypeEnvironment(None)
-    parent.define("globalt object", STRING)
+    parent.define("global object", STRING)
 
     child = TypeEnvironment(parent) 
 
-    assert child.get("globalt object") == STRING
+    assert child.get("global object") == STRING
 
 # Checks if it makes an error, if the object is not in the current environment
 def test_raise_error():
     parent = TypeEnvironment(None)
-    parent.define("globalt object", STRING)
+    parent.define("global object", STRING)
 
     child = TypeEnvironment(parent)
     child.define("local object", STRING)

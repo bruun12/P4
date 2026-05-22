@@ -63,6 +63,5 @@ def test_function_syntax_error_in_body():
                                 return "Hello world";
                             } else {
                                 return "hi";      
-                            }
-                                
+                            }    
                         }""")

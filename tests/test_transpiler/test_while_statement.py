@@ -1,6 +1,3 @@
-from parser.parser import Parser
-from lexer.lexer import Lexer
-from parser.ASTNodes import WhileStatement
 from tests.test_transpiler.test_line_trim import lineTrim
 
 def test_while_statement():

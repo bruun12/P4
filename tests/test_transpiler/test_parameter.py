@@ -1,6 +1,5 @@
 from lexer.lexer import Lexer
 from parser.parser import Parser
-from parser.ASTNodes import Parameter
 
 def test_parameter():
     lex = Lexer("integer foobar(integer x, integer y) { return x; }")

@@ -34,7 +34,7 @@ def test_double_params():
 
 
 def test_multiple_params():
-    params = parse_params("(integer xoxo, string yes, boolean bool, double d)")
+    params = parse_params("(integer xoxo, string yes, boolean b, double d)")
 
     assert len(params) == 4
     assert params[0].type == "integer"
@@ -42,7 +42,7 @@ def test_multiple_params():
     assert params[1].type == "string"
     assert params[1].name == "yes"
     assert params[2].type == "boolean"
-    assert params[2].name == "bool"
+    assert params[2].name == "b"
     assert params[3].type == "double"
     assert params[3].name == "d"
 

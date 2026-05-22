@@ -59,8 +59,6 @@ def test_sad_parser_program():
     assert result.stdout == ""
     assert "STRUCTURE_ERROR" in result.stderr
 
-
-
 def test_sad_typecheck_program():
     mainPath = Path(__file__).parent.parent / "src" #path to main
     mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
@@ -116,7 +114,6 @@ def test_keepFlag():
     cFile = mainPath / "ending_on.c"
     assert result.returncode == 0
     assert cFile.exists()
-
 
 def test_keepFlag_wrong_extension():
     mainPath = Path(__file__).parent.parent / "src" #path to main

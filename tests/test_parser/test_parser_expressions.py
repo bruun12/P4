@@ -19,10 +19,7 @@ def parse_expr(source: str):
     
     return expr
 
-
 # Empty / missing expressions
-###############################################################################################
-
 def test_empty_expression_raises():
     with pytest.raises(ParserError):
         parse_expr("")
@@ -45,8 +42,6 @@ def test_only_or_raises():
 
 
 #Missing right operand
-###############################################################################################
-
 def test_missing_right_operand_plus():
     with pytest.raises(ParserError):
         parse_expr("1 + ")
@@ -100,10 +95,7 @@ def test_missing_right_operand_ne():
     with pytest.raises(ParserError):
         parse_expr("x !=")
 
-
 #Double operator
-###############################################################################################
-
 def test_double_plus_raises():
     with pytest.raises(ParserError):
         parse_expr("1 + + 2")
@@ -124,10 +116,7 @@ def test_double_and_raises():
     with pytest.raises(ParserError):
         parse_expr("true AND AND false")
 
-
 #Parenthesis errors
-###############################################################################################
-
 def test_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( 42")
@@ -145,7 +134,6 @@ def test_expr():
     print("test")
 
 # Primary
-###############################################################################################
 def test_expression_integer_literal():
     node = parse_expr("42")
 
@@ -190,8 +178,6 @@ def test_expression_None():
     assert node.value is None
 
 # Unary
-###################################################################################################
-
 def test_expression_unary_not():
     node = parse_expr("!true;")
 
@@ -210,8 +196,6 @@ def test_expression_unary_minus():
 
 
 #Multiplicative, Division and Modulo
-######################################################################################################
-
 def test_expression_multiplicative():
     node = parse_expr("x * 2;")
 
@@ -235,8 +219,6 @@ def test_expression_modulo():
     assert node.operator == "MOD"
 
 # Additive
-########################################################################################################
-
 def test_expression_addition():
     node = parse_expr("x + 2;")
 
@@ -258,8 +240,6 @@ def test_expression_subtration():
     assert node.right.value == 2
 
 # Comparison
-#############################################################################################################
-
 def test_expression_less_than(): 
     node = parse_expr("x < 10")
 
@@ -301,8 +281,6 @@ def test_expression_greater_than_or_equal():
     assert node.right.value == 10
 
 # Equality
-##########################################################################################################
-
 def test_expression_equals():
     node = parse_expr("x == 5")
 
@@ -318,8 +296,6 @@ def test_expression_not_equals():
     assert node.operator == "!="
 
 # AND / OR 
-##################################################################################################################
-
 def test_expression_and():
     node = parse_expr("x == 1 AND y == 2")
 
@@ -342,8 +318,6 @@ def test_expression_and_before_than_or():
     assert node.right.operator == "AND"    
 
 #Precedence
-#############################################################################################################
-
 def test_expression_precedence_mul_over_add():
     node = parse_expr(" x + y * 2;")
 
@@ -357,7 +331,6 @@ def test_expression_precedence_min_over_add():
     assert node.left.operator == "-"
 
 #Chaining
-#############################################################################################################
 def test_chaining_eq():
     node = parse_expr("2 == 10 == 9")
 
@@ -484,10 +457,7 @@ def test_chaining_five():
     assert isinstance(node.right, Binary)
     assert node.right.operator == "<"
 
-
 #ArrayAccess
-###########################################################################################################
-
 def test_array_access_integer_index():
     node = parse_expr("a[3]")
 

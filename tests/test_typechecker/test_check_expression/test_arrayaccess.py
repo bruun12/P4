@@ -1,4 +1,4 @@
-from parser.ASTNodes import ArrayAccess, Literal, Variable
+from parser.ASTNodes import ArrayAccess, Literal
 from error_handling import ErrorCode
 from type_checker.TypeChecker import (
     TypeChecker,

@@ -11,7 +11,7 @@ def test_parser_primary_int():
 
     assert value == 1 
 
-def test_parser_primary_float():
+def test_parser_primary_double():
     lex = Lexer("1.1")
     lex.lexer()
     parser = Parser(lex.tokens)

@@ -10,4 +10,3 @@ def test_advance_success():
     assert parser.current().type == TokenType.TYPE
     parser.advance()
     assert parser.current().type == TokenType.IDENTIFIER
-
