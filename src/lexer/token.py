@@ -135,7 +135,10 @@ C_KEYWORDS = [
     "typedef",
     "unsigned",
     "void",
-    "while"
+    "while",
+    "true",
+    "false",
+    "bool",
 ]
 # All stdio.h functions (They are banned as identifier names)
 STDIO_AND_STDLIB_FUNCTIONS= [
