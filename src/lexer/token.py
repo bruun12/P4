@@ -135,7 +135,8 @@ C_KEYWORDS = [
     "typedef",
     "unsigned",
     "void",
-    "while"
+    "while",
+    "bool",
 ]
 
 
