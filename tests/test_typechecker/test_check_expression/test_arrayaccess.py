@@ -1,4 +1,3 @@
-import pytest
 from parser.ASTNodes import ArrayAccess, Literal, Variable
 from error_handling import ErrorCode
 from type_checker.TypeChecker import (
