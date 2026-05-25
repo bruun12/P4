@@ -521,12 +521,10 @@ def test_chaining_mix():
     assert isinstance(node.right, Binary)
     assert node.right.operator == "=="
     
-    # Complete the assertions for the right side
     assert isinstance(node.right.left, Binary)
     assert node.right.left.operator == "AND"
     assert isinstance(node.right.right, Literal)
     
-    # Assert the nested structure of node.right.left
     assert isinstance(node.right.left.left, Binary)
     assert node.right.left.left.operator == "<"
     assert isinstance(node.right.left.right, Binary)
