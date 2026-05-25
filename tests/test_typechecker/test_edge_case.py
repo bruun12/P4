@@ -3,7 +3,6 @@ from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, VOID, ERROR
 from lexer.lexer import Lexer
 from parser.parser import Parser
-import pytest
 
 def build_ast(program: str) -> Program:
     lexer = Lexer(program)
