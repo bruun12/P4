@@ -497,6 +497,27 @@ def test_chaining_five():
     assert isinstance(node.right, Binary)
     assert node.right.operator == "<"
 
+def test_chaining_mix():
+    node = parse_expr("20 > 10 > 0 == 9 < 99 < 999 == true")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.left, Binary)
+    assert node.left.left.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.left.left.operator == ">"
+    assert isinstance(node.left, Binary)
+    assert node.left.left.right.operator == ">"
+    assert isinstance(node.left, Binary)
+    assert node.left.right.left.operator == "<"
+    assert isinstance(node.left, Binary)
+    assert node.left.right.right.operator == "<"
+    
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "=="
+
 #ArrayAccess
 def test_array_access_integer_index():
     node = parse_expr("a[3]")
