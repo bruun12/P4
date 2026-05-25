@@ -480,7 +480,6 @@ def test_chaining_four():
 def test_chaining_five():
     # 2 < 10 AND 10 < 9 AND 9 < 8 AND 8 < 7
     node = parse_expr("2 < 10 < 9 < 8 < 7")
-    print(node)
 
     assert isinstance(node, Binary)
     assert node.operator == "AND"
@@ -504,19 +503,35 @@ def test_chaining_mix():
     assert node.operator == "AND"
     assert isinstance(node.left, Binary)
     assert node.left.operator == "=="
-    assert isinstance(node.left, Binary)
+    assert isinstance(node.left.left, Binary)
     assert node.left.left.operator == "AND"
-    assert isinstance(node.left, Binary)
+    assert isinstance(node.left.right, Binary)
+    assert node.left.right.operator == "AND"
+
+    assert isinstance(node.left.left.left, Binary)
     assert node.left.left.left.operator == ">"
-    assert isinstance(node.left, Binary)
+    assert isinstance(node.left.left.right, Binary)
     assert node.left.left.right.operator == ">"
-    assert isinstance(node.left, Binary)
+
+    assert isinstance(node.left.right.left, Binary)
     assert node.left.right.left.operator == "<"
-    assert isinstance(node.left, Binary)
+    assert isinstance(node.left.right.right, Binary)
     assert node.left.right.right.operator == "<"
-    
+
     assert isinstance(node.right, Binary)
     assert node.right.operator == "=="
+    
+    # Complete the assertions for the right side
+    assert isinstance(node.right.left, Binary)
+    assert node.right.left.operator == "AND"
+    assert isinstance(node.right.right, Literal)
+    
+    # Assert the nested structure of node.right.left
+    assert isinstance(node.right.left.left, Binary)
+    assert node.right.left.left.operator == "<"
+    assert isinstance(node.right.left.right, Binary)
+    assert node.right.left.right.operator == "<"
+
 
 #ArrayAccess
 def test_array_access_integer_index():
