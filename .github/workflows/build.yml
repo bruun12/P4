@@ -1,0 +1,87 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main, mainCWDErrorFixBranch]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests (unix)
+        if: runner.os != 'Windows'
+        env:
+          PYTHONPATH: src:.
+        run: pytest -v tests/
+
+      - name: Run tests (windows)
+        if: runner.os == 'Windows'
+        env:
+          PYTHONPATH: src;.
+        run: pytest -v tests/
+
+  build:
+    name: Compile (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            executable: cimple
+
+          - os: macos-latest
+            executable: cimple
+
+          - os: windows-latest
+            executable: cimple.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build standalone executable (unix)
+        if: runner.os != 'Windows'
+        working-directory: src
+        run: pyinstaller --onefile --name cimple main.py
+
+      - name: Build standalone executable (windows)
+        if: runner.os == 'Windows'
+        working-directory: src
+        run: pyinstaller --onefile --name cimple main.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimple-${{ matrix.os }}
+          path: src/dist/${{ matrix.executable }}
+          retention-days: 14

@@ -107,4 +107,35 @@ OPERATORS = {
     "/": TokenType.SLASH
 }
 
+# All c keywords (They are banned as identifier names)
+C_KEYWORDS = [
+    "break",
+    "case",
+    "char",
+    "const",
+    "continue",
+    "default",
+    "do",
+    "double",
+    "else",
+    "enum",
+    "float",
+    "for",
+    "goto",
+    "if",
+    "int",
+    "long",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "struct",
+    "switch",
+    "typedef",
+    "unsigned",
+    "void",
+    "while"
+]
+
 

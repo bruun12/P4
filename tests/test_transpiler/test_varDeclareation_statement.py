@@ -1,4 +1,6 @@
+import pytest
 from tests.test_transpiler.test_line_trim import lineTrim
+from error_handling import LexerError, ParserError, ErrorCode
 
 def test_varDeclaration_integer():
     correctLines = lineTrim("integer b=5;")
@@ -20,12 +22,17 @@ def test_varDeclaration_boolean():
 
     assert correctLines[0] == "bool b = true;"
 
-def test_varDeclaration_integer_integer():
-    correctLines = lineTrim("integer integer=5;")
+# checks for banned keywords should be stopped at the lexer
+def test_integer_int_edgecase():
+    with pytest.raises(LexerError) as err:
+        lineTrim("integer int = 5;")
+    assert err.value.error_code == ErrorCode.BANNED_WORD
 
-    assert correctLines[0] == "int integer = 5;"
+# since while is a banned word but is used in cimple
+# the error is allowed in the lexer
+# but it is a structural error and is there for thrown in the parser    
+def test_boolean_while_edgecase():
+    with pytest.raises(ParserError) as err:
+        lineTrim("boolean while = true;")
+    assert err.value.error_code == ErrorCode.STRUCTURE_ERROR
 
-def test_varDeclaration_integer_boolean():
-    correctLines = lineTrim("integer boolean=5;")
-
-    assert correctLines[0] == "int boolean = 5;"
