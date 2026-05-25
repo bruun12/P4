@@ -314,10 +314,19 @@ class Parser:
         left = self.parse_comparison()
         while self.match(TokenType.EQ, TokenType.NE):
             op = self.previous()
-            right = self.parse_additive()
+            right = self.parse_comparison()
             comparison = Binary(left, op.value, right, op.line, op.column)
-            left = self.parse_chain(comparison, right) # checks if it is a chain of comparisons 1 == 2 < 3
+            left = self.parse_equality_chain(comparison, right) # checks if it is a chain of comparisons 1 == x == y
         return left
+    
+    def parse_equality_chain(self, comparison, left):
+        if not self.match(TokenType.EQ, TokenType.NE): 
+            return comparison # if it is not a eq chain return the statement
+        op = self.previous()
+        right = self.parse_comparison()
+        new_comparison = Binary(left, op.value, right, op.line, op.column) # uses the right side of the last comparison as left and the new as right 
+        combined = Binary(comparison, 'AND', new_comparison, op.line, op.column) # 1 == 2 == 3 becomes 1 == 2 AND 2 == 3
+        return self.parse_equality_chain(combined, right)
     
     # Comparison expressions (<, <=, >, >=)
     def parse_comparison(self):
@@ -326,18 +335,18 @@ class Parser:
             op = self.previous()
             right = self.parse_additive()
             comparison = Binary(left, op.value, right, op.line, op.column)
-            left = self.parse_chain(comparison, right) # checks if it is a chain of comparisons 1 < 2 < 3
+            left = self.parse_comparison_chain(comparison, right) # checks if it is a chain of comparisons 1 < 2 < 3
         return left
     
     # check chaning for comparision operation, to construct it correctly 1 < 2 < 3 => 1 < 2 AND 2 < 3
-    def parse_chain(self, comparison, left):
-        if not self.match(TokenType.EQ, TokenType.NE, TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE): 
+    def parse_comparison_chain(self, comparison, left):
+        if not self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE): 
             return comparison # if it is not a chain return the statement
         op = self.previous()
         right = self.parse_additive()
         new_comparison = Binary(left, op.value, right, op.line, op.column) # uses the right side of the last comparison as left and the new as right 
         combined = Binary(comparison, 'AND', new_comparison, op.line, op.column) # 1 < 2 < 3 becomes 1 < 2 AND 2 < 3
-        return self.parse_chain(combined, right) # calls itself to check for more chained comparisons
+        return self.parse_comparison_chain(combined, right) # calls itself to check for more chained comparisons
 
     # Arithmetic operators (+, -)
     def parse_additive(self):
