@@ -80,6 +80,7 @@ def test_valid_array_access_with_variable():
 
     assert checker.errors == []
 
+# Attempting to access array element using a string
 def test_invalid_array_access_with_wrong_type():
     checker = TypeChecker(source_code="")
     env = TypeEnvironment(None)
