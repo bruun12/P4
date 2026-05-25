@@ -326,7 +326,7 @@ class Parser:
         right = self.parse_comparison()
         new_comparison = Binary(left, op.value, right, op.line, op.column) # uses the right side of the last comparison as left and the new as right 
         combined = Binary(comparison, 'AND', new_comparison, op.line, op.column) # 1 == 2 == 3 becomes 1 == 2 AND 2 == 3
-        return self.parse_comparison_chain(combined, right)
+        return self.parse_equality_chain(combined, right)
     
     # Comparison expressions (<, <=, >, >=)
     def parse_comparison(self):
