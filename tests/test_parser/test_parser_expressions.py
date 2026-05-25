@@ -129,9 +129,50 @@ def test_nested_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( ( 1 + 2 )")
 
-def test_expr():
-    print(parse_expr("2").value)
-    print("test")
+#def test_expr():
+ #   print(parse_expr("2").value)
+  #  print("test")
+
+# Whitespace
+###############################################################################################
+
+def test_edg_whitespace_not():
+    node = parse_expr(" !                                     true              ;")
+
+    assert isinstance(node, Unary)
+    assert node.operator == "!"
+    assert isinstance(node.right, Literal)
+    assert node.right.value is True
+
+def test_edg_whitespace_minus():
+    node = parse_expr("       -                     5;")
+
+    assert isinstance(node, Unary)
+    assert node.operator == "-"
+    assert isinstance(node.right, Literal)
+    assert node.right.value
+
+def test_edg_whitespace_multiplicative():
+    node = parse_expr("x             *              2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "*"
+    assert isinstance(node.left, Variable)
+    assert node.left.name == "x"
+    assert isinstance(node.right, Literal)
+    assert node.right.value == 2
+
+def test_edg_whitespace_division():
+    node = parse_expr("x                /                   2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "/"
+
+def test_edg_whitespace_modulo():
+    node = parse_expr(" x           MOD            2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "MOD"
 
 # Primary
 def test_expression_integer_literal():
@@ -193,7 +234,6 @@ def test_expression_unary_minus():
     assert node.operator == "-"
     assert isinstance(node.right, Literal)
     assert node.right.value
-
 
 #Multiplicative, Division and Modulo
 def test_expression_multiplicative():

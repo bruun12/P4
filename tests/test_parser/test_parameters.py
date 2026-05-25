@@ -57,3 +57,12 @@ def test_syntax_error_in_params2():
 def test_syntax_error_in_params3():
     with pytest.raises(ParserError):
         parse_params("(integer xoxo = 1)")
+
+def test_edg_whitespace():
+    params = parse_params("(integer              x     ,           string             y)")
+
+    assert len(params) == 2
+    assert params[0].type == "integer"
+    assert params[0].name == "x"
+    assert params[1].type == "string"
+    assert params[1].name == "y"
