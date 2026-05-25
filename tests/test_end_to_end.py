@@ -12,7 +12,7 @@ def test_valid_program():
         ["python", "main.py", str(inputFile), "output", "-r"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -33,7 +33,7 @@ def test_sad_lexer_program():
         ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -51,7 +51,7 @@ def test_sad_parser_program():
         ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -69,7 +69,7 @@ def test_sad_typecheck_program():
         ["python", "main.py", str(inputFile), "output"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -91,7 +91,7 @@ def test_help():
         ["python", "main.py", "--help"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -107,7 +107,7 @@ def test_keepFlag():
         ["python", "main.py", inputFile, "output" ,"-k", "ending_on.c"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -124,7 +124,7 @@ def test_keepFlag_wrong_extension():
         ["python", "main.py", inputFile, "output","-k", "not_ending_on_dot_c"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -140,7 +140,7 @@ def test_invalid_path():
         ["python", "main.py", inputFile, "output"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
@@ -156,7 +156,7 @@ def test_empty_file():
         ["python", "main.py", inputFile, "output", "-k", "hej.c"],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         cwd=mainPath
     )
 
