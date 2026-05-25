@@ -45,6 +45,12 @@ class Program(Node):
 
     #to_c for the program. Includes libraries needed in C
     def to_c(self):
+
+        functionHeaders = ""
+        for func in self.functions:
+            if func.name != "main":
+                functionHeaders += func.header_to_c() + "\n"
+
         functionList = ""
         for func in self.functions:
             functionList += func.to_c() + "\n"
@@ -54,6 +60,7 @@ class Program(Node):
                 #include <stdio.h>
                 #include <stdbool.h>
                 #define sametypeof(x, y) _Generic((x),typeof((y) + 0): 1, default: 0)
+                {functionHeaders}
                 {functionList}
                 """
 
@@ -75,6 +82,21 @@ class Function(Node):
             "body": self.statement.to_dict()
         }
     
+    def header_to_c(self):
+        type_map = {
+            'integer': 'int',
+            'double': 'double',
+            'boolean': "bool",
+            'string': 'char*',
+            'void': 'void'
+        }
+        paraList = ""
+        for param in self.parameters:
+            paraList += param.to_c() + ","
+        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]});"
+
+
+
     def to_c(self):
         type_map = {
             'integer': 'int',
