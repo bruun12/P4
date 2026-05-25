@@ -62,7 +62,7 @@ python main.py cimple.cimple exec -r -k exec.c
             print("No file is found.\n\nTo get help:\npython main.py --help", file=sys.stderr)
             sys.exit(1)
 
-        if source is None:
+        if source.strip() is "":
             print("The provided file is empty. Try another file", file=sys.stderr)
             sys.exit(ErrorCode.EMPTY_SOURCE_ERROR.value)
     else:

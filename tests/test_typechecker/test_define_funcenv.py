@@ -1,11 +1,15 @@
 from type_checker.TypeChecker import STRING, INTEGER, FunctionEnvironment
-
+from type_checker.ClassesAndHelpers import FunctionType
 # Checks if the value is added to the dictionary with the correct type
-def test_define_add_value():
+def test_define_function():
     env = FunctionEnvironment()
-    env.define(1, INTEGER)
-    env.define("add_this_string_as_function_name", STRING)
-
-    assert env.values[1] == INTEGER
-    assert env.values["add_this_string_as_function_name"] == STRING
+    func_type = FunctionType(
+        parameter_types=[INTEGER, INTEGER],
+        return_type=INTEGER
+    )
+    env.define("func", func_type)
+    assert env.get("func") == func_type
+    assert env.contains_in_current_scope("func") == True
     
+# Python will accept any type of value in the dict at runtime, not just FunctionType,
+#therefore no sad path test has been added

@@ -130,3 +130,37 @@ def test_keepFlag_wrong_extension():
 
     assert result.returncode == 1
     assert "The c file needs to end with .c" in result.stderr
+    
+def test_invalid_path():
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "vald.cimple"  #Invalid path to file
+    # Run main.py requesting help
+    result = subprocess.run(
+        ["python", "main.py", inputFile, "output"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        cwd=mainPath
+    )
+
+    assert result.returncode == 1
+    assert "No file is found." in result.stderr
+
+def test_empty_file():
+    mainPath = Path(__file__).parent.parent / "src" #path to main
+    mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
+    inputFile = mockdataPath / "empty_file.cimple"  #The file we want to test
+    # Run main.py requesting help
+    result = subprocess.run(
+        ["python", "main.py", inputFile, "output", "-k", "hej.c"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        cwd=mainPath
+    )
+
+    assert result.returncode == 84
+    assert "The provided file is empty. Try another file" in result.stderr
+    
+    
