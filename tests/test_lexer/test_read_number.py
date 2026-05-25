@@ -23,6 +23,7 @@ def test_read_number_with_two_dots():
         lex.read_number()    
     assert err.value.error_code == ErrorCode.INVALID_NUMBER
 
+# This error will be raised in parser and not the Lexer (Lexer stops after reaching the B)
 def test_read_number_with_stress_input():
     lex = Lexer("1B2___?3")
     token = lex.read_number()
