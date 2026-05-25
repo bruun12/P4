@@ -137,7 +137,7 @@ def test_keepFlag_wrong_extension():
 def test_invalid_path():
     mainPath = Path(__file__).parent.parent / "src" #path to main
     mockdataPath = Path(__file__).parent / "mock_data" #path to the cimple file 
-    inputFile = mockdataPath / "vald.cimple"  #Invalid path to file
+    inputFile = mockdataPath / "invalid_path.cimple"  #Invalid path to file
     # Run main.py requesting help
     result = subprocess.run(
         ["python", "main.py", inputFile, "output"],
