@@ -126,11 +126,13 @@ def test_lexer_while_statement():
         (TokenType.ASSIGN, "="),
         (TokenType.INTEGER, 0),
         (TokenType.SEMICOLON, ";"),
+        
         (TokenType.TYPE, "double"),
         (TokenType.IDENTIFIER, "f"),
         (TokenType.ASSIGN, "="),
         (TokenType.DOUBLE, 2.0),
         (TokenType.SEMICOLON, ";"),
+        
         (TokenType.WHILE, "while"),
         (TokenType.LPAREN, "("),
         (TokenType.IDENTIFIER, "i"),
@@ -138,19 +140,23 @@ def test_lexer_while_statement():
         (TokenType.INTEGER, 5),
         (TokenType.RPAREN, ")"),
         (TokenType.LCBRACE, "{"),
+        
         (TokenType.IDENTIFIER, "f"),
         (TokenType.ASSIGN, "="),
         (TokenType.IDENTIFIER, "f"),
         (TokenType.STAR, "*"),
         (TokenType.INTEGER, 2),
         (TokenType.SEMICOLON, ";"),
+        
         (TokenType.IDENTIFIER, "i"),
         (TokenType.ASSIGN, "="),
         (TokenType.IDENTIFIER, "i"),
         (TokenType.PLUS, "+"),
         (TokenType.INTEGER, 1),
         (TokenType.SEMICOLON, ";"),
+        
         (TokenType.RCBRACE, "}"),
+        
         (TokenType.EOF, "EOF")
     ]
     

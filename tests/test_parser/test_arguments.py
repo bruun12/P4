@@ -2,7 +2,6 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 
 # Checks if it takes the arguements correctly in
-
 def parse_args(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -36,7 +35,7 @@ def test_single_argument_boolean():
     args = parse_args("""(true)""")
 
     assert len(args) == 1
-    assert args[0].value
+    assert args[0].value == True
 
 def test_single_argument_variable():
     args = parse_args("""(x)""")

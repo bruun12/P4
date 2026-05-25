@@ -9,7 +9,6 @@ from parser.ASTNodes import (
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment
 
-
 # Checks it correctly handles when a while-stmt recieves a boolean condition
 def test_while_statement_valid_boolean_condition():
     checker = TypeChecker(source_code="")
@@ -30,7 +29,6 @@ def test_while_statement_valid_boolean_condition():
 
     assert checker.errors == []
 
-
 # Checks it correctly handles when it receives a wrong condition type
 def test_while_statement_invalid_condition_type():
     checker = TypeChecker(source_code="")
@@ -50,7 +48,6 @@ def test_while_statement_invalid_condition_type():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
-
 
 # Checks it correctly checks the entire while body
 def test_while_statement_checks_body():
@@ -80,7 +77,6 @@ def test_while_statement_checks_body():
 
     assert any(err.error_code == ErrorCode.UNDEFINED_VARIABLE_ERROR for err in checker.errors)
 
-
 # Checks it correctly checks its own body scope
 def test_while_statement_body_has_its_own_scope():
     checker = TypeChecker(source_code="")
@@ -109,7 +105,6 @@ def test_while_statement_body_has_its_own_scope():
 
     assert checker.errors == []
     assert env.contains_in_current_scope("x") is False
-
 
 # Checks it correctly handles when the user tries to make a nested return 
 def test_while_statement_nested_return_is_invalid():

@@ -1,7 +1,6 @@
 import json
 
-# synes det var difficult at sætte kommentare til det her, så der er nothing
-
+# The main class of the whole AST-tree
 class Node:
     def __init__(self, line: int, column: int):
         self.line = line
@@ -11,7 +10,7 @@ class Node:
     def __repr__(self): 
         return json.dumps(self.to_dict(), indent=4)
     
-    #Default print function
+    #Default print function for the AST tree
     def to_dict(self):
         return {"type": self.__class__.__name__}
     
@@ -19,11 +18,14 @@ class Node:
     def to_c(self):
         raise NotImplementedError(f"to_c is not implemented for {__class__.__name__}")
 
+# The main class for statement - Single inheritance
 class Statement(Node):
-    def __init__(self, line: int, column: int):
+    def __init__(self, line: int, column: int): 
         super().__init__(line, column)
+# init calls the parent class (Node) constructor to initialize line and column
+# Super initializes it
 
-
+# The main class for expession - Single inheritance
 class Expression(Node):
     def __init__(self, line: int, column: int):
         super().__init__(line, column)
@@ -84,8 +86,9 @@ class Function(Node):
         paraList = ""
         for param in self.parameters:
             paraList += param.to_c() + ","
-        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}"
-        
+        return f"{type_map[self.return_type]} {self.name}({paraList[:-1]}) {self.statement.to_c()}" # {paraList[:-1]} removes the last comma
+
+# Node for parameter        
 class Parameter(Node):
     def __init__(self, type: str, name: str, line: int, column: int):
         super().__init__(line, column)
@@ -156,7 +159,7 @@ class VarDeclaration(Statement):
         }
         return f"{type_map[self.type]} {self.name} = {self.value.to_c()};" 
          
-
+# Assignment of both varibale and arrays. Offset indicates array index.
 class AssignStatement(Statement):
     def __init__(self, name: str, offset: Expression, value: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -283,11 +286,12 @@ class ArrayDeclaration(Statement):
             'integer': 'int',
             'double': 'double',
             'string': 'char*',
+            'boolean': 'bool',
         }
         arrElements = ""
         for elements in self.elements:
             arrElements += elements.to_c() + ","
-        return f"{type_map[self.type]} {self.name}[] = {{{arrElements[:-1]}}};"
+        return f"{type_map[self.type]} {self.name}[{self.size.to_c()}] = {{{arrElements[:-1]}}};" #{arrElements[:-1]} removes the last comma
 
 class ArrayDeclarationEmpty(Statement):
     def __init__(self, type: str, name: str, size: Expression, line: int, column: int):
@@ -307,6 +311,9 @@ class ArrayDeclarationEmpty(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
+            'double': 'double',
+            'string': 'char*',
+            'boolean': 'bool',
         }
         return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
@@ -377,8 +384,7 @@ class FunctionCall(Expression):
             argString = ""
             for arg in self.arguments:
                 argString += arg.to_c() + ","
-            
-
+                
             #argString[:-1] removes the last comma
             return f"{self.name}({argString[:-1]})"
     
@@ -399,9 +405,6 @@ class FunctionCall(Expression):
                 """
             text = text + s
         return text
-
-
-
 
 #Unary expression ex. !True
 class Unary(Expression):
@@ -431,9 +434,9 @@ class Binary(Expression):
     def to_dict(self):
         # Map operator symbols to their string representations if needed
         op_map = {
-            '+': '+', '-': '-', '*': '*', '/': '/', '%': '%',
+            '+': '+', '-': '-', '*': '*', '/': '/', '%': 'MOD',
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
-            '&&': 'and', '||': 'or'
+            '&&': 'AND', '||': 'OR'
         }
         return {
             "type": "BinaryOp",

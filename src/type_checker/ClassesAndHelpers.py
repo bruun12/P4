@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from error_handling import TypeCheckError, ErrorCode
 
+# pass means it is a class that dont contains anything
 class Type:
     pass
 
@@ -77,15 +78,15 @@ def type_name(t: Type) -> str:
         return f"{type_name(t.element_type)}[]"
     
     if isinstance(t, FunctionType):
-        # Convert each type object into its string name (e.g., [integer, float])
+        # Convert each type object into its string name (e.g., [integer, double])
         name_list = []
         for p in t.parameter_types:
             name_list.append(type_name(p))
 
-        # Join them with commas (e.g., "integer, float")
+        # Join them with commas (e.g., "integer, double")
         params_string = ", ".join(name_list)
 
-        # Build the final function signature
+        # Build the final function signature containing only types
         return f"function({params_string}) -> {type_name(t.return_type)}"
     
     return repr(t)
@@ -111,13 +112,13 @@ def can_assign(target: Type, value: Type) -> bool:
 
     return False
 
-# Function to return either a double or an integer depending on the result (er usikker på om det er resultatet der tjekkes)
+# Function to return a double if a double is part of the expression, and an integer if that's the only numeric type in an expression (binary operations)
 def numeric_result_type(left: Type, right: Type) -> Type:
     if left == DOUBLE or right == DOUBLE:
         return DOUBLE
     return INTEGER
 
-# ???
+# To get the value string from the AST-tree and makes the string to a type object
 def parse_declared_type(declared_type: str) -> Type:
     if declared_type == "integer":
         return INTEGER

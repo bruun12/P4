@@ -10,7 +10,6 @@ from type_checker.TypeChecker import TypeChecker
 # Error with duplication of functionname
 def test_error_for_duplicated_funcs_name():
     checker = TypeChecker(source_code="")
-    
 
     function1 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
     function2 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
@@ -24,7 +23,6 @@ def test_error_for_duplicated_funcs_name():
 # Error with duplication of functionname but different type
 def test_error_for_duplicated_funcs_name_different_type():
     checker = TypeChecker(source_code="")
-    
 
     function1 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
     function2 = Function(return_type="double", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
@@ -39,7 +37,6 @@ def test_error_for_duplicated_funcs_name_different_type():
 #Test that for different functione names there should be no errors
 def test_no_error_for_different_funcs_name():
     checker = TypeChecker(source_code="")
-    
 
     function1 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
     function2 = Function(return_type="integer", name="func2", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
@@ -52,7 +49,6 @@ def test_no_error_for_different_funcs_name():
 #Test that it gives an error for each error
 def test_error_for_multiple_duplicated_funcs_name():
     checker = TypeChecker(source_code="")
-    
 
     function1 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)
     function2 = Function(return_type="integer", name="func1", parameters=[], statement=ExpressionStatement(Literal(1,2,3),2,3), line=3, column=4)

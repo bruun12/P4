@@ -29,7 +29,6 @@ def test_if_statement_valid_boolean_condition():
 
     assert checker.errors == []
 
-
 # Checks if it correctly handles an if-stmt with invalid condition type 
 def test_if_statement_invalid_condition_type():
     checker = TypeChecker(source_code="")
@@ -50,7 +49,6 @@ def test_if_statement_invalid_condition_type():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
-
 
 # Checks if it correctly handles a an assignment of undefined variable
 def test_if_statement_checks_then_branch():
@@ -80,7 +78,6 @@ def test_if_statement_checks_then_branch():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.UNDEFINED_VARIABLE_ERROR for err in checker.errors)
-
 
 # Checks if it correctly handles a an assignment of undefined variable in an else 
 def test_if_statement_checks_else_branch():

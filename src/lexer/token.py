@@ -7,7 +7,7 @@ class Token:
         self.value = value
         self.line = line
         self.column = column
-    # Printer function
+    # Printer function (AST)
     def __repr__(self):
         return f"Token(type={self.type}, value='{self.value}', line={self.line}, col={self.column})"
     

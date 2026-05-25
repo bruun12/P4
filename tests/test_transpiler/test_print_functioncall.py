@@ -1,7 +1,3 @@
-from parser.parser import Parser
-from lexer.lexer import Lexer
-from parser.ASTNodes import FunctionCall
-from parser.ASTNodes import BlockStatement
 from tests.test_transpiler.test_line_trim import lineTrim
 
 def test_print_func1():

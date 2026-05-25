@@ -7,6 +7,8 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![AAU](https://img.shields.io/badge/AAU-P4%20Project-blue)
 
+![Cimple Logo](./cimple.ico)
+
 ---
 
 ## What is this?
@@ -44,7 +46,6 @@ Cimple is a simple, statically typed language that supports:
 ```
 P4/
 ├── src/                  # Compiler source code
-│   ├── interpreter/      # Interpreter
 │   ├── lexer/            # Lexer
 │   ├── parser/           # Parser
 │   └── type_checker/     # Type checker

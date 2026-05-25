@@ -6,7 +6,6 @@ from parser.parser import Parser
 from parser.ASTNodes import BlockStatement
 
 # Checks if it correctly parses function declerations
-
 def parse_function(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -52,8 +51,7 @@ def test_function_syntax_error_in_func_declaration():
                                 return "Hello world";
                             } else {
                                 return "hi";      
-                            }
-                                
+                            }   
                         }""")
 
 
@@ -65,6 +63,5 @@ def test_function_syntax_error_in_body():
                                 return "Hello world";
                             } else {
                                 return "hi";      
-                            }
-                                
+                            }    
                         }""")

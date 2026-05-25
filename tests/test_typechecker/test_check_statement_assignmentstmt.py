@@ -2,7 +2,6 @@ from parser.ASTNodes import AssignStatement, VarDeclaration, ArrayDeclaration, L
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, INTEGER, ArrayType
 
-import pytest
 
 # Checks if it correctly handles a valid regular assignment 
 def test_valid_assign_statement():
@@ -136,7 +135,6 @@ def test_assign_statement_array_invalid_element_type():
         column=1,
     )
 
-    
     stmt = AssignStatement(
         name="arr",
         offset=Literal(3, line=1, column=13),
@@ -149,7 +147,6 @@ def test_assign_statement_array_invalid_element_type():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.CANNOT_ASSIGN for err in checker.errors)
-
 
 # Checks if it correctly handles an array assignment with an invalid type
 def test_assign_statement_array_invalid_type():
@@ -164,7 +161,6 @@ def test_assign_statement_array_invalid_type():
         column=13
     )
 
-    
     stmt = AssignStatement(
         name="x",
         offset=Literal(3, line=1, column=13),
@@ -177,8 +173,7 @@ def test_assign_statement_array_invalid_type():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
-
-
+    
 # Checks if it correctly handles an array assignment with an invalid offset
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
@@ -198,7 +193,6 @@ def test_assign_statement_array_invalid_offset():
         line=1,
         column=1,
     )
-
     
     stmt = AssignStatement(
         name="arr",
@@ -213,7 +207,6 @@ def test_assign_statement_array_invalid_offset():
 
     assert any(err.error_code == ErrorCode.INVALID_ARGUMENT_COUNT for err in checker.errors)
     
-
 # Checks if it correctly handles an array assignment with invalid offset
 def test_assign_statement_array_invalid_offset():
     checker = TypeChecker(source_code="")
@@ -234,7 +227,6 @@ def test_assign_statement_array_invalid_offset():
         column=1,
     )
 
-    
     stmt = AssignStatement(
         name="arr",
         offset=Literal(7, line=1, column=13),
@@ -247,7 +239,6 @@ def test_assign_statement_array_invalid_offset():
     checker.check_statement(stmt, env, within_function=False)
 
     assert any(err.error_code == ErrorCode.INVALID_ARGUMENT_COUNT for err in checker.errors)
-
 
 # Checks if it correctly handles an array assignment with invalid types
 def test_assign_statement_array_invalid_type():

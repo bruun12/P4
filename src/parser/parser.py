@@ -67,7 +67,7 @@ class Parser:
             return True
         return False
 
-    # Function to return true if current token is of specific types
+    # Function to return true and self advance if current token is of specific types 
     def match(self, *types: TokenType) -> bool:
         for type in types:
             if self.check(type):
@@ -125,6 +125,7 @@ class Parser:
     
     # Function to return a specific statement depending on the token read
     def statement(self) -> Statement:
+        # Checks if any tokentypes match
         if self.match(TokenType.LCBRACE):
             return self.block_statement()
 
@@ -163,7 +164,7 @@ class Parser:
             size = self.parse_expression()
             self.consume(TokenType.RBRACE)
 
-            if self.match(TokenType.ASSIGN): # example; integer a[4] = [1,2,3,4]
+            if self.match(TokenType.ASSIGN): # example; integer a[4] = [1,2,3,4];
                 if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)
@@ -176,7 +177,7 @@ class Parser:
                 # If it has no content, return the properties of the empty array
                 return ArrayDeclarationEmpty(type.value, name.value, size, name.line, name.column)
         
-        self.consume(TokenType.ASSIGN)
+        self.consume(TokenType.ASSIGN) # example; integer b = a[3];
         value = self.parse_expression()
         self.consume(TokenType.SEMICOLON)
 
@@ -218,7 +219,7 @@ class Parser:
     def while_statement(self) -> WhileStatement:
         # Checks if the statement contains () and {
         while_token = self.previous()
-        self.consume(TokenType.LPAREN)
+        self.consume(TokenType.LPAREN) # "Eats" the (
         condition = self.parse_expression()
         self.consume(TokenType.RPAREN)
         self.consume(TokenType.LCBRACE)
@@ -290,9 +291,9 @@ class Parser:
     def parse_expression(self):
         return self.parse_or()
 
-    # Arithmetic OR
     # We start with weakest precedence so it will be resolved by the end 
     # (the top note in the tree will be "or" if it is present)
+    # Arithmetic OR
     def parse_or(self): #self.match do self.advance
         left = self.parse_and() 
         while self.match(TokenType.OR):
@@ -308,12 +309,14 @@ class Parser:
             left = Binary(left, op.value, self.parse_equality(), op.line, op.column)
         return left
     
-    # Arithmetic OR
+    # Comparison expressions (==, !=)
     def parse_equality(self):
         left = self.parse_comparison()
         while self.match(TokenType.EQ, TokenType.NE):
             op = self.previous()
-            left = Binary(left, op.value, self.parse_comparison(), op.line, op.column)
+            right = self.parse_additive()
+            comparison = Binary(left, op.value, right, op.line, op.column)
+            left = self.parse_chain(comparison, right) # checks if it is a chain of comparisons 1 == 2 < 3
         return left
     
     # Comparison expressions (<, <=, >, >=)
@@ -326,8 +329,9 @@ class Parser:
             left = self.parse_chain(comparison, right) # checks if it is a chain of comparisons 1 < 2 < 3
         return left
     
+    # check chaning for comparision operation, to construct it correctly 1 < 2 < 3 => 1 < 2 AND 2 < 3
     def parse_chain(self, comparison, left):
-        if not self.match(TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE): 
+        if not self.match(TokenType.EQ, TokenType.NE, TokenType.LT, TokenType.LE, TokenType.GT, TokenType.GE): 
             return comparison # if it is not a chain return the statement
         op = self.previous()
         right = self.parse_additive()
@@ -399,11 +403,13 @@ class Parser:
             self.consume(TokenType.RBRACE)
             return ArrayAccess(name.value, index, name.line, name.column)
         
+        #function call
         if self.current().type == TokenType.IDENTIFIER and self.peek().type == TokenType.LPAREN:
             name = self.consume(TokenType.IDENTIFIER)
             arguments = self.arguments() 
             return FunctionCall(name.value, arguments, name.line, name.column)
 
+        # variable
         if self.match(TokenType.IDENTIFIER):
             return Variable(tok.value, tok.line, tok.column)
         

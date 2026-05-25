@@ -5,7 +5,6 @@ from type_checker.TypeChecker import (
     TypeEnvironment,
     INTEGER,
     DOUBLE,
-    BOOLEAN,
     STRING,
     ERROR,
 )

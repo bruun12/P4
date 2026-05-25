@@ -12,7 +12,7 @@ def test_block_statement_with_2():
                 """)
     assert correctLines[0] == "{"
     assert correctLines[1] == "int x = 2;"
-    assert correctLines[2] == "int arr[] = {1,2};"
+    assert correctLines[2] == "int arr[2] = {1,2};"
     assert correctLines[3] == "}"
 
 def test_block_statement_with_3():

@@ -4,10 +4,10 @@ from type_checker.TypeChecker import FunctionEnvironment, STRING
 # and not an undefined object
 def test_contains_and_not_contains():
     in_environment = FunctionEnvironment()
-    in_environment.define("ligger i miljøet", STRING)
+    in_environment.define("Is in the envirionment", STRING)
 
-    assert in_environment.contains_in_current_scope("ligger i miljøet")
-    assert not in_environment.contains_in_current_scope("ligger ikke i miljøet")
+    assert in_environment.contains_in_current_scope("Is in the envirionment")
+    assert not in_environment.contains_in_current_scope("Is not in the envirionment")
 
 # Checks the environment MUST contain somehting (cannot contain nothing)
 def test_contains_empty():
