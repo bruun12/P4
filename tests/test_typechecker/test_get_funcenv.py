@@ -1,15 +1,17 @@
-from type_checker.TypeChecker import FunctionEnvironment, TypeCheckError, STRING, INTEGER
+from type_checker.TypeChecker import FunctionEnvironment, TypeCheckError, STRING
 import pytest
 
+# Checks if the object is in the current environment
 def test_get_current_scope():
-    obj_type = FunctionEnvironment()
-    obj_type.define("hej med dig din seje reje", STRING)
+    nu_env = FunctionEnvironment()
+    nu_env.define("Current environment", STRING)
 
-    assert obj_type.get("hej med dig din seje reje") == STRING
+    assert nu_env.get("Current environment") == STRING
 
+# Checks if it makes an error, if the object is not in the current environment
 def test_raise_error():
-    obj_type = FunctionEnvironment()
-    obj_type.define("wow du er cool", STRING)
+    nu_env = FunctionEnvironment()
+    nu_env.define("Current environment", STRING)
 
     with pytest.raises(TypeCheckError):
-        obj_type.get("does_not_exist")
+        nu_env.get("this object is udefineret")

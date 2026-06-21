@@ -3,6 +3,7 @@ from lexer.lexer import Lexer
 from lexer.token import TokenType
 from error_handling import LexerError
 
+# Checks if it correctly reads the strings
 
 def test_read_simple_string():
     lexer = Lexer('"HejMorten"')

@@ -17,4 +17,6 @@ build/
 .vscode/
 .idea/
 
+# output
 output*
+*.c

@@ -1,9 +1,7 @@
-import pytest
-
 from lexer.lexer import Lexer
 from parser.parser import Parser
 
-
+# Tests that primary values are evaluated correctly
 def test_parser_primary_int():
     lex = Lexer("1")
     lex.lexer()
@@ -13,7 +11,7 @@ def test_parser_primary_int():
 
     assert value == 1 
 
-def test_parser_primary_float():
+def test_parser_primary_double():
     lex = Lexer("1.1")
     lex.lexer()
     parser = Parser(lex.tokens)

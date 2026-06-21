@@ -1,6 +1,7 @@
 from lexer.lexer import Lexer
 from parser.parser import Parser
 
+# Function to use in tests to slices lines
 def lineTrim(lexerString:str):
     lex = Lexer(lexerString)
     lex.lexer()

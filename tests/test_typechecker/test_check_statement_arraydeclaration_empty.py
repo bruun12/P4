@@ -2,11 +2,10 @@ from parser.ASTNodes import ArrayDeclarationEmpty, Literal
 from error_handling import ErrorCode
 from type_checker.TypeChecker import TypeChecker, TypeEnvironment, ArrayType, INTEGER
 
-import pytest
-
+# Checks if it can declare an empty array
 def test_valid_empty_array_declaration():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclarationEmpty(
         type="integer",
@@ -25,9 +24,11 @@ def test_valid_empty_array_declaration():
     assert declared.element_type == INTEGER
     assert declared.size == 5
 
+
+# Checks if it will throw an error if missing information(?)
 def test_empty_array_declaration_requires_integer_size():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
 
     stmt = ArrayDeclarationEmpty(
         type="integer",
@@ -41,10 +42,10 @@ def test_empty_array_declaration_requires_integer_size():
 
     assert any(err.error_code == ErrorCode.TYPE_MISMATCH_ERROR for err in checker.errors)
 
-    
+# Checks if it correctly handles an array with a void return type
 def test_empty_array_declaration_cannot_have_void_element_type():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt = ArrayDeclarationEmpty(
         type="void",
@@ -58,9 +59,10 @@ def test_empty_array_declaration_cannot_have_void_element_type():
     
     assert any(err.error_code == ErrorCode.INVALID_DECLARED_TYPE for err in checker.errors)
     
+# Checks if it correctly handles two empty arrays with the same name
 def test_empty_array_declaration_duplicate_name():
     checker = TypeChecker(source_code="")
-    env = TypeEnvironment()
+    env = TypeEnvironment(None)
     
     stmt1 = ArrayDeclarationEmpty(
         type="integer",

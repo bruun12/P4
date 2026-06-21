@@ -1,5 +1,7 @@
-from type_checker.TypeChecker import parse_declared_type, TypeCheckError, INTEGER, DOUBLE, BOOLEAN, STRING, VOID
+from type_checker.ClassesAndHelpers import parse_declared_type, TypeCheckError, INTEGER, DOUBLE, BOOLEAN, STRING, VOID
 import pytest
+
+# Checks if the type checker correctly parses wrong ways to write the types. 
 
 def test_correct_type():
     assert parse_declared_type("integer") == INTEGER

@@ -1,31 +1,20 @@
+from lexer.lexer import Lexer
+from parser.parser import Parser
 import pytest
 from error_handling import ParserError
-from lexer.lexer import Lexer
-from parser.ASTNodes import (
-    AssignStatement,
-    Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    IfStatement,
-    Literal,
-    Node,
-    Program,
-    ReturnStatement,
-    Statement,
-    Unary,
-    Variable,
-    WhileStatement,
-    VarDeclaration,
-)
-from parser.parser import Parser
-from error_handling import ParserError
 
+# Checks if it correctly parses the entire program
 def parse_program(source: str):
     lex = Lexer(source)
     lex.lexer()
     p = Parser(lex.tokens)
     return p.parse()
+
+def test_parser_program_with_no_function():
+    prog = parse_program("""
+                
+                 """)
+    assert len(prog.functions) == 0
 
 def test_parser_program_with_one_function():
     prog = parse_program("""

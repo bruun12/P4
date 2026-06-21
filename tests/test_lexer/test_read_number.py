@@ -1,7 +1,8 @@
+from lexer.lexer import Lexer, TokenType
+from error_handling import LexerError, ErrorCode
 import pytest
 
-from lexer.lexer import Lexer, TokenType
-from error_handling import LexerError
+# Checks if it correctly reads the string
 
 def test_read_number_with_int_input():
     lex = Lexer("123")
@@ -20,8 +21,9 @@ def test_read_number_with_two_dots():
     #Expects the program to throw error numbered accordinly to the issue
     with pytest.raises(LexerError) as err:    
         lex.read_number()    
-    assert err.value.error_code == 12
+    assert err.value.error_code == ErrorCode.INVALID_NUMBER
 
+# This error will be raised in parser and not the Lexer (Lexer stops after reaching the B)
 def test_read_number_with_stress_input():
     lex = Lexer("1B2___?3")
     token = lex.read_number()

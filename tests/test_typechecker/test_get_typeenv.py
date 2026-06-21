@@ -1,37 +1,41 @@
-from type_checker.TypeChecker import TypeEnvironment, TypeCheckError, STRING, INTEGER
+from type_checker.TypeChecker import TypeEnvironment, TypeCheckError, STRING
 import pytest
 
+# Checks if the object is in the current environment
 def test_get_current_scope():
-    obj_type = TypeEnvironment()
-    obj_type.define("hej med dig din seje reje", STRING)
+    current_environment = TypeEnvironment(None)
+    current_environment.define("Current environment", STRING)
 
-    assert obj_type.get("hej med dig din seje reje") == STRING
+    assert current_environment.get("Current environment") == STRING
 
+# Checks if the object is in the parent scope
 def test_get_parent_scope():
-    parent = TypeEnvironment()
-    parent.define("holy shit du er sej", STRING)
+    parent = TypeEnvironment(None)
+    parent.define("global object", STRING)
 
     child = TypeEnvironment(parent)    
 
-    assert child.get("holy shit du er sej") == STRING
+    assert child.get("global object") == STRING
 
-def test_both_in_child_and_parent():
-    parent = TypeEnvironment()
-    parent.define("wow du er cool", STRING)
+# Checks if the object defined in the parent also lies within the child (global scope)
+def test_defined_in_parent():
+    parent = TypeEnvironment(None)
+    parent.define("global object", STRING)
 
-    child = TypeEnvironment(parent)
-    child.define("wow du er cool", INTEGER)    
+    child = TypeEnvironment(parent) 
 
-    assert child.get("wow du er cool") == INTEGER
-    assert child.get("wow du er cool") != STRING
+    assert child.get("global object") == STRING
 
+# Checks if it makes an error, if the object is not in the current environment
 def test_raise_error():
-    parent = TypeEnvironment()
-    parent.define("wow du er cool", STRING)
+    parent = TypeEnvironment(None)
+    parent.define("global object", STRING)
 
     child = TypeEnvironment(parent)
-    child.define("wow du er cool", STRING)
+    child.define("local object", STRING)
 
     with pytest.raises(TypeCheckError):
-        child.get("does_not_exist")
+        child.get("this object is udefineret in child")
 
+    with pytest.raises (TypeCheckError):
+        parent.get(child) # parent node should not have access to the child node

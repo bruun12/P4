@@ -1,15 +1,35 @@
-'''
-from type_checker.TypeChecker import parse_declared_type, declared_type, INTEGER
-import unittest
+from type_checker.TypeChecker import TypeChecker
+from type_checker.ClassesAndHelpers import INTEGER, ERROR
 
-class test_parse_type_node(unittest.TestCase):
-    def test_existing_node(self):
-        parse_declared_type(INTEGER)
+# Checks it can correctly parse a valid datatype, 
+# and throw an error when invalid
 
-        result = declared_type(INTEGER)
-        self.assertTrue(result)
+class MockASTNode:
+    def __init__(self, line: int, column: int):
+        self.line = line
+        self.column = column
 
-    #def test_not_existing_node(self):
+def test_parse_valid_type():
+        checker = TypeChecker(source_code="")
 
+        node = MockASTNode(1, 1)
 
-'''
+        result = checker.parse_type_node("integer", node)
+
+        assert result == INTEGER
+        assert result != ERROR
+
+        assert len(checker.errors) == 0
+        
+
+def test_parse_invalid_type():
+        checker = TypeChecker(source_code="")
+
+        node = MockASTNode(1, 1)
+
+        result = checker.parse_type_node("int", node)
+
+        assert result != INTEGER
+        assert result == ERROR
+
+        assert len(checker.errors) == 1

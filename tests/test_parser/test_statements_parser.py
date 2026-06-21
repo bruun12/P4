@@ -3,6 +3,7 @@ from error_handling import ParserError
 from parser.parser import Parser
 import pytest
 
+# Checks if it correctly parses all the different statements
 def test_statements_if_and_blockStatement_match():
     lex = Lexer(""" 
                 {
@@ -31,7 +32,7 @@ def test_statements_while_match():
 
 def test_statements_return_match(): 
     lex = Lexer("""
-                return x +2;
+                return x + 2;
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
@@ -80,14 +81,27 @@ def test_expression_statement_equal():
 # Array declaration
 def test_statements_array_declaration_with_values():
     lex = Lexer("""
-                integer abe[] = {1,2,3};
+                integer abe[3] = [1,2,3];
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.type == "integer"
     assert node.name == "abe"
-    assert node.size == 3
+    assert node.size.value == 3
+
+# Array declaration whitespace
+def test_statements_array_whitespace_declaration_with_values():
+    lex = Lexer("""
+                arr[                1                  +                  2         ] =      2    ;
+                """)
+    lex.lexer()
+    parser = Parser(lex.tokens)
+    node = parser.statement()
+    assert node.name == "arr"
+    assert node.offset.left.value == 1
+    assert node.offset.right.value == 2
+    assert node.value.value == 2
 
 def test_statements_array_declaration_empty():
     lex = Lexer("""
@@ -103,14 +117,14 @@ def test_statements_array_declaration_empty():
 
 def test_statements_array_declaration_single_element():
     lex = Lexer(f"""
-                integer arr[] = {{{1}}};
+                integer arr[1] = [{1}];
                 """)
     lex.lexer()
     parser = Parser(lex.tokens)
     node = parser.statement()
     assert node.type == "integer"
     assert node.name == "arr"
-    assert node.size == 1
+    assert node.size.value == 1
 
 def test_statements_array_assignment_constant():
     lex = Lexer("""
@@ -135,7 +149,7 @@ def test_statements_array_assignment_expression():
     assert node.offset.right.value == 2
     assert node.value.value == 2
 
-# Errors for statements
+# Errors for statements 
 def parse_stmt(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -151,6 +165,18 @@ def test_var_decl_missing_assign():
 def test_var_decl_missing_semicolon():
     with pytest.raises(ParserError):
         parse_stmt("integer m = 1")
+
+def test_var_decl_keyword_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer integer = 1")
+
+def test_var_decl_bool_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer true = 1")
+
+def test_var_decl_number_variable():
+    with pytest.raises(ParserError):
+        parse_stmt("integer 5 = 1")
 
 # Block statement
 def test_block_statement_missing_closing_brace():

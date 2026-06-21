@@ -1,4 +1,6 @@
-from type_checker.TypeChecker import numeric_result_type, INTEGER, DOUBLE, STRING, BOOLEAN
+from type_checker.ClassesAndHelpers import numeric_result_type, INTEGER, DOUBLE, STRING, BOOLEAN
+
+# Checks if it correctly handles implicit type conversion
 
 def test_result_of_same_types():
     assert numeric_result_type(DOUBLE, DOUBLE) == DOUBLE

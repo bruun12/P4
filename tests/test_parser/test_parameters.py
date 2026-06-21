@@ -3,6 +3,8 @@ from lexer.lexer import Lexer
 from parser.parser import Parser
 from error_handling import ParserError
 
+# Checks if it correctly takes the parameters in 
+# or throws an error if incorrectly
 def parse_params(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -32,7 +34,7 @@ def test_double_params():
 
 
 def test_multiple_params():
-    params = parse_params("(integer xoxo, string yes, boolean bool, double d)")
+    params = parse_params("(integer xoxo, string yes, boolean b, double d)")
 
     assert len(params) == 4
     assert params[0].type == "integer"
@@ -40,7 +42,7 @@ def test_multiple_params():
     assert params[1].type == "string"
     assert params[1].name == "yes"
     assert params[2].type == "boolean"
-    assert params[2].name == "bool"
+    assert params[2].name == "b"
     assert params[3].type == "double"
     assert params[3].name == "d"
 
@@ -55,3 +57,12 @@ def test_syntax_error_in_params2():
 def test_syntax_error_in_params3():
     with pytest.raises(ParserError):
         parse_params("(integer xoxo = 1)")
+
+def test_edg_whitespace():
+    params = parse_params("(integer              x     ,           string             y)")
+
+    assert len(params) == 2
+    assert params[0].type == "integer"
+    assert params[0].name == "x"
+    assert params[1].type == "string"
+    assert params[1].name == "y"

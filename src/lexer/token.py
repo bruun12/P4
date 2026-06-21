@@ -1,18 +1,20 @@
 from enum import Enum, auto
 
 class Token:
-
+    # Properties within the Token 
     def __init__(self, type, value, line, column):
         self.type = type
         self.value = value
         self.line = line
         self.column = column
-    #Printer function
+    # Printer function (AST)
     def __repr__(self):
         return f"Token(type={self.type}, value='{self.value}', line={self.line}, col={self.column})"
     
 
+# Global variable token types
 class TokenType(Enum):
+
     # Special
     EOF = auto()
     INVALID = auto()
@@ -64,6 +66,7 @@ class TokenType(Enum):
     SEMICOLON = auto()    # ;
     COMMA = auto()        # ,
 
+# Global variables that assign values used in the source code to their respectively token type
 KEYWORDS = {
     "if": TokenType.IF,
     "else": TokenType.ELSE,
@@ -104,4 +107,78 @@ OPERATORS = {
     "/": TokenType.SLASH
 }
 
-
+# All c keywords (They are banned as identifier names)
+C_KEYWORDS = [
+    "break",
+    "case",
+    "char",
+    "const",
+    "continue",
+    "default",
+    "do",
+    "double",
+    "else",
+    "enum",
+    "float",
+    "for",
+    "goto",
+    "if",
+    "int",
+    "long",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "struct",
+    "switch",
+    "typedef",
+    "unsigned",
+    "void",
+    "while",
+    "bool",
+]
+# All stdio.h functions (They are banned as identifier names)
+STDIO_AND_STDLIB_FUNCTIONS= [
+    "fclose",
+    "feof",
+    "ferror",
+    "fgetc",
+    "fgets",
+    "fopen",
+    "fprintf",
+    "fputc",
+    "fputs",
+    "fread",
+    "fscanf",
+    "fseek",
+    "ftell",
+    "fwrite",
+    "getc",
+    "getchar",
+    "printf",
+    "putc",
+    "putchar",
+    "puts",
+    "remove",
+    "rename",
+    "rewind",
+    "scanf",
+    "snprintf",
+    "sprintf",
+    "sscanf",
+    "abs", 
+    "atof", 
+    "atoi", 
+    "atol", 
+    "atoll", 
+    "calloc", 
+    "div", 
+    "exit", 
+    "free", 
+    "malloc", 
+    "qsort", 
+    "rand", 
+    "realloc", 
+    "srand" 
+]

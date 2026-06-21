@@ -2,27 +2,15 @@ import pytest
 from error_handling import ParserError
 from lexer.lexer import Lexer
 from parser.ASTNodes import (
-    AssignStatement,
     Binary,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    IfStatement,
     Literal,
-    Node,
-    Program,
-    ReturnStatement,
-    Statement,
     Unary,
     Variable,
-    WhileStatement,
-    VarDeclaration,
     ArrayAccess,
 )
 from parser.parser import Parser
-from error_handling import ParserError
 
-# Helper function - Har ændret i denne, ved ikke om vores parser skal bruges til at tjekke efter for mange tokens
+# Helper function 
 def parse_expr(source: str):
     lex = Lexer(source)
     lex.lexer()
@@ -31,10 +19,7 @@ def parse_expr(source: str):
     
     return expr
 
-# Lav hvor vi ikke forventer errors
-
 # Empty / missing expressions
-
 def test_empty_expression_raises():
     with pytest.raises(ParserError):
         parse_expr("")
@@ -57,7 +42,6 @@ def test_only_or_raises():
 
 
 #Missing right operand
-
 def test_missing_right_operand_plus():
     with pytest.raises(ParserError):
         parse_expr("1 + ")
@@ -111,9 +95,7 @@ def test_missing_right_operand_ne():
     with pytest.raises(ParserError):
         parse_expr("x !=")
 
-
 #Double operator
-
 def test_double_plus_raises():
     with pytest.raises(ParserError):
         parse_expr("1 + + 2")
@@ -134,9 +116,7 @@ def test_double_and_raises():
     with pytest.raises(ParserError):
         parse_expr("true AND AND false")
 
-
 #Parenthesis errors
-
 def test_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( 42")
@@ -149,14 +129,52 @@ def test_nested_missing_rparen_raises():
     with pytest.raises(ParserError):
         parse_expr("( ( 1 + 2 )")
 
-def test_expr():
-    print(parse_expr("2").value)
-    print("test")
+#def test_expr():
+ #   print(parse_expr("2").value)
+  #  print("test")
 
-# Expression, is it working?
+# Whitespace
+###############################################################################################
+
+def test_edg_whitespace_not():
+    node = parse_expr(" !                                     true              ;")
+
+    assert isinstance(node, Unary)
+    assert node.operator == "!"
+    assert isinstance(node.right, Literal)
+    assert node.right.value is True
+
+def test_edg_whitespace_minus():
+    node = parse_expr("       -                     5;")
+
+    assert isinstance(node, Unary)
+    assert node.operator == "-"
+    assert isinstance(node.right, Literal)
+    assert node.right.value
+
+def test_edg_whitespace_multiplicative():
+    node = parse_expr("x             *              2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "*"
+    assert isinstance(node.left, Variable)
+    assert node.left.name == "x"
+    assert isinstance(node.right, Literal)
+    assert node.right.value == 2
+
+def test_edg_whitespace_division():
+    node = parse_expr("x                /                   2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "/"
+
+def test_edg_whitespace_modulo():
+    node = parse_expr(" x           MOD            2;")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "MOD"
 
 # Primary
-###############################################################################################
 def test_expression_integer_literal():
     node = parse_expr("42")
 
@@ -201,8 +219,6 @@ def test_expression_None():
     assert node.value is None
 
 # Unary
-###################################################################################################
-
 def test_expression_unary_not():
     node = parse_expr("!true;")
 
@@ -219,10 +235,7 @@ def test_expression_unary_minus():
     assert isinstance(node.right, Literal)
     assert node.right.value
 
-
-#Multiplicative
-######################################################################################################
-
+#Multiplicative, Division and Modulo
 def test_expression_multiplicative():
     node = parse_expr("x * 2;")
 
@@ -246,8 +259,6 @@ def test_expression_modulo():
     assert node.operator == "MOD"
 
 # Additive
-########################################################################################################
-
 def test_expression_addition():
     node = parse_expr("x + 2;")
 
@@ -269,8 +280,6 @@ def test_expression_subtration():
     assert node.right.value == 2
 
 # Comparison
-#############################################################################################################
-
 def test_expression_less_than(): 
     node = parse_expr("x < 10")
 
@@ -312,8 +321,6 @@ def test_expression_greater_than_or_equal():
     assert node.right.value == 10
 
 # Equality
-##########################################################################################################
-
 def test_expression_equals():
     node = parse_expr("x == 5")
 
@@ -329,8 +336,6 @@ def test_expression_not_equals():
     assert node.operator == "!="
 
 # AND / OR 
-##################################################################################################################
-
 def test_expression_and():
     node = parse_expr("x == 1 AND y == 2")
 
@@ -353,8 +358,6 @@ def test_expression_and_before_than_or():
     assert node.right.operator == "AND"    
 
 #Precedence
-#############################################################################################################
-
 def test_expression_precedence_mul_over_add():
     node = parse_expr(" x + y * 2;")
 
@@ -367,9 +370,168 @@ def test_expression_precedence_min_over_add():
     assert node.operator == "+"
     assert node.left.operator == "-"
 
-#ArrayAccess
-###########################################################################################################
+#Chaining
+def test_chaining_eq():
+    node = parse_expr("2 == 10 == 9")
 
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "=="
+
+def test_chaining_ne():
+    node = parse_expr("2 != 10 != 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "!="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "!="
+
+def test_chaining_eqne():
+    node = parse_expr("2 == 10 != 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "!="
+
+def test_chaining_less_than():
+    node = parse_expr("2 < 10 < 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert node.left.left.value == 2
+    assert node.left.right.value == 10
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+    assert node.right.left.value == 10
+    assert node.right.right.value == 9
+
+def test_chaining_greater_than():
+    node = parse_expr("2 > 10 > 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">"
+
+def test_chaining_less_great():
+    node = parse_expr("2 < 10 > 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">"
+
+def test_chaining_great_less():
+    node = parse_expr("2 > 10 < 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+
+def test_chaining_leq():
+    node = parse_expr("2 <= 10 <= 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "<="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<="
+
+def test_chaining_geq():
+    node = parse_expr("2 >= 10 >= 9")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == ">="
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == ">="
+
+def test_chaining_four():
+    node = parse_expr("2 < 10 < 9 < 8")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "AND"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+    assert node.left.left.operator == "<"
+    assert node.left.right.operator == "<"
+
+def test_chaining_five():
+    # 2 < 10 AND 10 < 9 AND 9 < 8 AND 8 < 7
+    node = parse_expr("2 < 10 < 9 < 8 < 7")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "AND"
+    assert isinstance(node.left.left, Binary)
+    assert node.left.left.operator == "AND"
+    assert isinstance(node.left.right, Binary)
+    assert node.left.right.operator == "<"
+    assert isinstance(node.left.left.left, Binary)
+    assert node.left.left.left.operator == "<"
+    assert isinstance(node.left.left.right, Binary)
+    assert node.left.left.right.operator == "<"
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "<"
+
+def test_chaining_mix():
+    node = parse_expr("20 > 10 > 0 == 9 < 99 < 999 == true")
+
+    assert isinstance(node, Binary)
+    assert node.operator == "AND"
+    assert isinstance(node.left, Binary)
+    assert node.left.operator == "=="
+    assert isinstance(node.left.left, Binary)
+    assert node.left.left.operator == "AND"
+    assert isinstance(node.left.right, Binary)
+    assert node.left.right.operator == "AND"
+
+    assert isinstance(node.left.left.left, Binary)
+    assert node.left.left.left.operator == ">"
+    assert isinstance(node.left.left.right, Binary)
+    assert node.left.left.right.operator == ">"
+
+    assert isinstance(node.left.right.left, Binary)
+    assert node.left.right.left.operator == "<"
+    assert isinstance(node.left.right.right, Binary)
+    assert node.left.right.right.operator == "<"
+
+    assert isinstance(node.right, Binary)
+    assert node.right.operator == "=="
+    
+    assert isinstance(node.right.left, Binary)
+    assert node.right.left.operator == "AND"
+    assert isinstance(node.right.right, Literal)
+    
+    assert isinstance(node.right.left.left, Binary)
+    assert node.right.left.left.operator == "<"
+    assert isinstance(node.right.left.right, Binary)
+    assert node.right.left.right.operator == "<"
+
+
+#ArrayAccess
 def test_array_access_integer_index():
     node = parse_expr("a[3]")
 
