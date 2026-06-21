@@ -333,10 +333,10 @@ class ArrayDeclarationEmpty(Statement):
     def to_c(self):
         type_map = {
             'integer': 'int',
-            'double': 'double',
-            'string': 'char*',
-            'boolean': 'bool',
         }
+
+        if self.type == 'string':
+            return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
         return f"{type_map[self.type]} {self.name}[{self.size.to_c()}];"
 
 #Expression nodes
@@ -428,7 +428,22 @@ class FunctionCall(Expression):
             text = text + s
         return text
 
-#Unary expression ex. !True
+        #self.name = "printf"
+        #s = ""
+        #for arg in self.arguments:
+        #    if type(arg.value).__name__ == "str":
+        #        s = s + arg.to_c() + ","
+        #    if type(arg.value).__name__ == "int":
+        #        s = s + "%d,"
+        #    if type(arg.value).__name__ == "float":
+        #        s = s + "%f,"
+        #    if type(arg.value).__name__ == "bool":
+        #        s = s + "%b,"
+        #return s
+
+
+
+
 class Unary(Expression):
     def __init__(self, operator: str, right: Expression, line: int, column: int):
         super().__init__(line, column)
@@ -462,7 +477,7 @@ class Binary(Expression):
         }
         return {
             "type": "BinaryOp",
-            "op": op_map.get(self.operator, self.operator),
+            "op": op_map[self.operator],
             "left": self.left.to_dict(),
             "right": self.right.to_dict()
         }
@@ -472,8 +487,8 @@ class Binary(Expression):
             '+': '+', '-': '-', '*': '*', '/': '/', 'MOD': '%',
             '==': '==', '!=': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>=',
             'AND': '&&', 'OR': '||'
-        }
-        return f"({self.left.to_c()} {op_map.get(self.operator, self.operator)} {self.right.to_c()})"
+        } 
+        return f"({self.left.to_c()} {op_map[self.operator]} {self.right.to_c()})"
     
 class ArrayAccess(Expression):
     def __init__(self, name: str, offset: Expression, line: int, column: int):

@@ -725,8 +725,8 @@ class TypeChecker:
             if left_type == ERROR or right_type == ERROR:
                 return ERROR
 
-            # Arithmetic supports numeric operators plus string concatenation for `+`.
-            if op in {"+", "-", "*", "/", "MOD"}:
+            # Arithmetic
+            if op in {"+", "-", "*", "/", "%"}:
                 if op == "+" and left_type == STRING and right_type == STRING:
                     return STRING
 

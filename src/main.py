@@ -21,6 +21,7 @@ def interprete_source(source: str) -> str:
         for err in checker.formatted_errors():
             print(err, file=sys.stderr)
         return None
+
     
     return ast.to_c()
 
