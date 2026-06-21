@@ -1,0 +1,217 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0c10;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    color: #e3e6eb;
+}
+
+/* main app container */
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+/* top bar with branding, actions */
+.top-bar {
+    background: rgba(18, 22, 28, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #2c2f36;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    z-index: 10;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-text {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -0.3px;
+    background: linear-gradient(to right, #f0f4ff, #cbd5ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.action-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn{
+    background: #1e2229;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(4px);
+    border: 1px solid #2f343e;
+}
+
+.btn-primary {
+    background: linear-gradient(105deg, #3b82f6, #2563eb);
+    border: 1px solid #6094fa;
+    color: white;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(105deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(37,99,235,0.4);
+}
+
+.btn:hover {
+    background: #2d323c;
+    border-color: #3f4652;
+}
+
+#taskDD {
+    background: #1e2229;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+
+/* main editor area: split view */
+.editor-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 1px;
+    background: #20242c;
+}
+
+/* panel styles */
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0f1117;
+    overflow: hidden;
+    transition: all 0.1s;
+}
+
+.panel-header {
+    background: #13161f;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #282e38;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #b9c3d4;
+}
+
+.panel-header i {
+    color: #5f7fbf;
+    font-size: 0.9rem;
+}
+
+.console-header {
+    background: #13161f;
+    padding: 12px 18px;
+    border-bottom: 1px solid #282e38;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.console-header span {
+    font-weight: 500;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b9c3d4;
+}
+
+.code-area {
+    flex: 1;
+    position: relative;
+    overflow: auto;
+    background: #0a0d14;
+    color: #e2e8f0;
+    border: none;
+    font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    tab-size: 4;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.code-area:focus {
+    background: #0b0f18;
+    box-shadow: inset 0 0 0 1px #2d3a5e;
+}
+
+/* responsive design */
+@media (max-width: 800px) {
+    .editor-container {
+        flex-direction: column;
+    }
+    .top-bar {
+        padding: 10px 16px;
+    }
+    .btn span {
+        display: none;
+    }
+    .btn i {
+        margin: 0;
+    }
+    .btn {
+        padding: 8px 12px;
+    }
+}
+
+.type {
+   color: #6c9ee0;
+}
+
+.structure {
+   color: #b96ce0;
+}
+
+.literate {
+   color: #ace06c;
+}
+
+.operand {
+   color: #e0c76c;
+}

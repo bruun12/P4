@@ -49,14 +49,14 @@ def compile_code(body: dict):
 
         # Kør: python main.py <input.mit> (ingen output-fil = printer til stdout)
         cimpleToC = subprocess.run(
-            ["python", "main.py", input_path, "output.c"],
+            ["python", "main.py", input_path, "output", "-r"],
             capture_output=True,
             text=True,
             timeout=5,
             cwd=cwd_path 
         )
 
-
+        """
         if cimpleToC.returncode != 0:
             return cimpleToC
         
@@ -67,7 +67,6 @@ def compile_code(body: dict):
             timeout=5,
             cwd=cwd_path  # Kør fra /src mappen
         )
-
 
         if cToExecutable.returncode != 0:
             return cToExecutable
@@ -82,6 +81,7 @@ def compile_code(body: dict):
 
         if executeC.returncode != 0:
             return executeC
+        """
 
 
         """
@@ -92,7 +92,7 @@ def compile_code(body: dict):
         # Vi fjerner den første linje så kun C-koden returneres
 
 
-        return executeC
+        return cimpleToC
 
     except subprocess.TimeoutExpired:
         return {"error": "Timeout"}

@@ -51,11 +51,7 @@ class Parser:
         if self.current().type == token_type:
             return self.advance()
         raise self.error(
-<<<<<<< HEAD
             f"Parser Error: Unexpected '{self.current().value}' after '{self.previous().value if self.previous() else "start"}'",
-=======
-            f"Parser Error: Unexpected '{self.current().value}' after '{"Start" if self.previous() is None else self.previous().value}'",
->>>>>>> ServerMain
             ErrorCode.STRUCTURE_ERROR
         )
 
@@ -167,12 +163,8 @@ class Parser:
         if self.match(TokenType.LBRACE):
             size = self.parse_expression()
             self.consume(TokenType.RBRACE)
-<<<<<<< HEAD
 
             if self.match(TokenType.ASSIGN): # example; integer a[4] = [1,2,3,4];
-=======
-            if self.match(TokenType.ASSIGN): #integer a[] = [1,2,3,4]
->>>>>>> ServerMain
                 if self.check(TokenType.LBRACE):
                     elements = self.parse_array_literal()
                     self.consume(TokenType.SEMICOLON)
